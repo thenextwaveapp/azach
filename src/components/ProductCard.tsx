@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ShoppingBag } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useToast } from "@/hooks/use-toast";
+import { Link } from "react-router-dom";
 
 interface ProductCardProps {
   id: number | string;
@@ -16,7 +17,9 @@ export const ProductCard = ({ id, name, price, image, category }: ProductCardPro
   const { addToCart } = useCart();
   const { toast } = useToast();
 
-  const handleAddToCart = () => {
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
     addToCart({
       id,
       name,
@@ -31,29 +34,31 @@ export const ProductCard = ({ id, name, price, image, category }: ProductCardPro
   };
 
   return (
-    <Card className="group overflow-hidden border-0 shadow-none">
-      <CardContent className="p-0">
-        <div className="relative aspect-[3/4] overflow-hidden bg-muted">
-          <img
-            src={image}
-            alt={name}
-            className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
-          />
-          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
-          <Button
-            size="icon"
-            className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity"
-            onClick={handleAddToCart}
-          >
-            <ShoppingBag className="h-4 w-4" />
-          </Button>
-        </div>
-        <div className="pt-4 space-y-2">
-          <p className="text-xs text-muted-foreground uppercase tracking-wider">{category}</p>
-          <h3 className="font-medium">{name}</h3>
-          <p className="text-lg font-semibold">${price}</p>
-        </div>
-      </CardContent>
-    </Card>
+    <Link to={`/product/${id}`}>
+      <Card className="group overflow-hidden border-0 shadow-none cursor-pointer">
+        <CardContent className="p-0">
+          <div className="relative aspect-[3/4] overflow-hidden bg-muted">
+            <img
+              src={image}
+              alt={name}
+              className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors" />
+            <Button
+              size="icon"
+              className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity"
+              onClick={handleAddToCart}
+            >
+              <ShoppingBag className="h-4 w-4" />
+            </Button>
+          </div>
+          <div className="pt-4 space-y-2">
+            <p className="text-xs text-muted-foreground uppercase tracking-wider">{category}</p>
+            <h3 className="font-medium">{name}</h3>
+            <p className="text-lg font-semibold">${price}</p>
+          </div>
+        </CardContent>
+      </Card>
+    </Link>
   );
 };

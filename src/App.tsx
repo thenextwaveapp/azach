@@ -24,6 +24,7 @@ import Lookbook from "./pages/Lookbook";
 import CustomerService from "./pages/CustomerService";
 import Returns from "./pages/Returns";
 import SizeGuide from "./pages/SizeGuide";
+import ProductDetail from "./pages/ProductDetail";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -90,6 +91,7 @@ const App = () => (
               <Route path="/customer-service" element={<CustomerService />} />
               <Route path="/returns" element={<Returns />} />
               <Route path="/size-guide" element={<SizeGuide />} />
+              <Route path="/product/:id" element={<ProductDetail />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

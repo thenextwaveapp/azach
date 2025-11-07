@@ -33,7 +33,7 @@ export const Newsletter = () => {
               required
               className="flex-1"
             />
-            <Button type="submit">Subscribe</Button>
+            <Button type="submit" className="hover:bg-[#a97c50] transition-colors">Subscribe</Button>
           </form>
         </div>
       </div>

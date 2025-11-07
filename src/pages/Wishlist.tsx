@@ -5,20 +5,28 @@ import { Heart } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
+import { useWishlist } from '@/hooks/useWishlist';
+import { productToDisplay } from '@/utils/productHelpers';
 
 const Wishlist = () => {
   const { user } = useAuth();
-  
-  // In a real app, this would fetch wishlist items from Supabase
-  const wishlistItems: any[] = [];
+  const { data: wishlistData = [], isLoading } = useWishlist();
+
+  const wishlistItems = wishlistData.map((item: any) =>
+    item.products ? productToDisplay(item.products) : null
+  ).filter(Boolean);
 
   return (
     <div className="min-h-screen">
       <Header />
       <div className="container mx-auto px-4 py-12">
         <h1 className="text-4xl font-bold mb-8">My Wishlist</h1>
-        
-        {wishlistItems.length === 0 ? (
+
+        {isLoading ? (
+          <div className="text-center py-12">
+            <p className="text-muted-foreground">Loading wishlist...</p>
+          </div>
+        ) : wishlistItems.length === 0 ? (
           <Card>
             <CardContent className="flex flex-col items-center justify-center py-16">
               <Heart className="h-16 w-16 text-muted-foreground mb-4" />

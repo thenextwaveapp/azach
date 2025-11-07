@@ -1,10 +1,13 @@
 import { useParams, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { useProduct } from '@/hooks/useProducts';
 import { useCart } from '@/contexts/CartContext';
 import { useToast } from '@/hooks/use-toast';
-import { ShoppingBag, ArrowLeft } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useIsInWishlist, useAddToWishlist, useRemoveFromWishlist } from '@/hooks/useWishlist';
+import { ShoppingBag, ArrowLeft, Heart } from 'lucide-react';
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -12,6 +15,13 @@ const ProductDetail = () => {
   const { data: product, isLoading, error } = useProduct(id || '');
   const { addToCart } = useCart();
   const { toast } = useToast();
+  const { user } = useAuth();
+  const { data: isInWishlist } = useIsInWishlist(id || '');
+  const addToWishlist = useAddToWishlist();
+  const removeFromWishlist = useRemoveFromWishlist();
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+  const [isHovering, setIsHovering] = useState(false);
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 
   const handleAddToCart = () => {
     if (!product) return;
@@ -28,6 +38,49 @@ const ProductDetail = () => {
       title: 'Added to cart',
       description: `${product.name} has been added to your cart.`,
     });
+  };
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    setMousePosition({ x, y });
+  };
+
+  const handleToggleWishlist = async () => {
+    if (!user) {
+      toast({
+        title: 'Login required',
+        description: 'Please login to add items to your wishlist',
+        variant: 'destructive',
+      });
+      navigate('/login');
+      return;
+    }
+
+    if (!product) return;
+
+    try {
+      if (isInWishlist) {
+        await removeFromWishlist.mutateAsync(product.id);
+        toast({
+          title: 'Removed from wishlist',
+          description: `${product.name} has been removed from your wishlist.`,
+        });
+      } else {
+        await addToWishlist.mutateAsync(product.id);
+        toast({
+          title: 'Added to wishlist',
+          description: `${product.name} has been added to your wishlist.`,
+        });
+      }
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to update wishlist',
+        variant: 'destructive',
+      });
+    }
   };
 
   if (isLoading) {
@@ -69,13 +122,68 @@ const ProductDetail = () => {
         </Button>
 
         <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
-          {/* Product Image */}
-          <div className="aspect-[3/4] overflow-hidden rounded-lg bg-muted">
-            <img
-              src={product.image_url}
-              alt={product.name}
-              className="w-full h-full object-cover"
-            />
+          {/* Product Images */}
+          <div className="space-y-4">
+            {/* Main Image */}
+            <div
+              className="aspect-[3/4] overflow-hidden rounded-lg bg-muted relative cursor-crosshair"
+              onMouseMove={handleMouseMove}
+              onMouseEnter={() => setIsHovering(true)}
+              onMouseLeave={() => setIsHovering(false)}
+            >
+              <img
+                src={
+                  product.image_urls && product.image_urls.length > 0
+                    ? selectedImageIndex === 0
+                      ? product.image_url
+                      : product.image_urls[selectedImageIndex - 1]
+                    : product.image_url
+                }
+                alt={product.name}
+                className="w-full h-full object-cover"
+                style={{
+                  transform: isHovering ? `scale(2)` : 'scale(1)',
+                  transformOrigin: `${mousePosition.x}% ${mousePosition.y}%`,
+                  transition: isHovering ? 'none' : 'transform 0.3s ease-out',
+                }}
+              />
+            </div>
+
+            {/* Thumbnail Gallery */}
+            {product.image_urls && product.image_urls.length > 0 && (
+              <div className="grid grid-cols-5 gap-2">
+                {/* Cover Image Thumbnail */}
+                <button
+                  onClick={() => setSelectedImageIndex(0)}
+                  className={`aspect-square overflow-hidden rounded-md border-2 transition-all ${
+                    selectedImageIndex === 0 ? 'border-primary' : 'border-transparent hover:border-muted-foreground'
+                  }`}
+                >
+                  <img
+                    src={product.image_url}
+                    alt="Cover"
+                    className="w-full h-full object-cover"
+                  />
+                </button>
+
+                {/* Additional Images Thumbnails */}
+                {product.image_urls.map((url, index) => (
+                  <button
+                    key={index}
+                    onClick={() => setSelectedImageIndex(index + 1)}
+                    className={`aspect-square overflow-hidden rounded-md border-2 transition-all ${
+                      selectedImageIndex === index + 1 ? 'border-primary' : 'border-transparent hover:border-muted-foreground'
+                    }`}
+                  >
+                    <img
+                      src={url}
+                      alt={`View ${index + 2}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Product Info */}
@@ -131,8 +239,8 @@ const ProductDetail = () => {
               </div>
             </div>
 
-            {/* Add to Cart Button */}
-            <div className="mt-auto">
+            {/* Add to Cart and Wishlist Buttons */}
+            <div className="mt-auto space-y-3">
               <Button
                 size="lg"
                 className="w-full"
@@ -141,6 +249,15 @@ const ProductDetail = () => {
               >
                 <ShoppingBag className="mr-2 h-5 w-5" />
                 {product.in_stock ? 'Add to Cart' : 'Out of Stock'}
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="w-full"
+                onClick={handleToggleWishlist}
+              >
+                <Heart className={`mr-2 h-5 w-5 transition-colors ${isInWishlist ? 'fill-red-500 text-red-500' : ''}`} />
+                {isInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}
               </Button>
             </div>
           </div>

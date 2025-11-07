@@ -28,7 +28,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } from '@/hooks/useProducts';
-import { Trash2, Edit, Plus, LogOut } from 'lucide-react';
+import { Trash2, Edit, Plus, LogOut, ChevronUp, ChevronDown } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import type { ProductInsert, ProductUpdate } from '@/types/product';
@@ -59,12 +59,14 @@ const Admin = () => {
     price: 0,
     category: '',
     image_url: '',
+    image_urls: [],
     stock: 0,
     in_stock: true,
     featured: false,
     on_sale: false,
     gender: undefined,
   });
+  const [additionalImageInput, setAdditionalImageInput] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -105,6 +107,7 @@ const Admin = () => {
       original_price: product.original_price,
       category: product.category,
       image_url: product.image_url,
+      image_urls: product.image_urls || [],
       stock: product.stock,
       in_stock: product.in_stock,
       featured: product.featured,
@@ -112,6 +115,34 @@ const Admin = () => {
       gender: product.gender,
     });
     setIsDialogOpen(true);
+  };
+
+  const addAdditionalImage = () => {
+    if (additionalImageInput.trim()) {
+      setFormData({
+        ...formData,
+        image_urls: [...(formData.image_urls || []), additionalImageInput.trim()],
+      });
+      setAdditionalImageInput('');
+    }
+  };
+
+  const removeAdditionalImage = (index: number) => {
+    setFormData({
+      ...formData,
+      image_urls: formData.image_urls?.filter((_, i) => i !== index),
+    });
+  };
+
+  const moveImage = (fromIndex: number, toIndex: number) => {
+    if (!formData.image_urls) return;
+    const newImages = [...formData.image_urls];
+    const [movedImage] = newImages.splice(fromIndex, 1);
+    newImages.splice(toIndex, 0, movedImage);
+    setFormData({
+      ...formData,
+      image_urls: newImages,
+    });
   };
 
   const handleDelete = async (id: string) => {
@@ -139,12 +170,14 @@ const Admin = () => {
       price: 0,
       category: '',
       image_url: '',
+      image_urls: [],
       stock: 0,
       in_stock: true,
       featured: false,
       on_sale: false,
       gender: undefined,
     });
+    setAdditionalImageInput('');
     setEditingProduct(null);
   };
 
@@ -187,11 +220,12 @@ const Admin = () => {
                   Add Product
                 </Button>
               </DialogTrigger>
-            <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+            <DialogContent className="max-w-3xl max-h-[90vh] flex flex-col">
               <DialogHeader>
                 <DialogTitle>{editingProduct ? 'Edit Product' : 'Add New Product'}</DialogTitle>
               </DialogHeader>
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="flex flex-col flex-1 overflow-hidden">
+                <div className="space-y-4 overflow-y-auto pr-2 flex-1">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="name">Name *</Label>
@@ -254,13 +288,77 @@ const Admin = () => {
                   </div>
                 </div>
                 <div>
-                  <Label htmlFor="image_url">Image URL *</Label>
+                  <Label htmlFor="image_url">Cover Image URL *</Label>
                   <Input
                     id="image_url"
                     value={formData.image_url}
                     onChange={(e) => setFormData({ ...formData, image_url: e.target.value })}
                     required
                   />
+                  <p className="text-xs text-muted-foreground mt-1">This will be the main product image</p>
+                </div>
+                <div>
+                  <Label>Additional Images</Label>
+                  <div className="space-y-2">
+                    <div className="flex gap-2">
+                      <Input
+                        placeholder="Enter image URL"
+                        value={additionalImageInput}
+                        onChange={(e) => setAdditionalImageInput(e.target.value)}
+                        onKeyPress={(e) => {
+                          if (e.key === 'Enter') {
+                            e.preventDefault();
+                            addAdditionalImage();
+                          }
+                        }}
+                      />
+                      <Button type="button" onClick={addAdditionalImage} variant="outline">
+                        <Plus className="h-4 w-4" />
+                      </Button>
+                    </div>
+                    {formData.image_urls && formData.image_urls.length > 0 && (
+                      <div className="space-y-2 mt-3">
+                        <p className="text-xs text-muted-foreground">Use arrows to reorder images</p>
+                        {formData.image_urls.map((url, index) => (
+                          <div key={index} className="flex items-center gap-2 p-2 border rounded">
+                            <div className="flex flex-col gap-1">
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="h-5 w-5"
+                                onClick={() => moveImage(index, index - 1)}
+                                disabled={index === 0}
+                              >
+                                <ChevronUp className="h-3 w-3" />
+                              </Button>
+                              <Button
+                                type="button"
+                                variant="ghost"
+                                size="icon"
+                                className="h-5 w-5"
+                                onClick={() => moveImage(index, index + 1)}
+                                disabled={index === formData.image_urls!.length - 1}
+                              >
+                                <ChevronDown className="h-3 w-3" />
+                              </Button>
+                            </div>
+                            <span className="text-xs text-muted-foreground w-6">#{index + 1}</span>
+                            <img src={url} alt={`Additional ${index + 1}`} className="w-12 h-12 object-cover rounded" />
+                            <span className="text-sm flex-1 truncate">{url}</span>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => removeAdditionalImage(index)}
+                            >
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <div>
                   <Label htmlFor="gender">Gender</Label>
@@ -307,9 +405,12 @@ const Admin = () => {
                     <Label htmlFor="in_stock">In Stock</Label>
                   </div>
                 </div>
-                <Button type="submit" className="w-full" disabled={createProduct.isPending || updateProduct.isPending}>
-                  {editingProduct ? 'Update Product' : 'Create Product'}
-                </Button>
+                </div>
+                <div className="pt-4 border-t mt-4">
+                  <Button type="submit" className="w-full" disabled={createProduct.isPending || updateProduct.isPending}>
+                    {editingProduct ? 'Update Product' : 'Create Product'}
+                  </Button>
+                </div>
               </form>
             </DialogContent>
           </Dialog>
