@@ -6,6 +6,7 @@ import { useState, useEffect } from "react";
 import { SearchDialog } from "@/components/SearchDialog";
 import { AccountDropdown } from "@/components/AccountDropdown";
 import { useCart } from "@/contexts/CartContext";
+import { ShippingBanner } from "@/components/ShippingBanner";
 
 export const Header = () => {
   const [searchOpen, setSearchOpen] = useState(false);
@@ -39,10 +40,12 @@ export const Header = () => {
   }, [lastScrollY]);
 
   return (
-    <header className={`sticky z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-500 ease-in-out ${
-      isVisible ? "top-0 translate-y-0" : "-top-20 -translate-y-full"
-    }`}>
-      <div className="container mx-auto px-4">
+    <>
+      <ShippingBanner />
+      <header className={`sticky z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 transition-all duration-500 ease-in-out ${
+        isVisible ? "top-0 translate-y-0" : "-top-20 -translate-y-full"
+      }`}>
+        <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Mobile Menu */}
           <Sheet>
@@ -97,5 +100,6 @@ export const Header = () => {
       </div>
       <SearchDialog open={searchOpen} onOpenChange={setSearchOpen} />
     </header>
+    </>
   );
 };
