@@ -12,6 +12,8 @@ import Women from "./pages/Women";
 import Men from "./pages/Men";
 import Sale from "./pages/Sale";
 import Cart from "./pages/Cart";
+import Checkout from "./pages/Checkout";
+import CheckoutSuccess from "./pages/CheckoutSuccess";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Account from "./pages/Account";
@@ -44,6 +46,8 @@ const App = () => (
               <Route path="/men" element={<Men />} />
               <Route path="/sale" element={<Sale />} />
               <Route path="/cart" element={<Cart />} />
+              <Route path="/checkout" element={<Checkout />} />
+              <Route path="/checkout/success" element={<CheckoutSuccess />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route

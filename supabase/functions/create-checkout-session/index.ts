@@ -56,8 +56,14 @@ serve(async (req) => {
       cancel_url: cancelUrl,
       customer_email: userEmail || undefined,
       metadata: {
-        // Store cart data for webhook processing
-        cartItems: JSON.stringify(items),
+        // Store only essential cart data (without image URLs to avoid 500 char limit)
+        cartItems: JSON.stringify(items.map((item: any) => ({
+          id: item.id,
+          name: item.name,
+          price: item.price,
+          quantity: item.quantity,
+          category: item.category,
+        }))),
       },
     })
 

@@ -3,12 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/contexts/CartContext";
 import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
 const Cart = () => {
   const { items, removeFromCart, updateQuantity, getTotalPrice, clearCart } = useCart();
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const handleCheckout = () => {
     if (items.length === 0) {
@@ -18,10 +19,7 @@ const Cart = () => {
       });
       return;
     }
-    toast({
-      title: "Checkout",
-      description: "Checkout functionality coming soon!",
-    });
+    navigate('/checkout');
   };
 
   if (items.length === 0) {
