@@ -1,0 +1,81 @@
+import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
+import Stripe from 'https://esm.sh/stripe@14.21.0?target=deno'
+
+const corsHeaders = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+}
+
+serve(async (req) => {
+  // Handle CORS preflight requests
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: corsHeaders })
+  }
+
+  try {
+    const stripeKey = Deno.env.get('STRIPE_SECRET_KEY')
+
+    if (!stripeKey) {
+      console.error('STRIPE_SECRET_KEY not found in environment')
+      throw new Error('Stripe key not configured')
+    }
+
+    console.log('Stripe key exists, first 7 chars:', stripeKey.substring(0, 7))
+
+    const stripe = new Stripe(stripeKey, {
+      apiVersion: '2023-10-16',
+    })
+
+    const { items, successUrl, cancelUrl, userEmail } = await req.json()
+    console.log('Creating checkout session for', items.length, 'items')
+
+    if (!items || items.length === 0) {
+      throw new Error('No items provided')
+    }
+
+    // Transform cart items into Stripe line items
+    const lineItems = items.map((item: any) => ({
+      price_data: {
+        currency: 'usd',
+        product_data: {
+          name: item.name,
+          images: [item.image],
+          description: item.category,
+        },
+        unit_amount: Math.round(item.price * 100), // Stripe uses cents
+      },
+      quantity: item.quantity,
+    }))
+
+    // Create Stripe checkout session
+    const session = await stripe.checkout.sessions.create({
+      payment_method_types: ['card'],
+      line_items: lineItems,
+      mode: 'payment',
+      success_url: successUrl,
+      cancel_url: cancelUrl,
+      customer_email: userEmail || undefined,
+      metadata: {
+        // Store cart data for webhook processing
+        cartItems: JSON.stringify(items),
+      },
+    })
+
+    return new Response(
+      JSON.stringify({ sessionId: session.id, url: session.url }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200,
+      }
+    )
+  } catch (error) {
+    console.error('Checkout session error:', error)
+    return new Response(
+      JSON.stringify({ error: error.message, details: error.toString() }),
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400,
+      }
+    )
+  }
+})
