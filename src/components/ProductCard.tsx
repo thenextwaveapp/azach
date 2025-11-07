@@ -2,6 +2,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ShoppingBag } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
+import { useCurrency } from "@/contexts/CurrencyContext";
 import { useToast } from "@/hooks/use-toast";
 import { Link } from "react-router-dom";
 
@@ -15,6 +16,7 @@ interface ProductCardProps {
 
 export const ProductCard = ({ id, name, price, image, category }: ProductCardProps) => {
   const { addToCart } = useCart();
+  const { formatPrice } = useCurrency();
   const { toast } = useToast();
 
   const handleAddToCart = (e: React.MouseEvent) => {
@@ -55,7 +57,7 @@ export const ProductCard = ({ id, name, price, image, category }: ProductCardPro
           <div className="pt-4 space-y-2">
             <p className="text-xs text-muted-foreground uppercase tracking-wider">{category}</p>
             <h3 className="font-medium">{name}</h3>
-            <p className="text-lg font-semibold">${price}</p>
+            <p className="text-lg font-semibold">{formatPrice(price)}</p>
           </div>
         </CardContent>
       </Card>

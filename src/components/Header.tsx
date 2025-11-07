@@ -5,6 +5,7 @@ import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { SearchDialog } from "@/components/SearchDialog";
 import { AccountDropdown } from "@/components/AccountDropdown";
+import { CurrencySwitcher } from "@/components/CurrencySwitcher";
 import { useCart } from "@/contexts/CartContext";
 import { ShippingBanner } from "@/components/ShippingBanner";
 
@@ -84,6 +85,7 @@ export const Header = () => {
             <Button variant="ghost" size="icon" onClick={() => setSearchOpen(true)}>
               <Search className="h-5 w-5" />
             </Button>
+            <CurrencySwitcher />
             <AccountDropdown />
             <Link to="/cart">
               <Button variant="ghost" size="icon" className="relative">

@@ -2,12 +2,14 @@ import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { useCart } from "@/contexts/CartContext";
+import { useCurrency } from "@/contexts/CurrencyContext";
 import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 
 const Cart = () => {
   const { items, removeFromCart, updateQuantity, getTotalPrice, clearCart } = useCart();
+  const { formatPrice } = useCurrency();
   const { toast } = useToast();
   const navigate = useNavigate();
 
@@ -97,7 +99,7 @@ const Cart = () => {
                         <Plus className="h-3 w-3" />
                       </Button>
                     </div>
-                    <p className="font-semibold">${(item.price * item.quantity).toFixed(2)}</p>
+                    <p className="font-semibold">{formatPrice(item.price * item.quantity)}</p>
                   </div>
                 </div>
               </div>
@@ -121,7 +123,7 @@ const Cart = () => {
               <div className="space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Subtotal ({items.reduce((sum, item) => sum + item.quantity, 0)} items)</span>
-                  <span>${getTotalPrice().toFixed(2)}</span>
+                  <span>{formatPrice(getTotalPrice())}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Shipping</span>
@@ -129,12 +131,12 @@ const Cart = () => {
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Tax</span>
-                  <span>${(getTotalPrice() * 0.1).toFixed(2)}</span>
+                  <span>{formatPrice(getTotalPrice() * 0.1)}</span>
                 </div>
                 <Separator />
                 <div className="flex justify-between text-lg font-bold">
                   <span>Total</span>
-                  <span>${(getTotalPrice() * 1.1).toFixed(2)}</span>
+                  <span>{formatPrice(getTotalPrice() * 1.1)}</span>
                 </div>
               </div>
 

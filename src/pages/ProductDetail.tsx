@@ -4,6 +4,7 @@ import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { useProduct } from '@/hooks/useProducts';
 import { useCart } from '@/contexts/CartContext';
+import { useCurrency } from '@/contexts/CurrencyContext';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsInWishlist, useAddToWishlist, useRemoveFromWishlist } from '@/hooks/useWishlist';
@@ -14,6 +15,7 @@ const ProductDetail = () => {
   const navigate = useNavigate();
   const { data: product, isLoading, error } = useProduct(id || '');
   const { addToCart } = useCart();
+  const { formatPrice } = useCurrency();
   const { toast } = useToast();
   const { user } = useAuth();
   const { data: isInWishlist } = useIsInWishlist(id || '');
@@ -195,11 +197,11 @@ const ProductDetail = () => {
               <h1 className="text-4xl font-bold mb-4">{product.name}</h1>
               <div className="flex items-baseline gap-3 mb-6">
                 <span className="text-3xl font-bold">
-                  ${product.price.toFixed(2)}
+                  {formatPrice(product.price)}
                 </span>
                 {product.original_price && product.original_price > product.price && (
                   <span className="text-xl text-muted-foreground line-through">
-                    ${product.original_price.toFixed(2)}
+                    {formatPrice(product.original_price)}
                   </span>
                 )}
               </div>

@@ -8,7 +8,8 @@ export const stripePromise = loadStripe(
 // Create checkout session via Supabase Edge Function
 export const createCheckoutSession = async (
   items: any[],
-  userEmail?: string
+  userEmail?: string,
+  currency: 'USD' | 'CAD' = 'USD'
 ) => {
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
   const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -24,6 +25,7 @@ export const createCheckoutSession = async (
       body: JSON.stringify({
         items,
         userEmail,
+        currency: currency.toLowerCase(),
         successUrl: `${window.location.origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
         cancelUrl: `${window.location.origin}/cart`,
       }),

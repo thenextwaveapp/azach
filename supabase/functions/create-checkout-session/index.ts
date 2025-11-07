@@ -26,8 +26,8 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
     })
 
-    const { items, successUrl, cancelUrl, userEmail } = await req.json()
-    console.log('Creating checkout session for', items.length, 'items')
+    const { items, successUrl, cancelUrl, userEmail, currency = 'usd' } = await req.json()
+    console.log('Creating checkout session for', items.length, 'items', 'in', currency.toUpperCase())
 
     if (!items || items.length === 0) {
       throw new Error('No items provided')
@@ -36,7 +36,7 @@ serve(async (req) => {
     // Transform cart items into Stripe line items
     const lineItems = items.map((item: any) => ({
       price_data: {
-        currency: 'usd',
+        currency: currency,
         product_data: {
           name: item.name,
           images: [item.image],

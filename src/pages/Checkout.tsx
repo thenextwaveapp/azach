@@ -4,6 +4,7 @@ import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCurrency } from '@/contexts/CurrencyContext';
 import { createCheckoutSession, stripePromise } from '@/lib/stripe';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -12,6 +13,7 @@ const Checkout = () => {
   const navigate = useNavigate();
   const { items, getTotalPrice } = useCart();
   const { user } = useAuth();
+  const { currency, formatPrice, convertPrice } = useCurrency();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
@@ -26,10 +28,11 @@ const Checkout = () => {
     try {
       setLoading(true);
 
-      // Create checkout session
+      // Send original USD prices to Stripe (items already in USD)
       const { url } = await createCheckoutSession(
         items,
-        user?.email
+        user?.email,
+        'USD' // Always charge in USD
       );
 
       // Redirect to Stripe Checkout URL
@@ -80,7 +83,7 @@ const Checkout = () => {
                     </div>
                   </div>
                   <p className="font-semibold">
-                    ${(item.price * item.quantity).toFixed(2)}
+                    {formatPrice(item.price * item.quantity)}
                   </p>
                 </div>
               ))}
@@ -89,7 +92,7 @@ const Checkout = () => {
             <div className="border-t mt-4 pt-4">
               <div className="flex justify-between items-center text-lg font-bold">
                 <span>Total</span>
-                <span>${getTotalPrice().toFixed(2)}</span>
+                <span>{formatPrice(getTotalPrice())}</span>
               </div>
             </div>
           </div>
