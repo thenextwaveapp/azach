@@ -8,7 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { CurrencyProvider } from "@/contexts/CurrencyContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Index from "./pages/Index";
-import NewArrivals from "./pages/NewArrivals";
+import ShopAll from "./pages/ShopAll";
 import Women from "./pages/Women";
 import Men from "./pages/Men";
 import Sale from "./pages/Sale";
@@ -28,6 +28,7 @@ import CustomerService from "./pages/CustomerService";
 import Returns from "./pages/Returns";
 import SizeGuide from "./pages/SizeGuide";
 import ProductDetail from "./pages/ProductDetail";
+import Bespoke from "./pages/Bespoke";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -43,7 +44,7 @@ const App = () => (
             <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
-              <Route path="/new" element={<NewArrivals />} />
+              <Route path="/shop-all" element={<ShopAll />} />
               <Route path="/women" element={<Women />} />
               <Route path="/men" element={<Men />} />
               <Route path="/sale" element={<Sale />} />
@@ -97,6 +98,7 @@ const App = () => (
               <Route path="/customer-service" element={<CustomerService />} />
               <Route path="/returns" element={<Returns />} />
               <Route path="/size-guide" element={<SizeGuide />} />
+              <Route path="/bespoke" element={<Bespoke />} />
               <Route path="/product/:id" element={<ProductDetail />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

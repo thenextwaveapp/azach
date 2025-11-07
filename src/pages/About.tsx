@@ -2,23 +2,67 @@ import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { Leaf, Users, Lightbulb, Heart } from 'lucide-react';
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from '@/components/ui/carousel';
+import { useEffect } from 'react';
 
 const About = () => {
+  useEffect(() => {
+    document.title = "Our Story - AZACH";
+  }, []);
+
   return (
     <div className="min-h-screen">
       <Header />
 
       {/* Hero Section */}
       <section className="relative h-[70vh] flex items-center justify-center overflow-hidden">
+        <Carousel className="absolute inset-0 w-full h-full">
+          <CarouselContent className="h-full">
+            <CarouselItem className="h-full">
         <div
-          className="absolute inset-0 bg-cover bg-center"
+                className="h-full w-full bg-cover bg-center"
           style={{
             backgroundImage: 'url(https://images.unsplash.com/photo-1558769132-cb1aea80ae1d?q=80&w=2574)',
           }}
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-background" />
+            </CarouselItem>
+            <CarouselItem className="h-full">
+              <div
+                className="h-full w-full bg-cover bg-center"
+                style={{
+                  backgroundImage: 'url(https://images.unsplash.com/photo-1441986300917-64674bd600d8?q=80&w=2070)',
+                }}
+              />
+            </CarouselItem>
+            <CarouselItem className="h-full">
+              <div
+                className="h-full w-full bg-cover bg-center"
+                style={{
+                  backgroundImage: 'url(https://images.unsplash.com/photo-1483985988355-763728e1935b?q=80&w=2070)',
+                }}
+              />
+            </CarouselItem>
+            <CarouselItem className="h-full">
+              <div
+                className="h-full w-full bg-cover bg-center"
+                style={{
+                  backgroundImage: 'url(https://images.unsplash.com/photo-1490481651871-ab68de25d43d?q=80&w=2070)',
+                }}
+              />
+            </CarouselItem>
+          </CarouselContent>
+          <CarouselPrevious className="!left-4 !z-20 text-white border-white/50 hover:bg-white/20 hover:border-white bg-black/30" />
+          <CarouselNext className="!right-4 !z-20 text-white border-white/50 hover:bg-white/20 hover:border-white bg-black/30" />
+        </Carousel>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-background z-10" />
 
-        <div className="container mx-auto px-4 relative z-10 text-center text-white">
+        <div className="container mx-auto px-4 relative z-20 text-center text-white">
           <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6">
             The AZACH Story
           </h1>
@@ -35,11 +79,18 @@ const About = () => {
             <h2 className="text-3xl md:text-4xl font-bold mb-6">
               More Than a Fashion Brand—It's a Movement
             </h2>
-            <p className="text-lg text-muted-foreground leading-relaxed mb-6">
+            <p className="text-lg text-muted-foreground leading-relaxed mb-8">
               AZACH is redefining how fashion is perceived and consumed by transforming discarded materials
               into bold, timeless, high-quality designs. Through upcycling, we give condemned fabrics a
               second life, proving that sustainability and style can go hand in hand.
             </p>
+            <div className="rounded-lg overflow-hidden shadow-lg my-8">
+              <img
+                src="https://images.unsplash.com/photo-1558618666-fcd25c85cd64?q=80&w=2070"
+                alt="Upcycled fashion pieces"
+                className="w-full h-[400px] object-cover"
+              />
+            </div>
           </div>
         </div>
       </section>
@@ -59,6 +110,14 @@ const About = () => {
                 It wasn't until someone pointed out what he was doing that Uche took a deeper dive into the
                 concept of upcycling.
               </p>
+
+              <div className="my-8 rounded-lg overflow-hidden shadow-lg">
+                <img
+                  src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1920"
+                  alt="Sustainable fashion creation process"
+                  className="w-full h-[350px] object-cover"
+                />
+              </div>
 
               <p>
                 Through research, he discovered the harmful effects of fast fashion—how much textile waste
@@ -98,7 +157,7 @@ const About = () => {
       {/* Mission & Vision */}
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-12 max-w-5xl mx-auto">
+          <div className="grid md:grid-cols-2 gap-12 max-w-5xl mx-auto mb-12">
             <div className="bg-background rounded-2xl p-8 shadow-sm border">
               <h3 className="text-2xl font-bold mb-4">Our Mission</h3>
               <p className="text-muted-foreground leading-relaxed">
@@ -113,6 +172,24 @@ const About = () => {
                 To lead the upcycling movement globally, making sustainable fashion accessible, desirable,
                 and a norm—not an exception.
               </p>
+            </div>
+          </div>
+          
+          {/* Image Collage */}
+          <div className="max-w-5xl mx-auto grid grid-cols-2 gap-4">
+            <div className="rounded-lg overflow-hidden shadow-lg">
+              <img
+                src="https://images.unsplash.com/photo-1469334031218-e382a71b716b?q=80&w=2070"
+                alt="Fashion craftsmanship"
+                className="w-full h-[300px] object-cover"
+              />
+            </div>
+            <div className="rounded-lg overflow-hidden shadow-lg">
+              <img
+                src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?q=80&w=1920"
+                alt="Sustainable fashion design"
+                className="w-full h-[300px] object-cover"
+              />
             </div>
           </div>
         </div>
@@ -181,6 +258,14 @@ const About = () => {
               At AZACH, we are not just a fashion brand; we are making impact.
             </p>
 
+            <div className="rounded-lg overflow-hidden shadow-lg mb-8">
+              <img
+                src="https://images.unsplash.com/photo-1445205170230-053b83016050?q=80&w=2071"
+                alt="Community impact and empowerment"
+                className="w-full h-[400px] object-cover"
+              />
+            </div>
+
             <div className="grid md:grid-cols-2 gap-6 mb-8">
               <div className="bg-background rounded-lg p-6 border">
                 <h3 className="font-bold text-lg mb-2">Reducing Textile Waste</h3>
@@ -233,7 +318,7 @@ const About = () => {
             💡 Want to be part of the change? Work with us. Wear AZACH. Support sustainability.
           </p>
           <div className="flex gap-4 justify-center flex-wrap">
-            <Link to="/new">
+            <Link to="/shop-all">
               <Button size="lg" className="text-lg px-8 py-6">
                 Shop Now
               </Button>

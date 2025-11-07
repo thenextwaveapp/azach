@@ -7,8 +7,13 @@ import { Button } from '@/components/ui/button';
 import { Link } from 'react-router-dom';
 import { useWishlist } from '@/hooks/useWishlist';
 import { productToDisplay } from '@/utils/productHelpers';
+import { useEffect } from 'react';
 
 const Wishlist = () => {
+  // Set page title
+  useEffect(() => {
+    document.title = "Wishlist - AZACH";
+  }, []);
   const { user } = useAuth();
   const { data: wishlistData = [], isLoading } = useWishlist();
 

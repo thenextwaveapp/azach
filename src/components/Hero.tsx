@@ -1,12 +1,61 @@
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useEffect, useRef } from "react";
 
 export const Hero = () => {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const saveIntervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    const handleLoadedMetadata = () => {
+      // Restore saved playback position once video metadata is loaded
+      const savedTime = sessionStorage.getItem('hero-video-time');
+      if (savedTime) {
+        const time = parseFloat(savedTime);
+        // Only restore if video duration is available and time is valid
+        if (video.duration && time < video.duration) {
+          video.currentTime = time;
+        }
+      }
+    };
+
+    // Save playback position every 0.5 seconds
+    const savePosition = () => {
+      if (video && !video.paused && video.readyState >= 2) {
+        sessionStorage.setItem('hero-video-time', video.currentTime.toString());
+      }
+    };
+
+    video.addEventListener('loadedmetadata', handleLoadedMetadata);
+    saveIntervalRef.current = setInterval(savePosition, 500);
+
+    // Also try to restore immediately if video is already loaded
+    if (video.readyState >= 1) {
+      handleLoadedMetadata();
+    }
+
+    // Cleanup on unmount
+    return () => {
+      if (saveIntervalRef.current) {
+        clearInterval(saveIntervalRef.current);
+      }
+      // Save final position before unmounting
+      if (video && video.readyState >= 2) {
+        sessionStorage.setItem('hero-video-time', video.currentTime.toString());
+      }
+      video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+    };
+  }, []);
+
   return (
     <section className="relative h-[calc(100vh-64px)] flex items-center justify-center overflow-hidden">
       {/* Video Background */}
       <video
+        ref={videoRef}
         autoPlay
         loop
         muted

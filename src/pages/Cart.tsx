@@ -6,8 +6,13 @@ import { useCurrency } from "@/contexts/CurrencyContext";
 import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { useEffect } from "react";
 
 const Cart = () => {
+  // Set page title
+  useEffect(() => {
+    document.title = "Shopping Cart - AZACH";
+  }, []);
   const { items, removeFromCart, updateQuantity, getTotalPrice, clearCart } = useCart();
   const { formatPrice } = useCurrency();
   const { toast } = useToast();
@@ -121,24 +126,15 @@ const Cart = () => {
               <Separator />
               
               <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Subtotal ({items.reduce((sum, item) => sum + item.quantity, 0)} items)</span>
+                <div className="flex justify-between text-lg font-bold">
+                  <span>Subtotal ({items.reduce((sum, item) => sum + item.quantity, 0)} items)</span>
                   <span>{formatPrice(getTotalPrice())}</span>
                 </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Shipping</span>
-                  <span>Free</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">Tax</span>
-                  <span>{formatPrice(getTotalPrice() * 0.1)}</span>
-                </div>
-                <Separator />
-                <div className="flex justify-between text-lg font-bold">
-                  <span>Total</span>
-                  <span>{formatPrice(getTotalPrice() * 1.1)}</span>
-                </div>
               </div>
+
+              <p className="text-xs text-muted-foreground text-center">
+                Shipping and taxes calculated at checkout
+              </p>
 
               <Button
                 onClick={handleCheckout}

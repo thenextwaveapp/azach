@@ -21,7 +21,7 @@ export const SearchDialog = ({ open, onOpenChange }: SearchDialogProps) => {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-3xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Search Products</DialogTitle>
+          <DialogTitle className="font-display font-semibold tracking-normal normal-case">Search Products</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div className="relative">
@@ -31,7 +31,7 @@ export const SearchDialog = ({ open, onOpenChange }: SearchDialogProps) => {
               placeholder="Search for products..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-10 pr-10"
+              className="pl-10 pr-10 focus:outline-none focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
               autoFocus
             />
             {searchQuery && (

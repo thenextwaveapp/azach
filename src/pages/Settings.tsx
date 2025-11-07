@@ -7,8 +7,13 @@ import { Separator } from '@/components/ui/separator';
 import { useAuth } from '@/contexts/AuthContext';
 import { useToast } from '@/hooks/use-toast';
 import { useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 
 const Settings = () => {
+  // Set page title
+  useEffect(() => {
+    document.title = "Settings - AZACH";
+  }, []);
   const { user, signOut } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
@@ -105,6 +110,11 @@ const Settings = () => {
 };
 
 export default Settings;
+
+
+
+
+
 
 
 

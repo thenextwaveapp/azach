@@ -1,7 +1,12 @@
 import { Header } from "@/components/Header";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 
 const SizeGuide = () => {
+  // Set page title
+  useEffect(() => {
+    document.title = "Size Guide - AZACH";
+  }, []);
   const [activeTab, setActiveTab] = useState<"men" | "women">("men");
 
   const mensSizes = [
@@ -260,47 +265,71 @@ const SizeGuide = () => {
       </section>
 
       {/* Footer */}
-      <footer className="py-12 border-t border-border">
+      <footer className="py-16 bg-black text-white">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+          {/* Top Section - Logo and Social */}
+          <div className="flex flex-col md:flex-row justify-between items-center mb-12 pb-12 border-b border-gray-800">
+            <Link 
+              to="/" 
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="mb-6 md:mb-0"
+            >
+              <img src="/Azach-Logo.png" alt="AZACH" className="h-16 w-auto brightness-0 invert" />
+            </Link>
+            <div className="flex gap-6">
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
+                <img src="/instagram.png" alt="Instagram" className="h-6 w-6" />
+                <span className="sr-only">Instagram</span>
+              </a>
+              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
+                <img src="/facebook.png" alt="Facebook" className="h-6 w-6" />
+                <span className="sr-only">Facebook</span>
+              </a>
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
+                <img src="/x.png" alt="X" className="h-6 w-6" />
+                <span className="sr-only">X</span>
+              </a>
+              <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
+                <img src="/tiktok.png" alt="TikTok" className="h-6 w-6" />
+                <span className="sr-only">TikTok</span>
+              </a>
+              <a href="https://snapchat.com" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
+                <img src="/snapchat.png" alt="Snapchat" className="h-6 w-6" />
+                <span className="sr-only">Snapchat</span>
+              </a>
+            </div>
+          </div>
+
+          {/* Links Section */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 mb-12">
             <div>
-              <h4 className="font-semibold mb-4">Shop</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition-colors">New Arrivals</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Women</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Men</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Sale</a></li>
+              <h4 className="font-semibold mb-4 text-white uppercase tracking-wider text-sm">Shop</h4>
+              <ul className="space-y-3 text-sm text-gray-400">
+                <li><Link to="/shop-all" className="hover:text-white transition-colors">Shop All</Link></li>
+                <li><Link to="/women" className="hover:text-white transition-colors">Women</Link></li>
+                <li><Link to="/men" className="hover:text-white transition-colors">Men</Link></li>
+                <li><Link to="/sale" className="hover:text-white transition-colors">Sale</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Help</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="/customer-service" className="hover:text-foreground transition-colors">Customer Service</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Shipping</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Returns</a></li>
-                <li><a href="/size-guide" className="hover:text-foreground transition-colors">Size Guide</a></li>
+              <h4 className="font-semibold mb-4 text-white uppercase tracking-wider text-sm">Help</h4>
+              <ul className="space-y-3 text-sm text-gray-400">
+                <li><Link to="/customer-service" className="hover:text-white transition-colors">Customer Service</Link></li>
+                <li><Link to="/returns" className="hover:text-white transition-colors">Returns</Link></li>
+                <li><Link to="/size-guide" className="hover:text-white transition-colors">Size Guide</Link></li>
               </ul>
             </div>
             <div>
-              <h4 className="font-semibold mb-4">Company</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition-colors">About Us</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Careers</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Sustainability</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Press</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4">Follow Us</h4>
-              <ul className="space-y-2 text-sm text-muted-foreground">
-                <li><a href="#" className="hover:text-foreground transition-colors">Instagram</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Facebook</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Twitter</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Pinterest</a></li>
+              <h4 className="font-semibold mb-4 text-white uppercase tracking-wider text-sm">Company</h4>
+              <ul className="space-y-3 text-sm text-gray-400">
+                <li><Link to="/our-story" className="hover:text-white transition-colors">Our Story</Link></li>
+                <li><Link to="/lookbook" className="hover:text-white transition-colors">Lookbook</Link></li>
               </ul>
             </div>
           </div>
-          <div className="mt-12 pt-8 border-t border-border text-center text-sm text-muted-foreground">
+
+          {/* Copyright */}
+          <div className="pt-8 border-t border-gray-800 text-center text-sm text-gray-400">
             <p>&copy; 2024 AZACH. All rights reserved.</p>
           </div>
         </div>

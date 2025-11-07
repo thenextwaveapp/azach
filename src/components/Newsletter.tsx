@@ -31,7 +31,7 @@ export const Newsletter = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
-              className="flex-1"
+              className="flex-1 focus:outline-none focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
             />
             <Button type="submit" className="hover:bg-[#a97c50] transition-colors">Subscribe</Button>
           </form>

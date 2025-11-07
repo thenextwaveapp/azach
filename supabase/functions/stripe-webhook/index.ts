@@ -63,6 +63,11 @@ serve(async (req) => {
         return new Response('No cart items', { status: 400 })
       }
 
+      // Parse shipping address from metadata
+      const shippingAddress = session.metadata?.shippingAddress
+        ? JSON.parse(session.metadata.shippingAddress)
+        : null
+
       // Calculate totals
       const subtotal = cartItems.reduce(
         (sum: number, item: any) => sum + item.price * item.quantity,
@@ -92,7 +97,7 @@ serve(async (req) => {
           subtotal: subtotal,
           stripe_session_id: session.id,
           stripe_payment_intent_id: session.payment_intent as string,
-          shipping_address: session.shipping_details || null,
+          shipping_address: shippingAddress,
         })
         .select()
         .single()

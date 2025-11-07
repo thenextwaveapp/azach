@@ -9,7 +9,8 @@ export const stripePromise = loadStripe(
 export const createCheckoutSession = async (
   items: any[],
   userEmail?: string,
-  currency: 'USD' | 'CAD' = 'USD'
+  currency: 'USD' | 'CAD' = 'USD',
+  shippingAddress?: any
 ) => {
   const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
   const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
@@ -26,6 +27,7 @@ export const createCheckoutSession = async (
         items,
         userEmail,
         currency: currency.toLowerCase(),
+        shippingAddress,
         successUrl: `${window.location.origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
         cancelUrl: `${window.location.origin}/cart`,
       }),

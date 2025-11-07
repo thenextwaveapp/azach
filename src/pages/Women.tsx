@@ -1,11 +1,34 @@
 import { Header } from "@/components/Header";
 import { ProductCard } from "@/components/ProductCard";
 import { Newsletter } from "@/components/Newsletter";
+import { ProductFilters } from "@/components/ProductFilters";
 import { useProductsByGender } from "@/hooks/useProducts";
 import { productToDisplay } from "@/utils/productHelpers";
+import { useState, useMemo, useEffect } from "react";
+import { Product } from "@/types/product";
 
 const Women = () => {
   const { data: womenProducts = [], isLoading } = useProductsByGender('women');
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>(womenProducts);
+
+  // Get unique categories and max price
+  const { categories, maxPrice } = useMemo(() => {
+    const uniqueCategories = Array.from(new Set(womenProducts.map(p => p.category)));
+    const max = womenProducts.length > 0
+      ? Math.max(...womenProducts.map(p => p.price))
+      : 1000;
+    return { categories: uniqueCategories, maxPrice: max };
+  }, [womenProducts]);
+
+  // Set page title
+  useEffect(() => {
+    document.title = "Women's Collection - AZACH";
+  }, []);
+
+  // Update filtered products when original products change
+  useEffect(() => {
+    setFilteredProducts(womenProducts);
+  }, [womenProducts]);
 
   return (
     <div className="min-h-screen">
@@ -31,11 +54,25 @@ const Women = () => {
               <p className="text-muted-foreground">Loading products...</p>
             </div>
           ) : womenProducts.length > 0 ? (
+            <>
+              <ProductFilters
+                products={womenProducts}
+                onProductsChange={setFilteredProducts}
+                availableCategories={categories}
+                maxPrice={maxPrice}
+              />
+              {filteredProducts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {womenProducts.map((product) => (
-                <ProductCard key={product.id} {...productToDisplay(product)} />
+                  {filteredProducts.map((product) => (
+                    <ProductCard key={product.id} {...productToDisplay(product)} product={product} />
               ))}
             </div>
+              ) : (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground">No products match your filters.</p>
+                </div>
+              )}
+            </>
           ) : (
             <div className="text-center py-12">
               <p className="text-muted-foreground">No women's products available.</p>

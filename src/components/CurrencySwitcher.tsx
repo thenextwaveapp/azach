@@ -14,7 +14,7 @@ export const CurrencySwitcher = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="sm" className="gap-1">
+        <Button variant="ghost" size="sm" className="gap-1 hover:bg-muted hover:text-foreground">
           <DollarSign className="h-4 w-4" />
           <span className="text-sm font-medium">{currency}</span>
         </Button>

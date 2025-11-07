@@ -12,6 +12,10 @@ const CheckoutSuccess = () => {
   const { clearCart } = useCart();
 
   useEffect(() => {
+    document.title = "Order Confirmed - AZACH";
+  }, []);
+
+  useEffect(() => {
     // Clear cart after successful checkout
     if (sessionId) {
       clearCart();

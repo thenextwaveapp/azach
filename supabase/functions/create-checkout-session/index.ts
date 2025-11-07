@@ -26,7 +26,7 @@ serve(async (req) => {
       apiVersion: '2023-10-16',
     })
 
-    const { items, successUrl, cancelUrl, userEmail, currency = 'usd' } = await req.json()
+    const { items, successUrl, cancelUrl, userEmail, currency = 'usd', shippingAddress } = await req.json()
     console.log('Creating checkout session for', items.length, 'items', 'in', currency.toUpperCase())
 
     if (!items || items.length === 0) {
@@ -34,18 +34,26 @@ serve(async (req) => {
     }
 
     // Transform cart items into Stripe line items
-    const lineItems = items.map((item: any) => ({
-      price_data: {
-        currency: currency,
-        product_data: {
-          name: item.name,
-          images: [item.image],
-          description: item.category,
+    const lineItems = items.map((item: any) => {
+      const productData: any = {
+        name: item.name,
+        description: item.category,
+      }
+
+      // Only include images if the image URL is not empty
+      if (item.image && item.image.trim() !== '') {
+        productData.images = [item.image]
+      }
+
+      return {
+        price_data: {
+          currency: currency,
+          product_data: productData,
+          unit_amount: Math.round(item.price * 100), // Stripe uses cents
         },
-        unit_amount: Math.round(item.price * 100), // Stripe uses cents
-      },
-      quantity: item.quantity,
-    }))
+        quantity: item.quantity,
+      }
+    })
 
     // Create Stripe checkout session
     const session = await stripe.checkout.sessions.create({
@@ -64,6 +72,8 @@ serve(async (req) => {
           quantity: item.quantity,
           category: item.category,
         }))),
+        // Store shipping address if provided
+        shippingAddress: shippingAddress ? JSON.stringify(shippingAddress) : undefined,
       },
     })
 

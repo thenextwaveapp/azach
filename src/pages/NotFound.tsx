@@ -1,8 +1,13 @@
 import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { useEffect } from "react";
 
 const NotFound = () => {
+  // Set page title
+  useEffect(() => {
+    document.title = "Page Not Found - AZACH";
+  }, []);
   return (
     <div className="min-h-screen">
       <Header />
@@ -17,8 +22,8 @@ const NotFound = () => {
             <Link to="/">
               <Button size="lg">Go Home</Button>
             </Link>
-            <Link to="/new">
-              <Button size="lg" variant="outline">Shop New Arrivals</Button>
+            <Link to="/shop-all">
+              <Button size="lg" variant="outline">Shop All</Button>
             </Link>
           </div>
         </div>

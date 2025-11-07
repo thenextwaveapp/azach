@@ -94,8 +94,33 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  html {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    scroll-padding-top: 80px;
+    /* Slower scroll feel */
+    scroll-snap-type: none;
+  }
+
   body {
     @apply bg-background text-foreground font-sans antialiased;
+    overflow-x: hidden;
+    /* Momentum scrolling for iOS */
+    -webkit-overflow-scrolling: touch;
+    /* Smooth font rendering */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    /* Slower, more deliberate scrolling */
+    overscroll-behavior: smooth;
+    /* Reduce motion for accessibility */
+    @media (prefers-reduced-motion: reduce) {
+      scroll-behavior: auto;
+    }
+  }
+
+  /* Slower scroll animations */
+  * {
+    scroll-margin: 0;
   }
 
   h1, h3, h4, h5, h6 {
@@ -109,5 +134,45 @@ All colors MUST be HSL.
 
   p {
     @apply font-sans;
+  }
+}
+
+/* Luxurious Scrolling */
+@layer utilities {
+  /* Smooth scroll with momentum */
+  @supports (scroll-behavior: smooth) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+
+
+  /* Smooth transitions for all interactive elements - slower */
+  a, button, [role="button"] {
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  /* Parallax effect for images */
+  .parallax-slow {
+    will-change: transform;
+    transition: transform 0.1s ease-out;
+  }
+
+  /* Enhanced smooth scrolling for sections - slower feel */
+  section {
+    scroll-margin-top: 80px;
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  /* Luxury feel: slower, more deliberate transitions */
+  @media (prefers-reduced-motion: no-preference) {
+    .luxury-scroll {
+      transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+  }
+
+  /* Slower scroll feel for images and cards */
+  img, [class*="card"], [class*="Card"] {
+    transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   }
 }

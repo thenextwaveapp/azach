@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
@@ -34,6 +34,10 @@ import { useAuth } from '@/contexts/AuthContext';
 import type { ProductInsert, ProductUpdate } from '@/types/product';
 
 const Admin = () => {
+  // Set page title
+  useEffect(() => {
+    document.title = "Admin Panel - AZACH";
+  }, []);
   const { data: products, isLoading } = useProducts();
   const createProduct = useCreateProduct();
   const updateProduct = useUpdateProduct();

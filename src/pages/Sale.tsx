@@ -1,12 +1,35 @@
 import { Header } from "@/components/Header";
 import { ProductCard } from "@/components/ProductCard";
 import { Newsletter } from "@/components/Newsletter";
+import { ProductFilters } from "@/components/ProductFilters";
 import { Badge } from "@/components/ui/badge";
 import { useSaleProducts } from "@/hooks/useProducts";
 import { productToDisplay } from "@/utils/productHelpers";
+import { useState, useMemo, useEffect } from "react";
+import { Product } from "@/types/product";
 
 const Sale = () => {
   const { data: saleProducts = [], isLoading } = useSaleProducts();
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>(saleProducts);
+
+  // Get unique categories and max price
+  const { categories, maxPrice } = useMemo(() => {
+    const uniqueCategories = Array.from(new Set(saleProducts.map(p => p.category)));
+    const max = saleProducts.length > 0
+      ? Math.max(...saleProducts.map(p => p.price))
+      : 1000;
+    return { categories: uniqueCategories, maxPrice: max };
+  }, [saleProducts]);
+
+  // Set page title
+  useEffect(() => {
+    document.title = "Sale - AZACH";
+  }, []);
+
+  // Update filtered products when original products change
+  useEffect(() => {
+    setFilteredProducts(saleProducts);
+  }, [saleProducts]);
 
   const calculateDiscount = (price: number, originalPrice: number) => {
     return Math.round(((originalPrice - price) / originalPrice) * 100);
@@ -36,8 +59,16 @@ const Sale = () => {
               <p className="text-muted-foreground">Loading products...</p>
             </div>
           ) : saleProducts.length > 0 ? (
+            <>
+              <ProductFilters
+                products={saleProducts}
+                onProductsChange={setFilteredProducts}
+                availableCategories={categories}
+                maxPrice={maxPrice}
+              />
+              {filteredProducts.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {saleProducts.map((product) => {
+                  {filteredProducts.map((product) => {
                 if (!product.original_price) return null;
                 const discount = calculateDiscount(product.price, product.original_price);
                 const productDisplay = productToDisplay(product);
@@ -46,7 +77,7 @@ const Sale = () => {
                     <Badge className="absolute top-4 right-4 z-10 bg-secondary text-secondary-foreground">
                       {discount}% OFF
                     </Badge>
-                    <ProductCard {...productDisplay} />
+                        <ProductCard {...productDisplay} product={product} />
                     <div className="mt-2 flex items-center gap-2">
                       <span className="text-lg font-semibold">${product.price}</span>
                       <span className="text-sm text-muted-foreground line-through">
@@ -57,6 +88,12 @@ const Sale = () => {
                 );
               })}
             </div>
+              ) : (
+                <div className="text-center py-12">
+                  <p className="text-muted-foreground">No products match your filters.</p>
+                </div>
+              )}
+            </>
           ) : (
             <div className="text-center py-12">
               <p className="text-muted-foreground">No sale products available.</p>

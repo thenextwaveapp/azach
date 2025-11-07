@@ -30,67 +30,67 @@ export const AccountDropdown = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon">
+        <Button variant="ghost" size="icon" className="hover:bg-muted hover:text-foreground">
           <User className="h-5 w-5" />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
+      <DropdownMenuContent align="end" className="w-auto min-w-[160px]">
         {isAuthenticated ? (
           <>
-            <DropdownMenuLabel>My Account</DropdownMenuLabel>
+            <DropdownMenuLabel className="px-3 py-2">My Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              <Link to="/account" className="flex items-center cursor-pointer">
-                <User className="mr-2 h-4 w-4" />
-                Profile
+            <DropdownMenuItem asChild className="px-3">
+              <Link to="/account" className="flex items-center cursor-pointer w-full">
+                <User className="mr-2 h-4 w-4 flex-shrink-0" />
+                <span>Profile</span>
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to="/orders" className="flex items-center cursor-pointer">
-                <Package className="mr-2 h-4 w-4" />
-                Orders
+            <DropdownMenuItem asChild className="px-3">
+              <Link to="/orders" className="flex items-center cursor-pointer w-full">
+                <Package className="mr-2 h-4 w-4 flex-shrink-0" />
+                <span>Orders</span>
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to="/wishlist" className="flex items-center cursor-pointer">
-                <Heart className="mr-2 h-4 w-4" />
-                Wishlist
+            <DropdownMenuItem asChild className="px-3">
+              <Link to="/wishlist" className="flex items-center cursor-pointer w-full">
+                <Heart className="mr-2 h-4 w-4 flex-shrink-0" />
+                <span>Wishlist</span>
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to="/settings" className="flex items-center cursor-pointer">
-                <Settings className="mr-2 h-4 w-4" />
-                Settings
+            <DropdownMenuItem asChild className="px-3">
+              <Link to="/settings" className="flex items-center cursor-pointer w-full">
+                <Settings className="mr-2 h-4 w-4 flex-shrink-0" />
+                <span>Settings</span>
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             {user?.email === "admin@azach.com" || user?.email?.includes("admin") ? (
-              <DropdownMenuItem asChild>
-                <Link to="/admin" className="flex items-center cursor-pointer">
-                  <Settings className="mr-2 h-4 w-4" />
-                  Admin Panel
+              <DropdownMenuItem asChild className="px-3">
+                <Link to="/admin" className="flex items-center cursor-pointer w-full">
+                  <Settings className="mr-2 h-4 w-4 flex-shrink-0" />
+                  <span>Admin Panel</span>
                 </Link>
               </DropdownMenuItem>
             ) : null}
-            <DropdownMenuItem className="text-destructive" onClick={handleLogout}>
-              <LogOut className="mr-2 h-4 w-4" />
-              Logout
+            <DropdownMenuItem className="text-destructive px-3" onClick={handleLogout}>
+              <LogOut className="mr-2 h-4 w-4 flex-shrink-0" />
+              <span>Logout</span>
             </DropdownMenuItem>
           </>
         ) : (
           <>
-            <DropdownMenuLabel>Account</DropdownMenuLabel>
+            <DropdownMenuLabel className="px-3 py-2">Account</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem asChild>
-              <Link to="/login" className="flex items-center cursor-pointer">
-                <LogIn className="mr-2 h-4 w-4" />
-                Login
+            <DropdownMenuItem asChild className="px-3">
+              <Link to="/login" className="flex items-center cursor-pointer w-full">
+                <LogIn className="mr-2 h-4 w-4 flex-shrink-0" />
+                <span>Login</span>
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem asChild>
-              <Link to="/register" className="flex items-center cursor-pointer">
-                <User className="mr-2 h-4 w-4" />
-                Create Account
+            <DropdownMenuItem asChild className="px-3">
+              <Link to="/register" className="flex items-center cursor-pointer w-full">
+                <User className="mr-2 h-4 w-4 flex-shrink-0" />
+                <span>Create Account</span>
               </Link>
             </DropdownMenuItem>
           </>

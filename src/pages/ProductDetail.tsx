@@ -1,5 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { useProduct } from '@/hooks/useProducts';
@@ -8,6 +8,9 @@ import { useCurrency } from '@/contexts/CurrencyContext';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIsInWishlist, useAddToWishlist, useRemoveFromWishlist } from '@/hooks/useWishlist';
+import { ProductReviews } from '@/components/ProductReviews';
+import { RelatedProducts } from '@/components/RelatedProducts';
+import { OptimizedImage } from '@/components/OptimizedImage';
 import { ShoppingBag, ArrowLeft, Heart } from 'lucide-react';
 
 const ProductDetail = () => {
@@ -24,6 +27,14 @@ const ProductDetail = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+
+  useEffect(() => {
+    if (product) {
+      document.title = `${product.name} - AZACH`;
+    } else {
+      document.title = "Product - AZACH";
+    }
+  }, [product]);
 
   const handleAddToCart = () => {
     if (!product) return;
@@ -133,7 +144,7 @@ const ProductDetail = () => {
               onMouseEnter={() => setIsHovering(true)}
               onMouseLeave={() => setIsHovering(false)}
             >
-              <img
+              <OptimizedImage
                 src={
                   product.image_urls && product.image_urls.length > 0
                     ? selectedImageIndex === 0
@@ -142,7 +153,9 @@ const ProductDetail = () => {
                     : product.image_url
                 }
                 alt={product.name}
-                className="w-full h-full object-cover"
+                aspectRatio="portrait"
+                priority={selectedImageIndex === 0}
+                className="w-full h-full"
                 style={{
                   transform: isHovering ? `scale(2)` : 'scale(1)',
                   transformOrigin: `${mousePosition.x}% ${mousePosition.y}%`,
@@ -161,10 +174,12 @@ const ProductDetail = () => {
                     selectedImageIndex === 0 ? 'border-primary' : 'border-transparent hover:border-muted-foreground'
                   }`}
                 >
-                  <img
+                  <OptimizedImage
                     src={product.image_url}
                     alt="Cover"
-                    className="w-full h-full object-cover"
+                    aspectRatio="square"
+                    className="w-full h-full"
+                    loading="lazy"
                   />
                 </button>
 
@@ -177,10 +192,12 @@ const ProductDetail = () => {
                       selectedImageIndex === index + 1 ? 'border-primary' : 'border-transparent hover:border-muted-foreground'
                     }`}
                   >
-                    <img
+                    <OptimizedImage
                       src={url}
                       alt={`View ${index + 2}`}
-                      className="w-full h-full object-cover"
+                      aspectRatio="square"
+                      className="w-full h-full"
+                      loading="lazy"
                     />
                   </button>
                 ))}
@@ -263,6 +280,16 @@ const ProductDetail = () => {
               </Button>
             </div>
           </div>
+        </div>
+
+        {/* Reviews Section */}
+        <div className="mt-16 pt-16 border-t">
+          <ProductReviews productId={product.id} />
+        </div>
+
+        {/* Related Products */}
+        <div className="mt-16 pt-16 border-t">
+          <RelatedProducts currentProduct={product} />
         </div>
       </div>
     </div>

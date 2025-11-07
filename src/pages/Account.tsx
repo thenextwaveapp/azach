@@ -6,8 +6,13 @@ import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/AuthContext';
 import { User, Mail, Calendar } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
 
 const Account = () => {
+  // Set page title
+  useEffect(() => {
+    document.title = "My Account - AZACH";
+  }, []);
   const { user } = useAuth();
 
   return (
