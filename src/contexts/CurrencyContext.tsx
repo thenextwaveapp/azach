@@ -6,32 +6,32 @@ interface CurrencyContextType {
   currency: Currency;
   setCurrency: (currency: Currency) => void;
   exchangeRate: number;
-  convertPrice: (priceUSD: number) => number;
-  formatPrice: (priceUSD: number) => string;
+  convertPrice: (priceCAD: number) => number;
+  formatPrice: (priceCAD: number) => string;
 }
 
 const CurrencyContext = createContext<CurrencyContextType | undefined>(undefined);
 
 const CURRENCY_STORAGE_KEY = 'azach-currency';
 
-// Fetch exchange rate from API
+// Fetch exchange rate from API (CAD to USD)
 const fetchExchangeRate = async (): Promise<number> => {
   try {
-    const response = await fetch('https://api.exchangerate-api.com/v4/latest/USD');
+    const response = await fetch('https://api.exchangerate-api.com/v4/latest/CAD');
     const data = await response.json();
-    return data.rates.CAD || 1.35; // Fallback to 1.35 if API fails
+    return data.rates.USD || 0.74; // Fallback to 0.74 if API fails (1 CAD = ~0.74 USD)
   } catch (error) {
     console.error('Error fetching exchange rate:', error);
-    return 1.35; // Fallback exchange rate
+    return 0.74; // Fallback exchange rate
   }
 };
 
 export const CurrencyProvider = ({ children }: { children: ReactNode }) => {
   const [currency, setCurrencyState] = useState<Currency>(() => {
     const stored = localStorage.getItem(CURRENCY_STORAGE_KEY);
-    return (stored as Currency) || 'USD';
+    return (stored as Currency) || 'CAD';
   });
-  const [exchangeRate, setExchangeRate] = useState<number>(1.35);
+  const [exchangeRate, setExchangeRate] = useState<number>(0.74);
 
   // Fetch exchange rate on mount and every hour
   useEffect(() => {
@@ -52,19 +52,19 @@ export const CurrencyProvider = ({ children }: { children: ReactNode }) => {
     localStorage.setItem(CURRENCY_STORAGE_KEY, newCurrency);
   };
 
-  // Convert USD price to selected currency
-  const convertPrice = (priceUSD: number): number => {
-    if (currency === 'USD') return priceUSD;
-    return priceUSD * exchangeRate;
+  // Convert CAD price to selected currency
+  const convertPrice = (priceCAD: number): number => {
+    if (currency === 'CAD') return priceCAD;
+    return priceCAD * exchangeRate; // Convert CAD to USD
   };
 
   // Format price with currency symbol
-  const formatPrice = (priceUSD: number): string => {
-    const price = convertPrice(priceUSD);
-    if (currency === 'USD') {
-      return `$${price.toFixed(2)}`;
+  const formatPrice = (priceCAD: number): string => {
+    const price = convertPrice(priceCAD);
+    if (currency === 'CAD') {
+      return `CA$${price.toFixed(2)}`;
     }
-    return `CA$${price.toFixed(2)}`;
+    return `$${price.toFixed(2)}`; // USD
   };
 
   return (

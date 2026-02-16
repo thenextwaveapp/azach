@@ -14,7 +14,7 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Futura', 'Inter', 'system-ui', 'sans-serif'],
         display: ['Space Grotesk', 'DM Sans', 'sans-serif'],
         heading: ['Bebas Neue', 'Impact', 'sans-serif'],
       },

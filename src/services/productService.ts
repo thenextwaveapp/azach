@@ -129,9 +129,9 @@ export const productService = {
   async updateStock(id: string, stock: number): Promise<Product> {
     const { data, error } = await supabase
       .from('products')
-      .update({ 
+      .update({
         stock,
-        in_stock: stock > 0 
+        in_stock: stock > 0
       })
       .eq('id', id)
       .select()
@@ -140,7 +140,78 @@ export const productService = {
     if (error) throw error;
     return data;
   },
+
+  // Get filtered products with server-side filtering and sorting
+  async getFiltered(filters: {
+    categories?: string[];
+    minPrice?: number;
+    maxPrice?: number;
+    inStock?: boolean | null;
+    onSale?: boolean | null;
+    gender?: 'men' | 'women' | 'unisex' | null;
+    genders?: ('men' | 'women' | 'unisex')[];
+    sortBy?: 'newest' | 'price-low' | 'price-high' | 'name-asc' | 'name-desc';
+  }): Promise<Product[]> {
+    let query = supabase.from('products').select('*');
+
+    // Category filter
+    if (filters.categories && filters.categories.length > 0) {
+      query = query.in('category', filters.categories);
+    }
+
+    // Price range filter
+    if (filters.minPrice !== undefined) {
+      query = query.gte('price', filters.minPrice);
+    }
+    if (filters.maxPrice !== undefined) {
+      query = query.lte('price', filters.maxPrice);
+    }
+
+    // Stock filter
+    if (filters.inStock !== null && filters.inStock !== undefined) {
+      query = query.eq('in_stock', filters.inStock);
+    }
+
+    // Sale filter
+    if (filters.onSale !== null && filters.onSale !== undefined) {
+      query = query.eq('on_sale', filters.onSale);
+    }
+
+    // Gender filter - support both single gender and multiple genders
+    if (filters.genders && filters.genders.length > 0) {
+      query = query.in('gender', filters.genders);
+    } else if (filters.gender) {
+      query = query.eq('gender', filters.gender);
+    }
+
+    // Sorting
+    switch (filters.sortBy) {
+      case 'newest':
+        query = query.order('created_at', { ascending: false });
+        break;
+      case 'price-low':
+        query = query.order('price', { ascending: true });
+        break;
+      case 'price-high':
+        query = query.order('price', { ascending: false });
+        break;
+      case 'name-asc':
+        query = query.order('name', { ascending: true });
+        break;
+      case 'name-desc':
+        query = query.order('name', { ascending: false });
+        break;
+      default:
+        query = query.order('created_at', { ascending: false });
+    }
+
+    const { data, error } = await query;
+
+    if (error) throw error;
+    return data || [];
+  },
 };
+
 
 
 

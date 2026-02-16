@@ -11,7 +11,7 @@ import { useIsInWishlist, useAddToWishlist, useRemoveFromWishlist } from '@/hook
 import { ProductReviews } from '@/components/ProductReviews';
 import { RelatedProducts } from '@/components/RelatedProducts';
 import { OptimizedImage } from '@/components/OptimizedImage';
-import { ShoppingBag, ArrowLeft, Heart } from 'lucide-react';
+import { ShoppingBag, ArrowLeft, Heart, ZoomIn, ZoomOut } from 'lucide-react';
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -27,6 +27,7 @@ const ProductDetail = () => {
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [isZoomEnabled, setIsZoomEnabled] = useState(false);
 
   useEffect(() => {
     if (product) {
@@ -138,30 +139,57 @@ const ProductDetail = () => {
           {/* Product Images */}
           <div className="space-y-4">
             {/* Main Image */}
-            <div
-              className="aspect-[3/4] overflow-hidden rounded-lg bg-muted relative cursor-crosshair"
-              onMouseMove={handleMouseMove}
-              onMouseEnter={() => setIsHovering(true)}
-              onMouseLeave={() => setIsHovering(false)}
-            >
-              <OptimizedImage
-                src={
-                  product.image_urls && product.image_urls.length > 0
-                    ? selectedImageIndex === 0
-                      ? product.image_url
-                      : product.image_urls[selectedImageIndex - 1]
-                    : product.image_url
-                }
-                alt={product.name}
-                aspectRatio="portrait"
-                priority={selectedImageIndex === 0}
-                className="w-full h-full"
-                style={{
-                  transform: isHovering ? `scale(2)` : 'scale(1)',
-                  transformOrigin: `${mousePosition.x}% ${mousePosition.y}%`,
-                  transition: isHovering ? 'none' : 'transform 0.3s ease-out',
-                }}
-              />
+            <div className="relative">
+              <div
+                className={`aspect-[3/4] overflow-hidden rounded-lg bg-muted relative ${isZoomEnabled ? 'cursor-crosshair' : 'cursor-default'}`}
+                onMouseMove={isZoomEnabled ? handleMouseMove : undefined}
+                onMouseEnter={isZoomEnabled ? () => setIsHovering(true) : undefined}
+                onMouseLeave={isZoomEnabled ? () => setIsHovering(false) : undefined}
+              >
+                <OptimizedImage
+                  src={
+                    product.image_urls && product.image_urls.length > 0
+                      ? selectedImageIndex === 0
+                        ? product.image_url
+                        : product.image_urls[selectedImageIndex - 1]
+                      : product.image_url
+                  }
+                  alt={product.name}
+                  aspectRatio="portrait"
+                  priority={selectedImageIndex === 0}
+                  className="w-full h-full"
+                  style={{
+                    transform: isZoomEnabled && isHovering ? `scale(2)` : 'scale(1)',
+                    transformOrigin: `${mousePosition.x}% ${mousePosition.y}%`,
+                    transition: isZoomEnabled && isHovering ? 'none' : 'transform 0.3s ease-out',
+                  }}
+                />
+              </div>
+
+              {/* Wishlist and Zoom Buttons */}
+              <div className="absolute top-4 right-4 z-50 flex gap-2">
+                {/* Wishlist Button */}
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  className="bg-black hover:bg-gray-900 shadow-lg border-0"
+                  onClick={handleToggleWishlist}
+                  title={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
+                >
+                  <Heart className={`h-5 w-5 text-white transition-colors ${isInWishlist ? 'fill-white' : ''}`} />
+                </Button>
+
+                {/* Zoom Toggle Button */}
+                <Button
+                  variant="secondary"
+                  size="icon"
+                  className="bg-black hover:bg-gray-900 shadow-lg border-0"
+                  onClick={() => setIsZoomEnabled(!isZoomEnabled)}
+                  title={isZoomEnabled ? "Disable zoom" : "Enable zoom"}
+                >
+                  {isZoomEnabled ? <ZoomOut className="h-5 w-5 text-white" /> : <ZoomIn className="h-5 w-5 text-white" />}
+                </Button>
+              </div>
             </div>
 
             {/* Thumbnail Gallery */}
@@ -253,13 +281,13 @@ const ProductDetail = () => {
               <div className="flex justify-between py-2 border-b">
                 <span className="text-muted-foreground">Availability</span>
                 <span className={`font-medium ${product.in_stock ? 'text-green-600' : 'text-red-600'}`}>
-                  {product.in_stock ? `In Stock (${product.stock})` : 'Out of Stock'}
+                  {product.in_stock ? 'In Stock' : 'Out of Stock'}
                 </span>
               </div>
             </div>
 
-            {/* Add to Cart and Wishlist Buttons */}
-            <div className="mt-auto space-y-3">
+            {/* Add to Cart Button */}
+            <div className="mt-auto">
               <Button
                 size="lg"
                 className="w-full"
@@ -268,15 +296,6 @@ const ProductDetail = () => {
               >
                 <ShoppingBag className="mr-2 h-5 w-5" />
                 {product.in_stock ? 'Add to Cart' : 'Out of Stock'}
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="w-full"
-                onClick={handleToggleWishlist}
-              >
-                <Heart className={`mr-2 h-5 w-5 transition-colors ${isInWishlist ? 'fill-red-500 text-red-500' : ''}`} />
-                {isInWishlist ? 'Remove from Wishlist' : 'Add to Wishlist'}
               </Button>
             </div>
           </div>

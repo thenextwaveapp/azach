@@ -185,17 +185,6 @@ const Admin = () => {
     setEditingProduct(null);
   };
 
-  if (isLoading) {
-    return (
-      <div className="min-h-screen">
-        <Header />
-        <div className="container mx-auto px-4 py-12">
-          <p>Loading...</p>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen">
       <Header />

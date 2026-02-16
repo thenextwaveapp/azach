@@ -47,6 +47,21 @@ export const useSearchProducts = (query: string) => {
   });
 };
 
+export const useFilteredProducts = (filters: {
+  categories?: string[];
+  minPrice?: number;
+  maxPrice?: number;
+  inStock?: boolean | null;
+  onSale?: boolean | null;
+  gender?: 'men' | 'women' | 'unisex' | null;
+  sortBy?: 'newest' | 'price-low' | 'price-high' | 'name-asc' | 'name-desc';
+}) => {
+  return useQuery({
+    queryKey: ['products', 'filtered', filters],
+    queryFn: () => productService.getFiltered(filters),
+  });
+};
+
 export const useCreateProduct = () => {
   const queryClient = useQueryClient();
 
@@ -80,6 +95,7 @@ export const useDeleteProduct = () => {
     },
   });
 };
+
 
 
 

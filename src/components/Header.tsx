@@ -1,4 +1,4 @@
-import { ShoppingBag, Menu, Search } from "lucide-react";
+import { ShoppingBag, Menu, Search, User, LogIn, Heart, Package, Settings, LogOut, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Link } from "react-router-dom";
@@ -7,15 +7,20 @@ import { SearchDialog } from "@/components/SearchDialog";
 import { AccountDropdown } from "@/components/AccountDropdown";
 import { CurrencySwitcher } from "@/components/CurrencySwitcher";
 import { useCart } from "@/contexts/CartContext";
+import { useAuth } from "@/contexts/AuthContext";
+import { useCurrency } from "@/contexts/CurrencyContext";
 import { ShippingBanner } from "@/components/ShippingBanner";
 import { CartDrawer } from "@/components/CartDrawer";
 
 export const Header = () => {
   const [searchOpen, setSearchOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isVisible, setIsVisible] = useState(true);
   const [lastScrollY, setLastScrollY] = useState(0);
   const { getTotalItems } = useCart();
+  const { user, signOut } = useAuth();
+  const { currency, setCurrency } = useCurrency();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -51,7 +56,7 @@ export const Header = () => {
         <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between">
           {/* Mobile Menu */}
-          <Sheet>
+          <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild className="lg:hidden">
               <Button variant="ghost" size="icon">
                 <Menu className="h-5 w-5" />
@@ -59,13 +64,98 @@ export const Header = () => {
             </SheetTrigger>
             <SheetContent side="left">
               <nav className="flex flex-col gap-4 mt-8">
-                <Link to="/our-story" className="text-lg hover:text-secondary transition-colors">Our Story</Link>
-                <Link to="/shop-all" className="text-lg hover:text-secondary transition-colors">Shop All</Link>
-                <Link to="/women" className="text-lg hover:text-secondary transition-colors">Women</Link>
-                <Link to="/men" className="text-lg hover:text-secondary transition-colors">Men</Link>
-                <Link to="/sale" className="text-lg hover:text-secondary transition-colors">Sale</Link>
-                <Link to="/bespoke" className="text-lg hover:text-secondary transition-colors">Bespoke</Link>
+                <Link to="/our-story" className="text-lg hover:text-secondary transition-colors" onClick={() => setMobileMenuOpen(false)}>Our Story</Link>
+                <Link to="/shop-all" className="text-lg hover:text-secondary transition-colors" onClick={() => setMobileMenuOpen(false)}>Shop All</Link>
+                <Link to="/women" className="text-lg hover:text-secondary transition-colors" onClick={() => setMobileMenuOpen(false)}>Women</Link>
+                <Link to="/men" className="text-lg hover:text-secondary transition-colors" onClick={() => setMobileMenuOpen(false)}>Men</Link>
+                <Link to="/sale" className="text-lg hover:text-secondary transition-colors" onClick={() => setMobileMenuOpen(false)}>Sale</Link>
+                <Link to="/bespoke" className="text-lg hover:text-secondary transition-colors" onClick={() => setMobileMenuOpen(false)}>Bespoke</Link>
               </nav>
+
+              {/* Mobile Actions */}
+              <div className="border-t border-border mt-6 pt-6 flex flex-col gap-3">
+                <button
+                  className="flex items-center gap-3 text-lg hover:text-secondary transition-colors"
+                  onClick={() => { setMobileMenuOpen(false); setSearchOpen(true); }}
+                >
+                  <Search className="h-5 w-5" />
+                  Search
+                </button>
+
+                <button
+                  className="flex items-center gap-3 text-lg hover:text-secondary transition-colors relative"
+                  onClick={() => { setMobileMenuOpen(false); setCartOpen(true); }}
+                >
+                  <ShoppingBag className="h-5 w-5" />
+                  Cart
+                  {getTotalItems() > 0 && (
+                    <span className="h-5 w-5 rounded-full bg-red-600 text-white text-xs flex items-center justify-center">
+                      {getTotalItems()}
+                    </span>
+                  )}
+                </button>
+
+                {/* Account Links */}
+                {user ? (
+                  <>
+                    <Link to="/account" className="flex items-center gap-3 text-lg hover:text-secondary transition-colors" onClick={() => setMobileMenuOpen(false)}>
+                      <User className="h-5 w-5" />
+                      Profile
+                    </Link>
+                    <Link to="/orders" className="flex items-center gap-3 text-lg hover:text-secondary transition-colors" onClick={() => setMobileMenuOpen(false)}>
+                      <Package className="h-5 w-5" />
+                      Orders
+                    </Link>
+                    <Link to="/wishlist" className="flex items-center gap-3 text-lg hover:text-secondary transition-colors" onClick={() => setMobileMenuOpen(false)}>
+                      <Heart className="h-5 w-5" />
+                      Wishlist
+                    </Link>
+                    <Link to="/settings" className="flex items-center gap-3 text-lg hover:text-secondary transition-colors" onClick={() => setMobileMenuOpen(false)}>
+                      <Settings className="h-5 w-5" />
+                      Settings
+                    </Link>
+                    <button
+                      className="flex items-center gap-3 text-lg text-destructive hover:opacity-80 transition-colors"
+                      onClick={() => { setMobileMenuOpen(false); signOut(); }}
+                    >
+                      <LogOut className="h-5 w-5" />
+                      Logout
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/login" className="flex items-center gap-3 text-lg hover:text-secondary transition-colors" onClick={() => setMobileMenuOpen(false)}>
+                      <LogIn className="h-5 w-5" />
+                      Login
+                    </Link>
+                    <Link to="/register" className="flex items-center gap-3 text-lg hover:text-secondary transition-colors" onClick={() => setMobileMenuOpen(false)}>
+                      <User className="h-5 w-5" />
+                      Create Account
+                    </Link>
+                  </>
+                )}
+
+                {/* Currency Switcher */}
+                <div className="border-t border-border mt-3 pt-3">
+                  <p className="text-sm text-muted-foreground mb-2">Currency</p>
+                  <div className="flex gap-2">
+                    <button
+                      className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${currency === 'USD' ? 'bg-muted' : 'hover:bg-muted/50'}`}
+                      onClick={() => setCurrency('USD')}
+                    >
+                      <DollarSign className="h-4 w-4" />
+                      USD
+                    </button>
+                    <button
+                      className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${currency === 'CAD' ? 'bg-muted' : 'hover:bg-muted/50'}`}
+                      onClick={() => setCurrency('CAD')}
+                    >
+                      <DollarSign className="h-4 w-4" />
+                      CAD
+                    </button>
+                  </div>
+                </div>
+              </div>
             </SheetContent>
           </Sheet>
 
@@ -117,8 +207,8 @@ export const Header = () => {
             <img src="/Azach-Logo.png" alt="AZACH" className="h-10 w-auto" />
           </Link>
 
-          {/* Actions */}
-          <div className="flex items-center gap-2">
+          {/* Actions - hidden on mobile, shown in drawer instead */}
+          <div className="hidden lg:flex items-center gap-2">
             <Link to="/bespoke">
               <Button
                 variant="ghost"

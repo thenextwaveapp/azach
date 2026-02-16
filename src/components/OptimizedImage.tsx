@@ -40,6 +40,8 @@ export const OptimizedImage = ({
         src={src}
         alt={alt}
         loading={priority ? 'eager' : loading}
+        fetchPriority={priority ? 'high' : 'auto'}
+        decoding="async"
         onLoad={() => setIsLoaded(true)}
         onError={() => setHasError(true)}
         className={cn(

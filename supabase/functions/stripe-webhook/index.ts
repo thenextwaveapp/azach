@@ -146,6 +146,14 @@ serve(async (req) => {
         }
       }
 
+      // Release stock reservation
+      const reservationSessionId = session.metadata?.reservationSessionId
+      if (reservationSessionId) {
+        await supabaseAdmin.rpc('release_reservation', {
+          p_session_id: reservationSessionId
+        })
+      }
+
       console.log('Order created successfully:', order.id)
     }
 

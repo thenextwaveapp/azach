@@ -1,34 +1,41 @@
 import { Header } from "@/components/Header";
 import { ProductCard } from "@/components/ProductCard";
 import { Newsletter } from "@/components/Newsletter";
-import { ProductFilters } from "@/components/ProductFilters";
-import { useProductsByGender } from "@/hooks/useProducts";
+import { ProductFilters, SortOption } from "@/components/ProductFilters";
+import { useFilteredProducts, useProducts } from "@/hooks/useProducts";
 import { productToDisplay } from "@/utils/productHelpers";
-import { useState, useMemo, useEffect } from "react";
-import { Product } from "@/types/product";
+import { useState, useEffect } from "react";
 
 const Men = () => {
-  const { data: menProducts = [], isLoading } = useProductsByGender('men');
-  const [filteredProducts, setFilteredProducts] = useState<Product[]>(menProducts);
+  const [filters, setFilters] = useState<{
+    categories: string[];
+    minPrice: number;
+    maxPrice: number;
+    inStock: boolean | null;
+    onSale: boolean | null;
+    gender: 'men' | 'women' | 'unisex' | null;
+    genders: ('men' | 'women' | 'unisex')[];
+    sortBy: SortOption;
+  }>({
+    categories: [],
+    minPrice: 0,
+    maxPrice: 10000,
+    inStock: null,
+    onSale: null,
+    gender: null,
+    genders: ['men', 'unisex'], // Filter for men and unisex
+    sortBy: 'newest',
+  });
 
-  // Get unique categories and max price
-  const { categories, maxPrice } = useMemo(() => {
-    const uniqueCategories = Array.from(new Set(menProducts.map(p => p.category)));
-    const max = menProducts.length > 0
-      ? Math.max(...menProducts.map(p => p.price))
-      : 1000;
-    return { categories: uniqueCategories, maxPrice: max };
-  }, [menProducts]);
+  const { data: products = [], isLoading } = useFilteredProducts(filters);
+
+  // Get all products for categories (we still need this for filter options)
+  const { data: allProducts = [] } = useProducts();
 
   // Set page title
   useEffect(() => {
     document.title = "Men's Collection - AZACH";
   }, []);
-
-  // Update filtered products when original products change
-  useEffect(() => {
-    setFilteredProducts(menProducts);
-  }, [menProducts]);
 
   return (
     <div className="min-h-screen">
@@ -49,33 +56,26 @@ const Men = () => {
       {/* Products Grid */}
       <section className="py-24">
         <div className="container mx-auto px-4">
+          <ProductFilters
+            onFiltersChange={setFilters}
+            availableCategories={Array.from(new Set(allProducts.map(p => p.category)))}
+            maxPrice={allProducts.length > 0 ? Math.max(...allProducts.map(p => p.price)) : 1000}
+            hideGenderFilter={true}
+          />
+
           {isLoading ? (
             <div className="text-center py-12">
               <p className="text-muted-foreground">Loading products...</p>
             </div>
-          ) : menProducts.length > 0 ? (
-            <>
-              <ProductFilters
-                products={menProducts}
-                onProductsChange={setFilteredProducts}
-                availableCategories={categories}
-                maxPrice={maxPrice}
-              />
-              {filteredProducts.length > 0 ? (
+          ) : products.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-                  {filteredProducts.map((product) => (
-                    <ProductCard key={product.id} {...productToDisplay(product)} product={product} />
+              {products.map((product) => (
+                <ProductCard key={product.id} {...productToDisplay(product)} product={product} />
               ))}
             </div>
-              ) : (
-                <div className="text-center py-12">
-                  <p className="text-muted-foreground">No products match your filters.</p>
-                </div>
-              )}
-            </>
           ) : (
             <div className="text-center py-12">
-              <p className="text-muted-foreground">No men's products available.</p>
+              <p className="text-muted-foreground">No products match your filters.</p>
             </div>
           )}
         </div>
