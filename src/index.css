@@ -95,6 +95,7 @@ All colors MUST be HSL.
   }
 
   html {
+    background-color: #000;
     scroll-behavior: smooth;
     -webkit-overflow-scrolling: touch;
     scroll-padding-top: 80px;
