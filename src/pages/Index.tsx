@@ -3,7 +3,7 @@ import { Hero } from "@/components/Hero";
 import { ProductCard } from "@/components/ProductCard";
 import { Newsletter } from "@/components/Newsletter";
 import { WelcomeModal } from "@/components/WelcomeModal";
-import { GoldDivider } from "@/components/GoldDivider";
+import { Footer } from "@/components/Footer";
 import { useFeaturedProducts } from "@/hooks/useProducts";
 import { productToDisplay } from "@/utils/productHelpers";
 import { OptimizedImage } from "@/components/OptimizedImage";
@@ -23,23 +23,23 @@ const Index = () => {
       <Header />
       <Hero />
       
-      {/* Featured Collections */}
-      <section className="py-24 bg-gradient-to-b from-[#f5f0e8] via-white to-white">
+      {/* NEW PIECES */}
+      <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-4xl md:text-5xl font-bold mb-4">New Arrivals</h2>
-            <p className="text-lg text-muted-foreground">
-              Curated pieces for the season ahead
-            </p>
+          <div className="flex justify-between items-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold uppercase tracking-wide">New Pieces</h2>
+            <Link to="/shop-all" className="text-sm uppercase tracking-wider hover:text-secondary transition-colors">
+              View All →
+            </Link>
           </div>
-          
+
           {isLoading ? (
             <div className="text-center py-12">
               <p className="text-muted-foreground">Loading products...</p>
             </div>
           ) : featuredProducts.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              {featuredProducts.map((product) => (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
+              {featuredProducts.slice(0, 5).map((product) => (
                 <ProductCard key={product.id} {...productToDisplay(product)} product={product} />
               ))}
             </div>
@@ -51,128 +51,209 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Collections Grid */}
-      <section className="py-24 bg-gradient-to-b from-white to-muted">
+      {/* Custom / Rework & Repair Introduction */}
+      <section className="py-24 bg-muted">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-2 gap-8">
-            <Link to="/women" className="relative aspect-square overflow-hidden group cursor-pointer">
-              <OptimizedImage
-                src="https://imagizer.imageshack.com/img922/6348/RmDO6F.jpg"
-                alt="Women's Collection"
-                aspectRatio="square"
-                className="h-full w-full object-cover object-bottom transition-transform duration-500 group-hover:scale-105"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors flex items-center justify-center">
-                <div className="text-white text-center">
-                  <h3 className="text-4xl font-bold mb-2 group-hover:scale-105 transition-transform">Women</h3>
-                  <p className="text-base font-medium opacity-90 group-hover:opacity-100 group-hover:translate-y-[-4px] transition-all flex items-center justify-center gap-2">
-                    Explore Collection
-                    <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                    </svg>
-                  </p>
+          <div className="max-w-4xl mx-auto text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-bold mb-6 uppercase">This is where your pieces evolve.</h2>
+            <p className="text-xl text-muted-foreground mb-4">
+              At AZACH, we work in two ways:
+            </p>
+            <p className="text-lg text-muted-foreground">
+              We create new pieces with you (Custom)<br />
+              Or we transform what you already have (Rework & Repair)
+            </p>
+            <p className="text-lg text-muted-foreground mt-6">
+              Both are built around collaboration — the difference is where you're starting from.
+            </p>
+          </div>
+
+          <div className="max-w-4xl mx-auto mb-12">
+            <h3 className="text-2xl font-bold mb-8 text-center uppercase">Choose Your Path</h3>
+            <div className="grid md:grid-cols-2 gap-8 mb-8">
+              <Link to="/bespoke" className="group">
+                <div className="bg-white p-8 h-full hover:shadow-lg transition-shadow border-2 border-transparent hover:border-foreground">
+                  <h4 className="text-2xl font-bold mb-4 uppercase">Custom (Bespoke)</h4>
+                  <p className="text-lg font-medium mb-4">Start from an idea.</p>
+                  <div className="text-sm text-muted-foreground space-y-2 mb-6">
+                    <p><strong>This is for you if:</strong></p>
+                    <p>• You want a completely new piece</p>
+                    <p>• You have a vision, reference, or concept</p>
+                    <p>• You want something made specifically for you</p>
+                    <p className="mt-4 text-xs">Available worldwide.</p>
+                  </div>
+                  <span className="text-sm uppercase tracking-wider group-hover:text-secondary transition-colors">
+                    Start Custom Request →
+                  </span>
                 </div>
-              </div>
-            </Link>
-            <Link to="/men" className="relative aspect-square overflow-hidden group cursor-pointer">
-              <OptimizedImage
-                src="https://imagizer.imageshack.com/img922/2820/P7UF2l.jpg"
-                alt="Men's Collection"
-                aspectRatio="square"
-                className="h-full w-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors flex items-center justify-center">
-                <div className="text-white text-center">
-                  <h3 className="text-4xl font-bold mb-2 group-hover:scale-105 transition-transform">Men</h3>
-                  <p className="text-base font-medium opacity-90 group-hover:opacity-100 group-hover:translate-y-[-4px] transition-all flex items-center justify-center gap-2">
-                    Explore Collection
-                    <svg className="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                    </svg>
-                  </p>
+              </Link>
+              <Link to="/rework" className="group">
+                <div className="bg-white p-8 h-full hover:shadow-lg transition-shadow border-2 border-transparent hover:border-foreground">
+                  <h4 className="text-2xl font-bold mb-4 uppercase">Rework & Repair</h4>
+                  <p className="text-lg font-medium mb-4">Start from what you already own.</p>
+                  <div className="text-sm text-muted-foreground space-y-2 mb-6">
+                    <p><strong>This is for you if:</strong></p>
+                    <p>• You have denim you want to transform</p>
+                    <p>• Your piece needs adjustment or redesign</p>
+                    <p>• You want to give new life to what you wear</p>
+                    <p className="mt-4 text-xs">Lagos, Nigeria only.</p>
+                  </div>
+                  <span className="text-sm uppercase tracking-wider group-hover:text-secondary transition-colors">
+                    Start Rework Request →
+                  </span>
                 </div>
+              </Link>
+            </div>
+          </div>
+
+          <div className="max-w-2xl mx-auto">
+            <Link to="/donate-garments" className="group block">
+              <div className="bg-white p-8 hover:shadow-lg transition-shadow text-center">
+                <h4 className="text-2xl font-bold mb-4 uppercase">Donate Garments</h4>
+                <p className="text-muted-foreground mb-6">
+                  Not everything needs to be thrown away. Your unused garments can still serve a purpose — either within the community or through our production process.
+                </p>
+                <span className="text-sm uppercase tracking-wider group-hover:text-secondary transition-colors">
+                  Learn About Donations →
+                </span>
               </div>
             </Link>
           </div>
         </div>
       </section>
 
-      <Newsletter />
-
-      <GoldDivider />
-
-      {/* Footer */}
-      <footer className="py-16 bg-black text-white">
+      {/* SHOP BY TYPE */}
+      <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
-          {/* Top Section - Logo and Social */}
-          <div className="flex flex-col md:flex-row justify-between items-center mb-12 pb-12 border-b border-gray-800">
-            <Link 
-              to="/" 
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="mb-6 md:mb-0"
-            >
-              <img src="/Azach-Logo.png" alt="AZACH" className="h-16 w-auto brightness-0 invert" />
+          <h2 className="text-3xl md:text-4xl font-bold uppercase tracking-wide mb-12 text-center">Shop by Type</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            <Link to="/shop-all?category=tops" className="relative aspect-square group overflow-hidden">
+              <OptimizedImage
+                src="https://imagizer.imageshack.com/img922/6348/RmDO6F.jpg"
+                alt="Tops"
+                aspectRatio="square"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors flex items-center justify-center">
+                <span className="text-white text-xl font-bold uppercase tracking-wide">Tops</span>
+              </div>
             </Link>
-            <div className="flex gap-6">
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
-                <img src="/instagram.png" alt="Instagram" className="h-6 w-6" />
-                <span className="sr-only">Instagram</span>
-              </a>
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
-                <img src="/facebook.png" alt="Facebook" className="h-6 w-6" />
-                <span className="sr-only">Facebook</span>
-              </a>
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
-                <img src="/x.png" alt="X" className="h-6 w-6" />
-                <span className="sr-only">X</span>
-              </a>
-              <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
-                <img src="/tiktok.png" alt="TikTok" className="h-6 w-6" />
-                <span className="sr-only">TikTok</span>
-              </a>
-              <a href="https://snapchat.com" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
-                <img src="/snapchat.png" alt="Snapchat" className="h-6 w-6" />
-                <span className="sr-only">Snapchat</span>
-              </a>
-            </div>
-          </div>
-
-          {/* Links Section */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 mb-12">
-            <div>
-              <h4 className="font-semibold mb-4 text-white uppercase tracking-wider text-sm">Shop</h4>
-              <ul className="space-y-3 text-sm text-gray-400">
-                <li><Link to="/shop-all" className="hover:text-white transition-colors">Shop All</Link></li>
-                <li><Link to="/women" className="hover:text-white transition-colors">Women</Link></li>
-                <li><Link to="/men" className="hover:text-white transition-colors">Men</Link></li>
-                <li><Link to="/sale" className="hover:text-white transition-colors">Sale</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4 text-white uppercase tracking-wider text-sm">Help</h4>
-              <ul className="space-y-3 text-sm text-gray-400">
-                <li><Link to="/customer-service" className="hover:text-white transition-colors">Customer Service</Link></li>
-                <li><Link to="/returns" className="hover:text-white transition-colors">Returns</Link></li>
-                <li><Link to="/size-guide" className="hover:text-white transition-colors">Size Guide</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4 text-white uppercase tracking-wider text-sm">Company</h4>
-              <ul className="space-y-3 text-sm text-gray-400">
-                <li><Link to="/our-story" className="hover:text-white transition-colors">Our Story</Link></li>
-                <li><Link to="/lookbook" className="hover:text-white transition-colors">Lookbook</Link></li>
-              </ul>
-            </div>
-          </div>
-
-          {/* Copyright */}
-          <div className="pt-8 border-t border-gray-800 text-center text-sm text-gray-400">
-            <p>&copy; 2024 AZACH. All rights reserved.</p>
+            <Link to="/shop-all?category=bottoms" className="relative aspect-square group overflow-hidden">
+              <OptimizedImage
+                src="https://imagizer.imageshack.com/img922/2820/P7UF2l.jpg"
+                alt="Bottoms"
+                aspectRatio="square"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors flex items-center justify-center">
+                <span className="text-white text-xl font-bold uppercase tracking-wide">Bottoms</span>
+              </div>
+            </Link>
+            <Link to="/shop-all?category=outerwear" className="relative aspect-square group overflow-hidden">
+              <OptimizedImage
+                src="https://imagizer.imageshack.com/img922/6348/RmDO6F.jpg"
+                alt="Outerwear"
+                aspectRatio="square"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors flex items-center justify-center">
+                <span className="text-white text-xl font-bold uppercase tracking-wide">Outerwear</span>
+              </div>
+            </Link>
+            <Link to="/shop-all?category=sets" className="relative aspect-square group overflow-hidden">
+              <OptimizedImage
+                src="https://imagizer.imageshack.com/img922/2820/P7UF2l.jpg"
+                alt="Sets"
+                aspectRatio="square"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors flex items-center justify-center">
+                <span className="text-white text-xl font-bold uppercase tracking-wide">Sets</span>
+              </div>
+            </Link>
+            <Link to="/shop-all?category=accessories" className="relative aspect-square group overflow-hidden">
+              <OptimizedImage
+                src="https://imagizer.imageshack.com/img922/6348/RmDO6F.jpg"
+                alt="Accessories"
+                aspectRatio="square"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors flex items-center justify-center">
+                <span className="text-white text-xl font-bold uppercase tracking-wide">Accessories</span>
+              </div>
+            </Link>
+            <Link to="/shop-all?category=hats" className="relative aspect-square group overflow-hidden">
+              <OptimizedImage
+                src="https://imagizer.imageshack.com/img922/2820/P7UF2l.jpg"
+                alt="Hats"
+                aspectRatio="square"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors flex items-center justify-center">
+                <span className="text-white text-xl font-bold uppercase tracking-wide">Hats</span>
+              </div>
+            </Link>
+            <Link to="/shop-all?category=bags" className="relative aspect-square group overflow-hidden">
+              <OptimizedImage
+                src="https://imagizer.imageshack.com/img922/6348/RmDO6F.jpg"
+                alt="Bags"
+                aspectRatio="square"
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors flex items-center justify-center">
+                <span className="text-white text-xl font-bold uppercase tracking-wide">Bags</span>
+              </div>
+            </Link>
           </div>
         </div>
-      </footer>
+      </section>
+
+      {/* HOW IT WORKS */}
+      <section className="py-24 bg-muted">
+        <div className="container mx-auto px-4">
+          <h2 className="text-3xl md:text-4xl font-bold uppercase tracking-wide mb-16 text-center">How It Works</h2>
+          <div className="grid md:grid-cols-3 gap-12 max-w-5xl mx-auto">
+            <div className="text-center">
+              <div className="w-20 h-20 rounded-full bg-foreground text-background flex items-center justify-center text-3xl font-bold mx-auto mb-6">
+                1
+              </div>
+              <h3 className="text-xl font-bold mb-3 uppercase">Choose Your Path</h3>
+              <p className="text-muted-foreground">
+                Browse our collection of one-of-one pieces, request a bespoke item, or bring in something to rework.
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="w-20 h-20 rounded-full bg-foreground text-background flex items-center justify-center text-3xl font-bold mx-auto mb-6">
+                2
+              </div>
+              <h3 className="text-xl font-bold mb-3 uppercase">We Create</h3>
+              <p className="text-muted-foreground">
+                Our skilled team reconstructs, repairs, or crafts your piece using upcycled materials.
+              </p>
+            </div>
+            <div className="text-center">
+              <div className="w-20 h-20 rounded-full bg-foreground text-background flex items-center justify-center text-3xl font-bold mx-auto mb-6">
+                3
+              </div>
+              <h3 className="text-xl font-bold mb-3 uppercase">You Receive</h3>
+              <p className="text-muted-foreground">
+                Get your unique piece delivered, ready to wear and make a statement.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <Newsletter />
+
+      <Footer />
     </div>
   );
 };

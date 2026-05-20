@@ -30,6 +30,8 @@ import Returns from "./pages/Returns";
 import SizeGuide from "./pages/SizeGuide";
 import ProductDetail from "./pages/ProductDetail";
 import Bespoke from "./pages/Bespoke";
+import Rework from "./pages/Rework";
+import DonateGarments from "./pages/DonateGarments";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -100,6 +102,8 @@ const App = () => (
               <Route path="/returns" element={<Returns />} />
               <Route path="/size-guide" element={<SizeGuide />} />
               <Route path="/bespoke" element={<Bespoke />} />
+              <Route path="/rework" element={<Rework />} />
+              <Route path="/donate-garments" element={<DonateGarments />} />
               <Route path="/product/:id" element={<ProductDetail />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />

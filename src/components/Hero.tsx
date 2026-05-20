@@ -1,94 +1,39 @@
 import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useEffect, useRef } from "react";
+import { OptimizedImage } from "@/components/OptimizedImage";
 
 export const Hero = () => {
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const saveIntervalRef = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const handleLoadedMetadata = () => {
-      // Restore saved playback position once video metadata is loaded
-      const savedTime = sessionStorage.getItem('hero-video-time');
-      if (savedTime) {
-        const time = parseFloat(savedTime);
-        // Only restore if video duration is available and time is valid
-        if (video.duration && time < video.duration) {
-          video.currentTime = time;
-        }
-      }
-    };
-
-    // Save playback position every 0.5 seconds
-    const savePosition = () => {
-      if (video && !video.paused && video.readyState >= 2) {
-        sessionStorage.setItem('hero-video-time', video.currentTime.toString());
-      }
-    };
-
-    video.addEventListener('loadedmetadata', handleLoadedMetadata);
-    saveIntervalRef.current = setInterval(savePosition, 500);
-
-    // Also try to restore immediately if video is already loaded
-    if (video.readyState >= 1) {
-      handleLoadedMetadata();
-    }
-
-    // Cleanup on unmount
-    return () => {
-      if (saveIntervalRef.current) {
-        clearInterval(saveIntervalRef.current);
-      }
-      // Save final position before unmounting
-      if (video && video.readyState >= 2) {
-        sessionStorage.setItem('hero-video-time', video.currentTime.toString());
-      }
-      video.removeEventListener('loadedmetadata', handleLoadedMetadata);
-    };
-  }, []);
-
   return (
     <section className="relative h-[calc(100vh-64px)] flex items-center justify-center overflow-hidden">
-      {/* Video Background */}
-      <video
-        ref={videoRef}
-        autoPlay
-        loop
-        muted
-        playsInline
+      {/* Background Image */}
+      <OptimizedImage
+        src="/hero-image.png"
+        alt="AZACH Hero - Reconstructed Fashion"
+        aspectRatio="landscape"
         className="absolute inset-0 w-full h-full object-cover"
-      >
-        <source src="/hero-video.mp4" type="video/mp4" />
-      </video>
+        loading="eager"
+      />
 
       {/* Dark Overlay */}
-      <div className="absolute inset-0 bg-black/50" />
+      <div className="absolute inset-0 bg-black/40" />
 
       <div className="container mx-auto px-4 relative z-10">
-        <div className="max-w-4xl mx-auto text-center space-y-6">
-          <div className="text-xs md:text-sm uppercase tracking-[0.3em] text-white/80 font-light mb-4">
-            Est. Lagos, Nigeria
-          </div>
-          <h1 className="text-7xl md:text-[10rem] font-bold tracking-tight font-display text-white leading-none">
-            UPCYCLED DENIM
+        <div className="max-w-5xl mx-auto text-center space-y-6">
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight text-white leading-tight">
+            RECONSTRUCTED.<br />NOT MASS PRODUCED.
           </h1>
-          <p className="text-xl md:text-3xl text-white/90 font-light max-w-2xl mx-auto">
-            From discarded fabric to timeless fashion
+          <p className="text-lg md:text-xl lg:text-2xl text-white/90 font-light max-w-3xl mx-auto">
+            Every piece is one-of-one, rebuilt from existing materials into something entirely new.
           </p>
-          <div className="flex gap-4 justify-center pt-8">
-            <Link to="/our-story">
-              <Button size="lg" className="bg-white text-black hover:bg-white/90 uppercase font-bold px-8">
-                Our Story
+          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
+            <Link to="/shop-all">
+              <Button size="lg" className="bg-[#a97c50] text-white hover:bg-[#8b6440] uppercase font-bold px-8 w-full sm:w-auto">
+                Shop New Pieces
               </Button>
             </Link>
-            <Link to="/lookbook">
-              <Button size="lg" className="bg-black text-white hover:bg-black/90 group uppercase font-bold px-8">
-                Our Looks
-                <ArrowRight className="ml-2 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+            <Link to="/bespoke">
+              <Button size="lg" variant="outline" className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-black uppercase font-bold px-8 w-full sm:w-auto">
+                Custom Request
               </Button>
             </Link>
           </div>

@@ -394,19 +394,53 @@ const Bespoke = () => {
     <div className="min-h-screen">
       <Header />
 
-      <section className="pt-32 pb-32 relative overflow-hidden min-h-screen">
-        {/* Elegant Gradient Background */}
+      {/* Hero Section */}
+      <section className="pt-32 pb-16 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-[#faf9f7] via-[#f5f3f0] to-[#f0ede8]"></div>
-        <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-white/40 to-transparent"></div>
-        <div className="absolute inset-0" style={{
-          backgroundImage: `radial-gradient(circle at 20% 30%, rgba(169, 124, 80, 0.08) 0%, transparent 50%),
-                           radial-gradient(circle at 80% 70%, rgba(169, 124, 80, 0.05) 0%, transparent 50%)`
-        }}></div>
-        
         <div className="container mx-auto px-4 relative z-10">
+          <div className="max-w-4xl mx-auto text-center mb-16">
+            <h1 className="text-4xl md:text-6xl font-bold mb-6 uppercase">Custom (Bespoke)</h1>
+            <p className="text-xl md:text-2xl text-muted-foreground mb-4">
+              Start from an idea.
+            </p>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              This is for you if you want a completely new piece, have a vision or concept, or want something made specifically for you.
+            </p>
+          </div>
+
+          {/* Info Cards */}
+          <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-8 mb-16">
+            <Card className="bg-white/80 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle>What You Get</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm text-muted-foreground">
+                <p>• Design and build using existing AZACH silhouettes</p>
+                <p>• Completely new piece made specifically for you</p>
+                <p>• Collaborative design process</p>
+                <p>• Custom silhouettes available at additional cost</p>
+                <p>• Available worldwide</p>
+              </CardContent>
+            </Card>
+
+            <Card className="bg-white/80 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle>How It Works</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-3 text-sm text-muted-foreground">
+                <p><strong>1.</strong> Fill the form below with your idea</p>
+                <p><strong>2.</strong> Choose your silhouette from our designs</p>
+                <p><strong>3.</strong> We take your measurements</p>
+                <p><strong>4.</strong> Design approval before production</p>
+                <p><strong>5.</strong> Production: 7–10 working days</p>
+                <p><strong>6.</strong> Delivery to your location</p>
+              </CardContent>
+            </Card>
+          </div>
+
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-8">
-              <h1 className="text-4xl md:text-5xl font-bold mb-4">Bespoke Orders</h1>
+              <h2 className="text-3xl md:text-4xl font-bold mb-4">Start Your Request</h2>
               <p className="text-lg text-muted-foreground">
                 Create your perfect custom piece with your measurements and style preferences
               </p>

@@ -64,12 +64,15 @@ export const Header = () => {
             </SheetTrigger>
             <SheetContent side="left">
               <nav className="flex flex-col gap-4 mt-8">
-                <Link to="/our-story" className="text-lg hover:text-secondary transition-colors" onClick={() => setMobileMenuOpen(false)}>Our Story</Link>
-                <Link to="/shop-all" className="text-lg hover:text-secondary transition-colors" onClick={() => setMobileMenuOpen(false)}>Shop All</Link>
-                <Link to="/women" className="text-lg hover:text-secondary transition-colors" onClick={() => setMobileMenuOpen(false)}>Women</Link>
-                <Link to="/men" className="text-lg hover:text-secondary transition-colors" onClick={() => setMobileMenuOpen(false)}>Men</Link>
-                <Link to="/sale" className="text-lg hover:text-secondary transition-colors" onClick={() => setMobileMenuOpen(false)}>Sale</Link>
-                <Link to="/bespoke" className="text-lg hover:text-secondary transition-colors" onClick={() => setMobileMenuOpen(false)}>Bespoke</Link>
+                <Link to="/shop-all" className="text-lg hover:text-secondary transition-colors uppercase tracking-wide" onClick={() => setMobileMenuOpen(false)}>Shop</Link>
+                <Link to="/bespoke" className="text-lg hover:text-secondary transition-colors uppercase tracking-wide" onClick={() => setMobileMenuOpen(false)}>Custom</Link>
+                <Link to="/rework" className="text-lg hover:text-secondary transition-colors uppercase tracking-wide" onClick={() => setMobileMenuOpen(false)}>Rework</Link>
+                <Link to="/our-story" className="text-lg hover:text-secondary transition-colors uppercase tracking-wide" onClick={() => setMobileMenuOpen(false)}>About</Link>
+                <div className="border-t border-border mt-2 pt-2">
+                  <Link to="/women" className="text-lg hover:text-secondary transition-colors block mb-3" onClick={() => setMobileMenuOpen(false)}>Women</Link>
+                  <Link to="/men" className="text-lg hover:text-secondary transition-colors block mb-3" onClick={() => setMobileMenuOpen(false)}>Men</Link>
+                  <Link to="/sale" className="text-lg hover:text-secondary transition-colors block" onClick={() => setMobileMenuOpen(false)}>Sale</Link>
+                </div>
               </nav>
 
               {/* Mobile Actions */}
@@ -159,41 +162,39 @@ export const Header = () => {
             </SheetContent>
           </Sheet>
 
+          {/* EST. LAGOS, NIGERIA tag */}
+          <div className="hidden lg:block text-xs tracking-wider text-muted-foreground">
+            EST. LAGOS, NIGERIA
+          </div>
+
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex gap-8">
-            <Link 
-              to="/our-story" 
-              className="relative text-sm font-medium transition-all duration-300 hover:text-secondary group"
+            <Link
+              to="/shop-all"
+              className="relative text-sm font-medium transition-all duration-300 hover:text-secondary group uppercase tracking-wide"
             >
-              Our Story
+              Shop
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all duration-300 group-hover:w-full"></span>
             </Link>
-            <Link 
-              to="/shop-all" 
-              className="relative text-sm font-medium transition-all duration-300 hover:text-secondary group"
+            <Link
+              to="/bespoke"
+              className="relative text-sm font-medium transition-all duration-300 hover:text-secondary group uppercase tracking-wide"
             >
-              Shop All
+              Custom
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all duration-300 group-hover:w-full"></span>
             </Link>
-            <Link 
-              to="/women" 
-              className="relative text-sm font-medium transition-all duration-300 hover:text-secondary group"
+            <Link
+              to="/rework"
+              className="relative text-sm font-medium transition-all duration-300 hover:text-secondary group uppercase tracking-wide"
             >
-              Women
+              Rework
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all duration-300 group-hover:w-full"></span>
             </Link>
-            <Link 
-              to="/men" 
-              className="relative text-sm font-medium transition-all duration-300 hover:text-secondary group"
+            <Link
+              to="/our-story"
+              className="relative text-sm font-medium transition-all duration-300 hover:text-secondary group uppercase tracking-wide"
             >
-              Men
-              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all duration-300 group-hover:w-full"></span>
-            </Link>
-            <Link 
-              to="/sale" 
-              className="relative text-sm font-medium transition-all duration-300 hover:text-secondary group"
-            >
-              Sale
+              About
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all duration-300 group-hover:w-full"></span>
             </Link>
           </nav>
@@ -209,15 +210,6 @@ export const Header = () => {
 
           {/* Actions - hidden on mobile, shown in drawer instead */}
           <div className="hidden lg:flex items-center gap-2">
-            <Link to="/bespoke">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="hidden sm:flex hover:bg-gradient-to-r hover:from-[#a97c50] hover:to-[#c4976d] hover:text-white transition-all duration-500 hover:scale-105 hover:shadow-md"
-              >
-                Bespoke
-              </Button>
-            </Link>
             <Button variant="ghost" size="icon" onClick={() => setSearchOpen(true)} className="hover:bg-muted hover:text-foreground">
               <Search className="h-5 w-5" />
             </Button>

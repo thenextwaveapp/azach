@@ -17,12 +17,12 @@ export const Newsletter = () => {
   };
 
   return (
-    <section className="py-24 bg-muted">
+    <section className="py-24 bg-white">
       <div className="container mx-auto px-4">
-        <div className="max-w-2xl mx-auto text-center space-y-6">
-          <h2 className="text-4xl md:text-5xl font-bold">Stay Updated</h2>
+        <div className="max-w-3xl mx-auto text-center space-y-8">
+          <h2 className="text-3xl md:text-4xl font-bold uppercase tracking-wide">Stay Connected</h2>
           <p className="text-lg text-muted-foreground">
-            Subscribe to our newsletter for exclusive offers and fashion insights
+            Subscribe to our newsletter for exclusive offers and updates
           </p>
           <form onSubmit={handleSubmit} className="flex gap-2 max-w-md mx-auto">
             <Input
@@ -33,8 +33,31 @@ export const Newsletter = () => {
               required
               className="flex-1 focus:outline-none focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
             />
-            <Button type="submit" className="hover:bg-[#a97c50] transition-colors">Subscribe</Button>
+            <Button type="submit" className="bg-[#a97c50] hover:bg-[#8b6440] transition-colors">Subscribe</Button>
           </form>
+
+          {/* Social Media Icons */}
+          <div className="pt-6">
+            <p className="text-sm text-muted-foreground mb-4 uppercase tracking-wider">Follow Us</p>
+            <div className="flex gap-6 justify-center">
+              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
+                <img src="/instagram.png" alt="Instagram" className="h-6 w-6" />
+                <span className="sr-only">Instagram</span>
+              </a>
+              <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
+                <img src="/tiktok.png" alt="TikTok" className="h-6 w-6" />
+                <span className="sr-only">TikTok</span>
+              </a>
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
+                <img src="/x.png" alt="X" className="h-6 w-6" />
+                <span className="sr-only">X</span>
+              </a>
+              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
+                <img src="/facebook.png" alt="Facebook" className="h-6 w-6" />
+                <span className="sr-only">Facebook</span>
+              </a>
+            </div>
+          </div>
         </div>
       </div>
     </section>
