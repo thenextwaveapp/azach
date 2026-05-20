@@ -17,29 +17,29 @@ export const Newsletter = () => {
   };
 
   return (
-    <section className="py-24 bg-white">
+    <section className="py-24 bg-white border-t border-border">
       <div className="container mx-auto px-4">
-        <div className="max-w-3xl mx-auto text-center space-y-8">
-          <h2 className="text-3xl md:text-4xl font-bold uppercase tracking-wide">Stay Connected</h2>
-          <p className="text-lg text-muted-foreground">
-            Subscribe to our newsletter for exclusive offers and updates
-          </p>
-          <form onSubmit={handleSubmit} className="flex gap-2 max-w-md mx-auto">
-            <Input
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              className="flex-1 focus:outline-none focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
-            />
-            <Button type="submit" className="bg-[#a97c50] hover:bg-[#8b6440] transition-colors">Subscribe</Button>
-          </form>
+        <div className="max-w-5xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold uppercase tracking-wide mb-8 text-center">Stay Connected</h2>
 
-          {/* Social Media Icons */}
-          <div className="pt-6">
-            <p className="text-sm text-muted-foreground mb-4 uppercase tracking-wider">Follow Us</p>
-            <div className="flex gap-6 justify-center">
+          <div className="flex flex-col md:flex-row gap-8 items-center justify-between">
+            {/* Left: Email Form */}
+            <form onSubmit={handleSubmit} className="flex gap-2 w-full md:w-auto md:flex-1 max-w-md">
+              <Input
+                type="email"
+                placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+                className="flex-1 focus:outline-none focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
+              />
+              <Button type="submit" className="bg-[#a97c50] hover:bg-[#8b6440] transition-colors">
+                Subscribe
+              </Button>
+            </form>
+
+            {/* Right: Social Media Icons */}
+            <div className="flex gap-6 items-center">
               <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
                 <img src="/instagram.png" alt="Instagram" className="h-6 w-6" />
                 <span className="sr-only">Instagram</span>

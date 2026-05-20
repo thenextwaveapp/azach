@@ -4,44 +4,44 @@ import { OptimizedImage } from "@/components/OptimizedImage";
 
 export const Hero = () => {
   return (
-    <section className="relative h-[calc(100vh-64px)] flex items-center justify-center overflow-hidden">
-      {/* Background Image */}
-      <OptimizedImage
-        src="/hero-image.png"
-        alt="AZACH Hero - Reconstructed Fashion"
-        aspectRatio="landscape"
-        className="absolute inset-0 w-full h-full object-cover"
-        loading="eager"
-      />
-
-      {/* Dark Overlay */}
-      <div className="absolute inset-0 bg-black/40" />
-
-      <div className="container mx-auto px-4 relative z-10">
-        <div className="max-w-5xl mx-auto text-center space-y-6">
-          <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight text-white leading-tight">
-            RECONSTRUCTED.<br />NOT MASS PRODUCED.
-          </h1>
-          <p className="text-lg md:text-xl lg:text-2xl text-white/90 font-light max-w-3xl mx-auto">
-            Every piece is one-of-one, rebuilt from existing materials into something entirely new.
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center pt-8">
-            <Link to="/shop-all">
-              <Button size="lg" className="bg-[#a97c50] text-white hover:bg-[#8b6440] uppercase font-bold px-8 w-full sm:w-auto">
-                Shop New Pieces
-              </Button>
-            </Link>
-            <Link to="/bespoke">
-              <Button size="lg" variant="outline" className="bg-transparent border-2 border-white text-white hover:bg-white hover:text-black uppercase font-bold px-8 w-full sm:w-auto">
-                Custom Request
-              </Button>
-            </Link>
+    <section className="relative h-[calc(100vh-64px)] overflow-hidden bg-[#f5f0e8]">
+      <div className="container mx-auto px-4 h-full">
+        <div className="grid lg:grid-cols-2 gap-8 h-full items-center">
+          {/* Left: Text Content */}
+          <div className="space-y-6 lg:pr-12">
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-tight">
+              RECONSTRUCTED.<br />NOT MASS PRODUCED.
+            </h1>
+            <div className="space-y-2 text-lg md:text-xl text-muted-foreground">
+              <p>One-of-one pieces,</p>
+              <p>rebuilt from existing materials.</p>
+              <p>Designed with intention.</p>
+              <p>Made to last.</p>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4 pt-4">
+              <Link to="/shop-all">
+                <Button size="lg" className="bg-[#a97c50] text-white hover:bg-[#8b6440] uppercase font-bold px-8 w-full sm:w-auto">
+                  Shop New Pieces
+                </Button>
+              </Link>
+              <Link to="/bespoke">
+                <Button size="lg" variant="outline" className="border-2 border-foreground hover:bg-foreground hover:text-background uppercase font-bold px-8 w-full sm:w-auto">
+                  Custom Request
+                </Button>
+              </Link>
+            </div>
           </div>
-        </div>
-      </div>
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 animate-bounce">
-        <div className="w-6 h-10 border-2 border-white rounded-full flex items-start justify-center p-2">
-          <div className="w-1 h-2 bg-white rounded-full" />
+
+          {/* Right: Image */}
+          <div className="relative h-full hidden lg:block">
+            <OptimizedImage
+              src="/hero-image.png"
+              alt="AZACH Hero - Reconstructed Fashion"
+              aspectRatio="portrait"
+              className="absolute inset-0 w-full h-full object-cover object-center"
+              loading="eager"
+            />
+          </div>
         </div>
       </div>
     </section>

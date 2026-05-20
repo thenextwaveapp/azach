@@ -38,9 +38,11 @@ const Index = () => {
               <p className="text-muted-foreground">Loading products...</p>
             </div>
           ) : featuredProducts.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
+            <div className="flex gap-6 overflow-x-auto pb-4 scrollbar-hide">
               {featuredProducts.slice(0, 5).map((product) => (
-                <ProductCard key={product.id} {...productToDisplay(product)} product={product} />
+                <div key={product.id} className="flex-shrink-0 w-64">
+                  <ProductCard {...productToDisplay(product)} product={product} />
+                </div>
               ))}
             </div>
           ) : (
@@ -126,8 +128,8 @@ const Index = () => {
       <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-bold uppercase tracking-wide mb-12 text-center">Shop by Type</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-            <Link to="/shop-all?category=tops" className="relative aspect-square group overflow-hidden">
+          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
+            <Link to="/shop-all?category=tops" className="relative w-48 h-48 flex-shrink-0 group overflow-hidden">
               <OptimizedImage
                 src="https://imagizer.imageshack.com/img922/6348/RmDO6F.jpg"
                 alt="Tops"
@@ -136,10 +138,10 @@ const Index = () => {
                 loading="lazy"
               />
               <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors flex items-center justify-center">
-                <span className="text-white text-xl font-bold uppercase tracking-wide">Tops</span>
+                <span className="text-white text-lg font-bold uppercase tracking-wide">Tops</span>
               </div>
             </Link>
-            <Link to="/shop-all?category=bottoms" className="relative aspect-square group overflow-hidden">
+            <Link to="/shop-all?category=bottoms" className="relative w-48 h-48 flex-shrink-0 group overflow-hidden">
               <OptimizedImage
                 src="https://imagizer.imageshack.com/img922/2820/P7UF2l.jpg"
                 alt="Bottoms"
@@ -148,10 +150,10 @@ const Index = () => {
                 loading="lazy"
               />
               <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors flex items-center justify-center">
-                <span className="text-white text-xl font-bold uppercase tracking-wide">Bottoms</span>
+                <span className="text-white text-lg font-bold uppercase tracking-wide">Bottoms</span>
               </div>
             </Link>
-            <Link to="/shop-all?category=outerwear" className="relative aspect-square group overflow-hidden">
+            <Link to="/shop-all?category=outerwear" className="relative w-48 h-48 flex-shrink-0 group overflow-hidden">
               <OptimizedImage
                 src="https://imagizer.imageshack.com/img922/6348/RmDO6F.jpg"
                 alt="Outerwear"
@@ -160,10 +162,10 @@ const Index = () => {
                 loading="lazy"
               />
               <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors flex items-center justify-center">
-                <span className="text-white text-xl font-bold uppercase tracking-wide">Outerwear</span>
+                <span className="text-white text-lg font-bold uppercase tracking-wide">Outerwear</span>
               </div>
             </Link>
-            <Link to="/shop-all?category=sets" className="relative aspect-square group overflow-hidden">
+            <Link to="/shop-all?category=sets" className="relative w-48 h-48 flex-shrink-0 group overflow-hidden">
               <OptimizedImage
                 src="https://imagizer.imageshack.com/img922/2820/P7UF2l.jpg"
                 alt="Sets"
@@ -172,10 +174,10 @@ const Index = () => {
                 loading="lazy"
               />
               <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors flex items-center justify-center">
-                <span className="text-white text-xl font-bold uppercase tracking-wide">Sets</span>
+                <span className="text-white text-lg font-bold uppercase tracking-wide">Sets</span>
               </div>
             </Link>
-            <Link to="/shop-all?category=accessories" className="relative aspect-square group overflow-hidden">
+            <Link to="/shop-all?category=accessories" className="relative w-48 h-48 flex-shrink-0 group overflow-hidden">
               <OptimizedImage
                 src="https://imagizer.imageshack.com/img922/6348/RmDO6F.jpg"
                 alt="Accessories"
@@ -184,10 +186,10 @@ const Index = () => {
                 loading="lazy"
               />
               <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors flex items-center justify-center">
-                <span className="text-white text-xl font-bold uppercase tracking-wide">Accessories</span>
+                <span className="text-white text-lg font-bold uppercase tracking-wide">Accessories</span>
               </div>
             </Link>
-            <Link to="/shop-all?category=hats" className="relative aspect-square group overflow-hidden">
+            <Link to="/shop-all?category=hats" className="relative w-48 h-48 flex-shrink-0 group overflow-hidden">
               <OptimizedImage
                 src="https://imagizer.imageshack.com/img922/2820/P7UF2l.jpg"
                 alt="Hats"
@@ -196,19 +198,19 @@ const Index = () => {
                 loading="lazy"
               />
               <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors flex items-center justify-center">
-                <span className="text-white text-xl font-bold uppercase tracking-wide">Hats</span>
+                <span className="text-white text-lg font-bold uppercase tracking-wide">Hats</span>
               </div>
             </Link>
-            <Link to="/shop-all?category=bags" className="relative aspect-square group overflow-hidden">
+            <Link to="/shop-all?category=keychains" className="relative w-48 h-48 flex-shrink-0 group overflow-hidden">
               <OptimizedImage
                 src="https://imagizer.imageshack.com/img922/6348/RmDO6F.jpg"
-                alt="Bags"
+                alt="Keychains"
                 aspectRatio="square"
                 className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 loading="lazy"
               />
               <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors flex items-center justify-center">
-                <span className="text-white text-xl font-bold uppercase tracking-wide">Bags</span>
+                <span className="text-white text-lg font-bold uppercase tracking-wide">Keychains</span>
               </div>
             </Link>
           </div>
@@ -218,34 +220,59 @@ const Index = () => {
       {/* HOW IT WORKS */}
       <section className="py-24 bg-muted">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold uppercase tracking-wide mb-16 text-center">How It Works</h2>
-          <div className="grid md:grid-cols-3 gap-12 max-w-5xl mx-auto">
-            <div className="text-center">
-              <div className="w-20 h-20 rounded-full bg-foreground text-background flex items-center justify-center text-3xl font-bold mx-auto mb-6">
-                1
+          <div className="flex justify-between items-center mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold uppercase tracking-wide">How It Works</h2>
+            <Link to="/our-story" className="text-sm uppercase tracking-wider hover:text-secondary transition-colors hidden md:block">
+              View Process →
+            </Link>
+          </div>
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            {/* Left: Steps */}
+            <div className="space-y-8">
+              <div className="flex gap-6">
+                <div className="w-16 h-16 rounded-full bg-foreground text-background flex items-center justify-center text-2xl font-bold flex-shrink-0">
+                  1
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold mb-2 uppercase">Choose Your Path</h3>
+                  <p className="text-muted-foreground">
+                    Browse our collection of one-of-one pieces, request a bespoke item, or bring in something to rework.
+                  </p>
+                </div>
               </div>
-              <h3 className="text-xl font-bold mb-3 uppercase">Choose Your Path</h3>
-              <p className="text-muted-foreground">
-                Browse our collection of one-of-one pieces, request a bespoke item, or bring in something to rework.
-              </p>
+              <div className="flex gap-6">
+                <div className="w-16 h-16 rounded-full bg-foreground text-background flex items-center justify-center text-2xl font-bold flex-shrink-0">
+                  2
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold mb-2 uppercase">We Create</h3>
+                  <p className="text-muted-foreground">
+                    Our skilled team reconstructs, repairs, or crafts your piece using upcycled materials.
+                  </p>
+                </div>
+              </div>
+              <div className="flex gap-6">
+                <div className="w-16 h-16 rounded-full bg-foreground text-background flex items-center justify-center text-2xl font-bold flex-shrink-0">
+                  3
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold mb-2 uppercase">You Receive</h3>
+                  <p className="text-muted-foreground">
+                    Get your unique piece delivered, ready to wear and make a statement.
+                  </p>
+                </div>
+              </div>
             </div>
-            <div className="text-center">
-              <div className="w-20 h-20 rounded-full bg-foreground text-background flex items-center justify-center text-3xl font-bold mx-auto mb-6">
-                2
-              </div>
-              <h3 className="text-xl font-bold mb-3 uppercase">We Create</h3>
-              <p className="text-muted-foreground">
-                Our skilled team reconstructs, repairs, or crafts your piece using upcycled materials.
-              </p>
-            </div>
-            <div className="text-center">
-              <div className="w-20 h-20 rounded-full bg-foreground text-background flex items-center justify-center text-3xl font-bold mx-auto mb-6">
-                3
-              </div>
-              <h3 className="text-xl font-bold mb-3 uppercase">You Receive</h3>
-              <p className="text-muted-foreground">
-                Get your unique piece delivered, ready to wear and make a statement.
-              </p>
+
+            {/* Right: Image */}
+            <div className="relative aspect-square overflow-hidden rounded-lg">
+              <OptimizedImage
+                src="https://imagizer.imageshack.com/img922/6348/RmDO6F.jpg"
+                alt="How AZACH Works"
+                aspectRatio="square"
+                className="w-full h-full object-cover"
+                loading="lazy"
+              />
             </div>
           </div>
         </div>
