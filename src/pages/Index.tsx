@@ -53,71 +53,61 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Custom / Rework & Repair Introduction */}
-      <section className="py-24 bg-muted">
+      {/* Three Service Cards */}
+      <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-bold mb-6 uppercase">This is where your pieces evolve.</h2>
-            <p className="text-xl text-muted-foreground mb-4">
-              At AZACH, we work in two ways:
-            </p>
-            <p className="text-lg text-muted-foreground">
-              We create new pieces with you (Custom)<br />
-              Or we transform what you already have (Rework & Repair)
-            </p>
-            <p className="text-lg text-muted-foreground mt-6">
-              Both are built around collaboration — the difference is where you're starting from.
-            </p>
-          </div>
+          <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            <Link to="/bespoke" className="group relative h-80 overflow-hidden">
+              <OptimizedImage
+                src="https://imagizer.imageshack.com/img922/6348/RmDO6F.jpg"
+                alt="Bespoke"
+                aspectRatio="portrait"
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-black/60 group-hover:bg-black/70 transition-colors" />
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 text-white">
+                <h3 className="text-2xl font-bold mb-4 uppercase">Bespoke</h3>
+                <p className="text-sm mb-6">Made for you. Work with our studio to create something personal.</p>
+                <button className="border-2 border-white px-6 py-2 text-sm uppercase tracking-wide hover:bg-white hover:text-black transition-colors">
+                  Learn More
+                </button>
+              </div>
+            </Link>
 
-          <div className="max-w-4xl mx-auto mb-12">
-            <h3 className="text-2xl font-bold mb-8 text-center uppercase">Choose Your Path</h3>
-            <div className="grid md:grid-cols-2 gap-8 mb-8">
-              <Link to="/bespoke" className="group">
-                <div className="bg-white p-8 h-full hover:shadow-lg transition-shadow border-2 border-transparent hover:border-foreground">
-                  <h4 className="text-2xl font-bold mb-4 uppercase">Custom (Bespoke)</h4>
-                  <p className="text-lg font-medium mb-4">Start from an idea.</p>
-                  <div className="text-sm text-muted-foreground space-y-2 mb-6">
-                    <p><strong>This is for you if:</strong></p>
-                    <p>• You want a completely new piece</p>
-                    <p>• You have a vision, reference, or concept</p>
-                    <p>• You want something made specifically for you</p>
-                    <p className="mt-4 text-xs">Available worldwide.</p>
-                  </div>
-                  <span className="text-sm uppercase tracking-wider group-hover:text-secondary transition-colors">
-                    Start Custom Request →
-                  </span>
-                </div>
-              </Link>
-              <Link to="/rework" className="group">
-                <div className="bg-white p-8 h-full hover:shadow-lg transition-shadow border-2 border-transparent hover:border-foreground">
-                  <h4 className="text-2xl font-bold mb-4 uppercase">Rework & Repair</h4>
-                  <p className="text-lg font-medium mb-4">Start from what you already own.</p>
-                  <div className="text-sm text-muted-foreground space-y-2 mb-6">
-                    <p><strong>This is for you if:</strong></p>
-                    <p>• You have denim you want to transform</p>
-                    <p>• Your piece needs adjustment or redesign</p>
-                    <p>• You want to give new life to what you wear</p>
-                    <p className="mt-4 text-xs">Lagos, Nigeria only.</p>
-                  </div>
-                  <span className="text-sm uppercase tracking-wider group-hover:text-secondary transition-colors">
-                    Start Rework Request →
-                  </span>
-                </div>
-              </Link>
-            </div>
-          </div>
+            <Link to="/rework" className="group relative h-80 overflow-hidden">
+              <OptimizedImage
+                src="https://imagizer.imageshack.com/img922/2820/P7UF2l.jpg"
+                alt="Rework & Repair"
+                aspectRatio="portrait"
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-black/60 group-hover:bg-black/70 transition-colors" />
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 text-white">
+                <h3 className="text-2xl font-bold mb-4 uppercase">Rework & Repair</h3>
+                <p className="text-sm mb-6">Give your pieces a second life.</p>
+                <button className="border-2 border-white px-6 py-2 text-sm uppercase tracking-wide hover:bg-white hover:text-black transition-colors">
+                  Learn More
+                </button>
+              </div>
+            </Link>
 
-          <div className="max-w-2xl mx-auto">
-            <Link to="/donate-garments" className="group block">
-              <div className="bg-white p-8 hover:shadow-lg transition-shadow text-center">
-                <h4 className="text-2xl font-bold mb-4 uppercase">Donate Garments</h4>
-                <p className="text-muted-foreground mb-6">
-                  Not everything needs to be thrown away. Your unused garments can still serve a purpose — either within the community or through our production process.
-                </p>
-                <span className="text-sm uppercase tracking-wider group-hover:text-secondary transition-colors">
-                  Learn About Donations →
-                </span>
+            <Link to="/donate-garments" className="group relative h-80 overflow-hidden">
+              <OptimizedImage
+                src="https://imagizer.imageshack.com/img922/6348/RmDO6F.jpg"
+                alt="Donate Garments"
+                aspectRatio="portrait"
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                loading="lazy"
+              />
+              <div className="absolute inset-0 bg-black/60 group-hover:bg-black/70 transition-colors" />
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 text-white">
+                <h3 className="text-2xl font-bold mb-4 uppercase">Donate Garments</h3>
+                <p className="text-sm mb-6">Your old clothes can help someone else and the planet.</p>
+                <button className="border-2 border-white px-6 py-2 text-sm uppercase tracking-wide hover:bg-white hover:text-black transition-colors">
+                  Learn More
+                </button>
               </div>
             </Link>
           </div>
@@ -125,100 +115,106 @@ const Index = () => {
       </section>
 
       {/* SHOP BY TYPE */}
-      <section className="py-24 bg-white">
+      <section className="py-24 bg-muted">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl md:text-4xl font-bold uppercase tracking-wide mb-12 text-center">Shop by Type</h2>
-          <div className="flex gap-4 overflow-x-auto pb-4 scrollbar-hide">
-            <Link to="/shop-all?category=tops" className="relative w-48 h-48 flex-shrink-0 group overflow-hidden">
-              <OptimizedImage
-                src="https://imagizer.imageshack.com/img922/6348/RmDO6F.jpg"
-                alt="Tops"
-                aspectRatio="square"
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors flex items-center justify-center">
-                <span className="text-white text-lg font-bold uppercase tracking-wide">Tops</span>
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4 max-w-7xl mx-auto">
+            <Link to="/shop-all?category=tops" className="group text-center">
+              <div className="relative aspect-square mb-3 overflow-hidden">
+                <OptimizedImage
+                  src="https://imagizer.imageshack.com/img922/6348/RmDO6F.jpg"
+                  alt="Tops"
+                  aspectRatio="square"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
               </div>
+              <span className="text-sm font-medium uppercase tracking-wide">Tops</span>
             </Link>
-            <Link to="/shop-all?category=bottoms" className="relative w-48 h-48 flex-shrink-0 group overflow-hidden">
-              <OptimizedImage
-                src="https://imagizer.imageshack.com/img922/2820/P7UF2l.jpg"
-                alt="Bottoms"
-                aspectRatio="square"
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors flex items-center justify-center">
-                <span className="text-white text-lg font-bold uppercase tracking-wide">Bottoms</span>
+
+            <Link to="/shop-all?category=bottoms" className="group text-center">
+              <div className="relative aspect-square mb-3 overflow-hidden">
+                <OptimizedImage
+                  src="https://imagizer.imageshack.com/img922/2820/P7UF2l.jpg"
+                  alt="Bottoms"
+                  aspectRatio="square"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
               </div>
+              <span className="text-sm font-medium uppercase tracking-wide">Bottoms</span>
             </Link>
-            <Link to="/shop-all?category=outerwear" className="relative w-48 h-48 flex-shrink-0 group overflow-hidden">
-              <OptimizedImage
-                src="https://imagizer.imageshack.com/img922/6348/RmDO6F.jpg"
-                alt="Outerwear"
-                aspectRatio="square"
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors flex items-center justify-center">
-                <span className="text-white text-lg font-bold uppercase tracking-wide">Outerwear</span>
+
+            <Link to="/shop-all?category=outerwear" className="group text-center">
+              <div className="relative aspect-square mb-3 overflow-hidden">
+                <OptimizedImage
+                  src="https://imagizer.imageshack.com/img922/6348/RmDO6F.jpg"
+                  alt="Outerwear"
+                  aspectRatio="square"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
               </div>
+              <span className="text-sm font-medium uppercase tracking-wide">Outerwear</span>
             </Link>
-            <Link to="/shop-all?category=sets" className="relative w-48 h-48 flex-shrink-0 group overflow-hidden">
-              <OptimizedImage
-                src="https://imagizer.imageshack.com/img922/2820/P7UF2l.jpg"
-                alt="Sets"
-                aspectRatio="square"
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors flex items-center justify-center">
-                <span className="text-white text-lg font-bold uppercase tracking-wide">Sets</span>
+
+            <Link to="/shop-all?category=sets" className="group text-center">
+              <div className="relative aspect-square mb-3 overflow-hidden">
+                <OptimizedImage
+                  src="https://imagizer.imageshack.com/img922/2820/P7UF2l.jpg"
+                  alt="Sets"
+                  aspectRatio="square"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
               </div>
+              <span className="text-sm font-medium uppercase tracking-wide">Sets</span>
             </Link>
-            <Link to="/shop-all?category=accessories" className="relative w-48 h-48 flex-shrink-0 group overflow-hidden">
-              <OptimizedImage
-                src="https://imagizer.imageshack.com/img922/6348/RmDO6F.jpg"
-                alt="Accessories"
-                aspectRatio="square"
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors flex items-center justify-center">
-                <span className="text-white text-lg font-bold uppercase tracking-wide">Accessories</span>
+
+            <Link to="/shop-all?category=accessories" className="group text-center">
+              <div className="relative aspect-square mb-3 overflow-hidden">
+                <OptimizedImage
+                  src="https://imagizer.imageshack.com/img922/6348/RmDO6F.jpg"
+                  alt="Accessories"
+                  aspectRatio="square"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
               </div>
+              <span className="text-sm font-medium uppercase tracking-wide">Accessories</span>
             </Link>
-            <Link to="/shop-all?category=hats" className="relative w-48 h-48 flex-shrink-0 group overflow-hidden">
-              <OptimizedImage
-                src="https://imagizer.imageshack.com/img922/2820/P7UF2l.jpg"
-                alt="Hats"
-                aspectRatio="square"
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors flex items-center justify-center">
-                <span className="text-white text-lg font-bold uppercase tracking-wide">Hats</span>
+
+            <Link to="/shop-all?category=hats" className="group text-center">
+              <div className="relative aspect-square mb-3 overflow-hidden">
+                <OptimizedImage
+                  src="https://imagizer.imageshack.com/img922/2820/P7UF2l.jpg"
+                  alt="Hats"
+                  aspectRatio="square"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
               </div>
+              <span className="text-sm font-medium uppercase tracking-wide">Hats</span>
             </Link>
-            <Link to="/shop-all?category=keychains" className="relative w-48 h-48 flex-shrink-0 group overflow-hidden">
-              <OptimizedImage
-                src="https://imagizer.imageshack.com/img922/6348/RmDO6F.jpg"
-                alt="Keychains"
-                aspectRatio="square"
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/50 transition-colors flex items-center justify-center">
-                <span className="text-white text-lg font-bold uppercase tracking-wide">Keychains</span>
+
+            <Link to="/shop-all?category=keychains" className="group text-center">
+              <div className="relative aspect-square mb-3 overflow-hidden">
+                <OptimizedImage
+                  src="https://imagizer.imageshack.com/img922/6348/RmDO6F.jpg"
+                  alt="Keychains"
+                  aspectRatio="square"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
               </div>
+              <span className="text-sm font-medium uppercase tracking-wide">Keychains</span>
             </Link>
           </div>
         </div>
       </section>
 
       {/* HOW IT WORKS */}
-      <section className="py-24 bg-muted">
+      <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold uppercase tracking-wide">How It Works</h2>
@@ -226,50 +222,46 @@ const Index = () => {
               View Process →
             </Link>
           </div>
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left: Steps */}
-            <div className="space-y-8">
-              <div className="flex gap-6">
-                <div className="w-16 h-16 rounded-full bg-foreground text-background flex items-center justify-center text-2xl font-bold flex-shrink-0">
+          <div className="flex gap-8 items-start max-w-7xl mx-auto">
+            {/* Steps - Horizontal */}
+            <div className="flex-1 grid grid-cols-1 md:grid-cols-3 gap-8">
+              <div className="text-center">
+                <div className="w-16 h-16 rounded-full bg-foreground text-background flex items-center justify-center text-2xl font-bold mx-auto mb-4">
                   1
                 </div>
-                <div>
-                  <h3 className="text-xl font-bold mb-2 uppercase">Choose Your Path</h3>
-                  <p className="text-muted-foreground">
-                    Browse our collection of one-of-one pieces, request a bespoke item, or bring in something to rework.
-                  </p>
-                </div>
+                <h3 className="text-lg font-bold mb-2 uppercase">Choose Your Path</h3>
+                <p className="text-sm text-muted-foreground">
+                  Browse our collection, request a bespoke item, or bring in something to rework.
+                </p>
               </div>
-              <div className="flex gap-6">
-                <div className="w-16 h-16 rounded-full bg-foreground text-background flex items-center justify-center text-2xl font-bold flex-shrink-0">
+
+              <div className="text-center">
+                <div className="w-16 h-16 rounded-full bg-foreground text-background flex items-center justify-center text-2xl font-bold mx-auto mb-4">
                   2
                 </div>
-                <div>
-                  <h3 className="text-xl font-bold mb-2 uppercase">We Create</h3>
-                  <p className="text-muted-foreground">
-                    Our skilled team reconstructs, repairs, or crafts your piece using upcycled materials.
-                  </p>
-                </div>
+                <h3 className="text-lg font-bold mb-2 uppercase">We Create</h3>
+                <p className="text-sm text-muted-foreground">
+                  Our skilled team reconstructs, repairs, or crafts your piece using upcycled materials.
+                </p>
               </div>
-              <div className="flex gap-6">
-                <div className="w-16 h-16 rounded-full bg-foreground text-background flex items-center justify-center text-2xl font-bold flex-shrink-0">
+
+              <div className="text-center">
+                <div className="w-16 h-16 rounded-full bg-foreground text-background flex items-center justify-center text-2xl font-bold mx-auto mb-4">
                   3
                 </div>
-                <div>
-                  <h3 className="text-xl font-bold mb-2 uppercase">You Receive</h3>
-                  <p className="text-muted-foreground">
-                    Get your unique piece delivered, ready to wear and make a statement.
-                  </p>
-                </div>
+                <h3 className="text-lg font-bold mb-2 uppercase">You Receive</h3>
+                <p className="text-sm text-muted-foreground">
+                  Get your unique piece delivered, ready to wear and make a statement.
+                </p>
               </div>
             </div>
 
-            {/* Right: Image */}
-            <div className="relative aspect-square overflow-hidden rounded-lg">
+            {/* Image - Rectangle same height */}
+            <div className="hidden lg:block w-80 flex-shrink-0">
               <OptimizedImage
                 src="https://imagizer.imageshack.com/img922/6348/RmDO6F.jpg"
                 alt="How AZACH Works"
-                aspectRatio="square"
+                aspectRatio="portrait"
                 className="w-full h-full object-cover"
                 loading="lazy"
               />

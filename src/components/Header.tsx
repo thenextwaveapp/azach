@@ -54,7 +54,7 @@ export const Header = () => {
         isVisible ? "top-0 translate-y-0" : "-top-20 -translate-y-full"
       }`}>
         <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
+        <div className="flex h-16 items-center justify-between relative">
           {/* Mobile Menu */}
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild className="lg:hidden">
@@ -162,12 +162,7 @@ export const Header = () => {
             </SheetContent>
           </Sheet>
 
-          {/* EST. LAGOS, NIGERIA tag */}
-          <div className="hidden lg:block text-xs tracking-wider text-muted-foreground">
-            EST. LAGOS, NIGERIA
-          </div>
-
-          {/* Desktop Navigation */}
+          {/* Desktop Navigation - LEFT */}
           <nav className="hidden lg:flex gap-8">
             <Link
               to="/shop-all"
@@ -199,14 +194,19 @@ export const Header = () => {
             </Link>
           </nav>
 
-          {/* Logo */}
-          <Link 
-            to="/" 
-            onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-            className="absolute left-1/2 -translate-x-1/2 hover:opacity-80 transition-opacity"
-          >
-            <img src="/Azach-Logo.png" alt="AZACH" className="h-10 w-auto" />
-          </Link>
+          {/* Logo - CENTER */}
+          <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-3">
+            <Link
+              to="/"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="hover:opacity-80 transition-opacity"
+            >
+              <img src="/Azach-Logo.png" alt="AZACH" className="h-10 w-auto" />
+            </Link>
+            <div className="hidden lg:block text-xs tracking-wider text-muted-foreground">
+              EST. LAGOS, NIGERIA
+            </div>
+          </div>
 
           {/* Actions - hidden on mobile, shown in drawer instead */}
           <div className="hidden lg:flex items-center gap-2">

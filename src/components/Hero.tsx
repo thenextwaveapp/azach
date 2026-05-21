@@ -33,12 +33,11 @@ export const Hero = () => {
           </div>
 
           {/* Right: Image */}
-          <div className="relative h-full hidden lg:block">
-            <OptimizedImage
+          <div className="relative h-full hidden lg:flex items-center justify-center">
+            <img
               src="/hero-image.png"
               alt="AZACH Hero - Reconstructed Fashion"
-              aspectRatio="portrait"
-              className="absolute inset-0 w-full h-full object-cover object-center"
+              className="h-full w-auto object-contain"
               loading="eager"
             />
           </div>
