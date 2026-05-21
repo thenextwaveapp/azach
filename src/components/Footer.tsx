@@ -66,7 +66,8 @@ export const Footer = () => {
 
           {/* Copyright */}
           <div className="pt-8 border-t border-gray-800 text-center text-sm text-gray-400">
-            <p>&copy; 2024 AZACH. All rights reserved.</p>
+            <p>&copy; 2026 AZACH. All rights reserved.</p>
+            <p className="mt-2 text-xs uppercase tracking-wider">Reconstructed. Not Mass Produced.</p>
           </div>
         </div>
       </footer>
