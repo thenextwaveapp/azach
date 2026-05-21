@@ -63,7 +63,7 @@ const About = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-background z-10" />
 
         <div className="container mx-auto px-4 relative z-20 text-center text-white">
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6">
+          <h1 className="text-5xl md:text-7xl font-semibold tracking-tight mb-6">
             The AZACH Story
           </h1>
           <p className="text-xl md:text-2xl max-w-3xl mx-auto">
@@ -76,7 +76,7 @@ const About = () => {
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">
+            <h2 className="text-3xl md:text-4xl font-semibold mb-6">
               More Than a Fashion Brand—It's a Movement
             </h2>
             <p className="text-lg text-muted-foreground leading-relaxed mb-8">
@@ -99,7 +99,7 @@ const About = () => {
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold mb-8 text-center">
+            <h2 className="text-3xl md:text-4xl font-semibold mb-8 text-center">
               From a Personal Project to a Global Mission
             </h2>
 
@@ -159,7 +159,7 @@ const About = () => {
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-2 gap-12 max-w-5xl mx-auto mb-12">
             <div className="bg-background rounded-2xl p-8 shadow-sm border">
-              <h3 className="text-2xl font-bold mb-4">Our Mission</h3>
+              <h3 className="text-2xl font-semibold mb-4">Our Mission</h3>
               <p className="text-muted-foreground leading-relaxed">
                 To redefine fashion by creating bold, high-quality designs from discarded materials,
                 promoting sustainability, empowering communities, and changing how people perceive waste.
@@ -167,7 +167,7 @@ const About = () => {
             </div>
 
             <div className="bg-background rounded-2xl p-8 shadow-sm border">
-              <h3 className="text-2xl font-bold mb-4">Our Vision</h3>
+              <h3 className="text-2xl font-semibold mb-4">Our Vision</h3>
               <p className="text-muted-foreground leading-relaxed">
                 To lead the upcycling movement globally, making sustainable fashion accessible, desirable,
                 and a norm—not an exception.
@@ -198,7 +198,7 @@ const About = () => {
       {/* Four Pillars */}
       <section className="py-20">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center">
+          <h2 className="text-3xl md:text-4xl font-semibold mb-12 text-center">
             The Four Pillars of AZACH
           </h2>
 
@@ -207,7 +207,7 @@ const About = () => {
               <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
                 <Leaf className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="text-xl font-bold">Sustainability & Upcycling</h3>
+              <h3 className="text-xl font-semibold">Sustainability & Upcycling</h3>
               <p className="text-muted-foreground">
                 We transform waste into wearable art, reducing fashion's environmental impact.
               </p>
@@ -217,7 +217,7 @@ const About = () => {
               <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
                 <Lightbulb className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="text-xl font-bold">Craftsmanship & Innovation</h3>
+              <h3 className="text-xl font-semibold">Craftsmanship & Innovation</h3>
               <p className="text-muted-foreground">
                 Every AZACH piece is a blend of traditional techniques and contemporary design.
               </p>
@@ -227,7 +227,7 @@ const About = () => {
               <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
                 <Users className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="text-xl font-bold">Community & Empowerment</h3>
+              <h3 className="text-xl font-semibold">Community & Empowerment</h3>
               <p className="text-muted-foreground">
                 We create economic opportunities by training and employing local artisans.
               </p>
@@ -237,7 +237,7 @@ const About = () => {
               <div className="w-16 h-16 mx-auto bg-primary/10 rounded-full flex items-center justify-center">
                 <Heart className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="text-xl font-bold">Authenticity & Individuality</h3>
+              <h3 className="text-xl font-semibold">Authenticity & Individuality</h3>
               <p className="text-muted-foreground">
                 No two AZACH pieces are alike. We celebrate uniqueness and self-expression.
               </p>
@@ -250,7 +250,7 @@ const About = () => {
       <section className="py-20 bg-muted/30">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl md:text-4xl font-bold mb-8 text-center">
+            <h2 className="text-3xl md:text-4xl font-semibold mb-8 text-center">
               Our Impact in Sustainable Fashion
             </h2>
 
@@ -268,7 +268,7 @@ const About = () => {
 
             <div className="grid md:grid-cols-2 gap-6 mb-8">
               <div className="bg-background rounded-lg p-6 border">
-                <h3 className="font-bold text-lg mb-2">Reducing Textile Waste</h3>
+                <h3 className="font-semibold text-lg mb-2">Reducing Textile Waste</h3>
                 <p className="text-muted-foreground">
                   We upcycle second-hand fabrics that would otherwise end up in landfills,
                   contributing to pollution.
@@ -276,21 +276,21 @@ const About = () => {
               </div>
 
               <div className="bg-background rounded-lg p-6 border">
-                <h3 className="font-bold text-lg mb-2">Empowering Communities</h3>
+                <h3 className="font-semibold text-lg mb-2">Empowering Communities</h3>
                 <p className="text-muted-foreground">
                   By training individuals in upcycling, we provide jobs and economic opportunities.
                 </p>
               </div>
 
               <div className="bg-background rounded-lg p-6 border">
-                <h3 className="font-bold text-lg mb-2">Challenging Fast Fashion</h3>
+                <h3 className="font-semibold text-lg mb-2">Challenging Fast Fashion</h3>
                 <p className="text-muted-foreground">
                   We offer a sustainable alternative that promotes conscious consumerism.
                 </p>
               </div>
 
               <div className="bg-background rounded-lg p-6 border">
-                <h3 className="font-bold text-lg mb-2">Expanding the Circular Economy</h3>
+                <h3 className="font-semibold text-lg mb-2">Expanding the Circular Economy</h3>
                 <p className="text-muted-foreground">
                   We are building systems that help people participate in sustainable fashion.
                 </p>
@@ -309,7 +309,7 @@ const About = () => {
       {/* CTA */}
       <section className="py-20 bg-gradient-to-br from-muted via-background to-muted">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl md:text-5xl font-bold mb-6">Join the Movement</h2>
+          <h2 className="text-3xl md:text-5xl font-semibold mb-6">Join the Movement</h2>
           <p className="text-lg md:text-xl text-muted-foreground max-w-3xl mx-auto mb-8">
             AZACH is more than a brand—it's a vision for the future of fashion. Whether you are
             a customer, retailer, collaborator, or supporter, there's a place for you in this journey.

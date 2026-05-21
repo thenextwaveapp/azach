@@ -39,7 +39,7 @@ export const CartDrawer = ({ open, onOpenChange }: CartDrawerProps) => {
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-lg flex flex-col">
         <SheetHeader>
-          <SheetTitle className="text-2xl font-bold">
+          <SheetTitle className="text-2xl font-semibold">
             Shopping Cart ({items.length})
           </SheetTitle>
         </SheetHeader>
@@ -130,7 +130,7 @@ export const CartDrawer = ({ open, onOpenChange }: CartDrawerProps) => {
                   </span>
                   <span className="font-semibold">{formatPrice(getTotalPrice())}</span>
                 </div>
-                <div className="flex justify-between text-lg font-bold">
+                <div className="flex justify-between text-lg font-semibold">
                   <span>Total</span>
                   <span>{formatPrice(getTotalPrice())}</span>
                 </div>

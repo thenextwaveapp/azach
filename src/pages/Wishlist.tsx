@@ -25,7 +25,7 @@ const Wishlist = () => {
     <div className="min-h-screen">
       <Header />
       <div className="container mx-auto px-4 py-12">
-        <h1 className="text-4xl font-bold mb-8">My Wishlist</h1>
+        <h1 className="text-4xl font-semibold mb-8">My Wishlist</h1>
 
         {isLoading ? (
           <div className="text-center py-12">

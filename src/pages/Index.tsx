@@ -27,7 +27,7 @@ const Index = () => {
       <section className="py-12 bg-white">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl md:text-4xl font-bold uppercase tracking-wide">New Pieces</h2>
+            <h2 className="text-3xl md:text-4xl font-semibold uppercase tracking-wide">New Pieces</h2>
             <Link to="/shop-all" className="text-sm uppercase tracking-wider hover:text-secondary transition-colors">
               View All →
             </Link>
@@ -80,7 +80,7 @@ const Index = () => {
               />
               <div className="absolute inset-0 bg-black/60 group-hover:bg-black/70 transition-colors" />
               <div className="absolute inset-0 flex flex-col justify-center p-8 text-white">
-                <h3 className="text-2xl font-bold mb-3 uppercase">Bespoke</h3>
+                <h3 className="text-2xl font-semibold mb-3 uppercase">Bespoke</h3>
                 <p className="text-sm mb-6 max-w-xs">Made for you. Work with our studio to create something personal.</p>
                 <button className="border-2 border-white px-6 py-2 text-sm uppercase tracking-wide hover:bg-white hover:text-black transition-colors self-start flex items-center gap-2">
                   Learn More
@@ -101,7 +101,7 @@ const Index = () => {
               />
               <div className="absolute inset-0 bg-black/60 group-hover:bg-black/70 transition-colors" />
               <div className="absolute inset-0 flex flex-col justify-center p-8 text-white">
-                <h3 className="text-2xl font-bold mb-3 uppercase">Rework & Repair</h3>
+                <h3 className="text-2xl font-semibold mb-3 uppercase">Rework & Repair</h3>
                 <p className="text-sm mb-6 max-w-xs">Give your pieces a second life.</p>
                 <button className="border-2 border-white px-6 py-2 text-sm uppercase tracking-wide hover:bg-white hover:text-black transition-colors self-start flex items-center gap-2">
                   Learn More
@@ -122,7 +122,7 @@ const Index = () => {
               />
               <div className="absolute inset-0 bg-black/60 group-hover:bg-black/70 transition-colors" />
               <div className="absolute inset-0 flex flex-col justify-center p-8 text-white">
-                <h3 className="text-2xl font-bold mb-3 uppercase">Donate Garments</h3>
+                <h3 className="text-2xl font-semibold mb-3 uppercase">Donate Garments</h3>
                 <p className="text-sm mb-6 max-w-xs">Your old clothes can help someone else and the planet.</p>
                 <button className="border-2 border-white px-6 py-2 text-sm uppercase tracking-wide hover:bg-white hover:text-black transition-colors self-start flex items-center gap-2">
                   Learn More
@@ -139,7 +139,7 @@ const Index = () => {
       {/* SHOP BY TYPE */}
       <section className="py-12 bg-muted">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-bold uppercase tracking-wide mb-8">Shop by Type</h2>
+          <h2 className="text-3xl md:text-4xl font-semibold uppercase tracking-wide mb-8">Shop by Type</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4 max-w-7xl mx-auto">
             <Link to="/shop-all?category=tops" className="group text-center">
               <div className="relative aspect-square mb-3 overflow-hidden">
@@ -239,7 +239,7 @@ const Index = () => {
       <section className="py-12 bg-white">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl md:text-4xl font-bold uppercase tracking-wide">How It Works</h2>
+            <h2 className="text-3xl md:text-4xl font-semibold uppercase tracking-wide">How It Works</h2>
             <Link to="/our-story" className="text-sm uppercase tracking-wider hover:text-secondary transition-colors hidden md:block">
               View Process →
             </Link>
@@ -248,30 +248,30 @@ const Index = () => {
             {/* Steps - Horizontal */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
               <div className="text-center">
-                <div className="w-16 h-16 rounded-full bg-foreground text-background flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                <div className="w-16 h-16 rounded-full bg-foreground text-background flex items-center justify-center text-2xl font-semibold mx-auto mb-4">
                   1
                 </div>
-                <h3 className="text-lg font-bold mb-2 uppercase">Choose Your Path</h3>
+                <h3 className="text-lg font-semibold mb-2 uppercase">Choose Your Path</h3>
                 <p className="text-sm text-muted-foreground">
                   Browse our collection, request a bespoke item, or bring in something to rework.
                 </p>
               </div>
 
               <div className="text-center">
-                <div className="w-16 h-16 rounded-full bg-foreground text-background flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                <div className="w-16 h-16 rounded-full bg-foreground text-background flex items-center justify-center text-2xl font-semibold mx-auto mb-4">
                   2
                 </div>
-                <h3 className="text-lg font-bold mb-2 uppercase">We Create</h3>
+                <h3 className="text-lg font-semibold mb-2 uppercase">We Create</h3>
                 <p className="text-sm text-muted-foreground">
                   Our skilled team reconstructs, repairs, or crafts your piece using upcycled materials.
                 </p>
               </div>
 
               <div className="text-center">
-                <div className="w-16 h-16 rounded-full bg-foreground text-background flex items-center justify-center text-2xl font-bold mx-auto mb-4">
+                <div className="w-16 h-16 rounded-full bg-foreground text-background flex items-center justify-center text-2xl font-semibold mx-auto mb-4">
                   3
                 </div>
-                <h3 className="text-lg font-bold mb-2 uppercase">You Receive</h3>
+                <h3 className="text-lg font-semibold mb-2 uppercase">You Receive</h3>
                 <p className="text-sm text-muted-foreground">
                   Get your unique piece delivered, ready to wear and make a statement.
                 </p>

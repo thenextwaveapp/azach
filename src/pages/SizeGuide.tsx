@@ -54,7 +54,7 @@ const SizeGuide = () => {
       <section className="pt-32 pb-16 bg-gradient-to-b from-background to-muted">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto">
-            <h1 className="text-5xl md:text-6xl font-bold mb-6">Size Guide</h1>
+            <h1 className="text-5xl md:text-6xl font-semibold mb-6">Size Guide</h1>
             <p className="text-xl text-muted-foreground">
               Find your perfect fit with our comprehensive sizing charts
             </p>
@@ -95,7 +95,7 @@ const SizeGuide = () => {
         <div className="container mx-auto px-4">
           {activeTab === "men" ? (
             <div className="max-w-5xl mx-auto">
-              <h2 className="text-3xl font-bold mb-8 text-center">Men's Size Chart</h2>
+              <h2 className="text-3xl font-semibold mb-8 text-center">Men's Size Chart</h2>
 
               {/* Men's Size Table */}
               <div className="overflow-x-auto mb-12">
@@ -130,7 +130,7 @@ const SizeGuide = () => {
 
               {/* How to Measure - Men */}
               <div className="bg-muted p-8 rounded-lg mb-8">
-                <h3 className="text-2xl font-bold mb-4">How to Measure</h3>
+                <h3 className="text-2xl font-semibold mb-4">How to Measure</h3>
                 <div className="space-y-4 text-muted-foreground">
                   <div>
                     <h4 className="font-semibold text-foreground mb-2">Chest:</h4>
@@ -145,7 +145,7 @@ const SizeGuide = () => {
             </div>
           ) : (
             <div className="max-w-6xl mx-auto">
-              <h2 className="text-3xl font-bold mb-8 text-center">Women's Size Chart</h2>
+              <h2 className="text-3xl font-semibold mb-8 text-center">Women's Size Chart</h2>
 
               {/* Women's Size Table */}
               <div className="overflow-x-auto mb-12">
@@ -191,7 +191,7 @@ const SizeGuide = () => {
 
               {/* How to Measure - Women */}
               <div className="bg-muted p-8 rounded-lg mb-8">
-                <h3 className="text-2xl font-bold mb-4">How to Measure</h3>
+                <h3 className="text-2xl font-semibold mb-4">How to Measure</h3>
                 <div className="space-y-4 text-muted-foreground">
                   <div>
                     <h4 className="font-semibold text-foreground mb-2">Bust:</h4>
@@ -212,7 +212,7 @@ const SizeGuide = () => {
 
           {/* Trouser Length Table */}
           <div className="max-w-3xl mx-auto mt-16">
-            <h2 className="text-3xl font-bold mb-8 text-center">Trouser Length Guide</h2>
+            <h2 className="text-3xl font-semibold mb-8 text-center">Trouser Length Guide</h2>
             <div className="overflow-x-auto">
               <table className="w-full border-collapse bg-card rounded-lg overflow-hidden shadow-sm">
                 <thead>
@@ -241,7 +241,7 @@ const SizeGuide = () => {
 
           {/* Fit Tips */}
           <div className="max-w-4xl mx-auto mt-16 bg-primary/5 p-8 rounded-lg border border-primary/20">
-            <h3 className="text-2xl font-bold mb-4 text-center">Fit Tips</h3>
+            <h3 className="text-2xl font-semibold mb-4 text-center">Fit Tips</h3>
             <div className="grid md:grid-cols-2 gap-6 text-muted-foreground">
               <div>
                 <h4 className="font-semibold text-foreground mb-2">Between Sizes?</h4>

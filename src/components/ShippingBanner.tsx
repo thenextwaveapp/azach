@@ -35,9 +35,9 @@ export const ShippingBanner = () => {
           <Package className="h-4 w-4" />
           <p className="text-sm font-medium">
             {itemsNeeded === 1 ? (
-              <>Add <span className="font-bold">1 more item</span> to unlock FREE SHIPPING</>
+              <>Add <span className="font-semibold">1 more item</span> to unlock FREE SHIPPING</>
             ) : (
-              <>Add <span className="font-bold">{itemsNeeded} more items</span> to unlock FREE SHIPPING</>
+              <>Add <span className="font-semibold">{itemsNeeded} more items</span> to unlock FREE SHIPPING</>
             )}
           </p>
         </div>

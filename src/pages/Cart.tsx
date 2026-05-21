@@ -36,7 +36,7 @@ const Cart = () => {
         <div className="container mx-auto px-4 py-24">
           <div className="max-w-2xl mx-auto text-center space-y-6">
             <ShoppingBag className="h-16 w-16 text-muted-foreground mx-auto" />
-            <h1 className="text-4xl font-bold">Your cart is empty</h1>
+            <h1 className="text-4xl font-semibold">Your cart is empty</h1>
             <p className="text-lg text-muted-foreground">
               Looks like you haven't added anything to your cart yet.
             </p>
@@ -53,7 +53,7 @@ const Cart = () => {
     <div className="min-h-screen">
       <Header />
       <div className="container mx-auto px-4 py-12">
-        <h1 className="text-4xl font-bold mb-8">Shopping Cart</h1>
+        <h1 className="text-4xl font-semibold mb-8">Shopping Cart</h1>
         
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Cart Items */}
@@ -122,11 +122,11 @@ const Cart = () => {
           {/* Order Summary */}
           <div className="lg:col-span-1">
             <div className="border rounded-lg p-6 space-y-4 sticky top-24">
-              <h2 className="text-2xl font-bold">Order Summary</h2>
+              <h2 className="text-2xl font-semibold">Order Summary</h2>
               <Separator />
               
               <div className="space-y-2">
-                <div className="flex justify-between text-lg font-bold">
+                <div className="flex justify-between text-lg font-semibold">
                   <span>Subtotal ({items.reduce((sum, item) => sum + item.quantity, 0)} items)</span>
                   <span>{formatPrice(getTotalPrice())}</span>
                 </div>

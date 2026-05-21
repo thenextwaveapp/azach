@@ -81,7 +81,7 @@ const DonateGarments = () => {
         />
         <div className="absolute inset-0 bg-black/50" />
         <div className="container mx-auto px-4 relative z-10 text-center text-white">
-          <h1 className="text-5xl md:text-7xl font-bold mb-4 uppercase">Donate Garments</h1>
+          <h1 className="text-5xl md:text-7xl font-semibold mb-4 uppercase">Donate Garments</h1>
           <p className="text-xl md:text-2xl font-light max-w-2xl mx-auto">
             Give your pieces another life.
           </p>
@@ -96,7 +96,7 @@ const DonateGarments = () => {
               Not everything needs to be thrown away. Through our donation initiative, we create a system where your unused garments can still serve a purpose — either within the community or through our production process.
             </p>
             <div className="p-6 bg-muted rounded-lg">
-              <h3 className="text-lg font-bold mb-3">A Shared Responsibility</h3>
+              <h3 className="text-lg font-semibold mb-3">A Shared Responsibility</h3>
               <p className="text-muted-foreground">
                 This is not just about giving things away — it's about being intentional with what we no longer need.
               </p>
@@ -110,13 +110,13 @@ const DonateGarments = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-5xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4 uppercase">How It Works</h2>
+              <h2 className="text-3xl md:text-4xl font-semibold mb-4 uppercase">How It Works</h2>
             </div>
 
             <div className="grid md:grid-cols-3 gap-8 mb-12">
               <Card className="bg-white">
                 <CardHeader>
-                  <div className="w-12 h-12 rounded-full bg-foreground text-background flex items-center justify-center text-xl font-bold mb-4">
+                  <div className="w-12 h-12 rounded-full bg-foreground text-background flex items-center justify-center text-xl font-semibold mb-4">
                     1
                   </div>
                   <CardTitle>Send or Drop Off</CardTitle>
@@ -130,7 +130,7 @@ const DonateGarments = () => {
 
               <Card className="bg-white">
                 <CardHeader>
-                  <div className="w-12 h-12 rounded-full bg-foreground text-background flex items-center justify-center text-xl font-bold mb-4">
+                  <div className="w-12 h-12 rounded-full bg-foreground text-background flex items-center justify-center text-xl font-semibold mb-4">
                     2
                   </div>
                   <CardTitle>We Sort Every Item</CardTitle>
@@ -144,7 +144,7 @@ const DonateGarments = () => {
 
               <Card className="bg-white">
                 <CardHeader>
-                  <div className="w-12 h-12 rounded-full bg-foreground text-background flex items-center justify-center text-xl font-bold mb-4">
+                  <div className="w-12 h-12 rounded-full bg-foreground text-background flex items-center justify-center text-xl font-semibold mb-4">
                     3
                   </div>
                   <CardTitle>Two Possible Paths</CardTitle>
@@ -168,7 +168,7 @@ const DonateGarments = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold mb-6 uppercase">Why This Matters</h2>
+              <h2 className="text-3xl md:text-4xl font-semibold mb-6 uppercase">Why This Matters</h2>
               <p className="text-xl text-muted-foreground mb-8">
                 Clothing doesn't end when you're done with it.
               </p>
@@ -216,7 +216,7 @@ const DonateGarments = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">What We Accept</h2>
+              <h2 className="text-3xl md:text-4xl font-semibold mb-4">What We Accept</h2>
             </div>
 
             <div className="grid md:grid-cols-2 gap-8 mb-12">
@@ -262,7 +262,7 @@ const DonateGarments = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-8">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4 uppercase">Make a Donation</h2>
+              <h2 className="text-3xl md:text-4xl font-semibold mb-4 uppercase">Make a Donation</h2>
               <p className="text-lg text-muted-foreground">
                 Ready to pass something on? Fill out the form below.
               </p>
@@ -488,7 +488,7 @@ const DonateGarments = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">How It Works</h2>
+              <h2 className="text-3xl md:text-4xl font-semibold mb-4">How It Works</h2>
             </div>
 
             <div className="grid md:grid-cols-2 gap-8">

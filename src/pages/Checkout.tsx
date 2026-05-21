@@ -143,7 +143,7 @@ const Checkout = () => {
       <Header />
       <div className="container mx-auto px-4 py-12">
         <div className="max-w-4xl mx-auto">
-          <h1 className="text-4xl font-bold mb-8">Checkout</h1>
+          <h1 className="text-4xl font-semibold mb-8">Checkout</h1>
 
           <div className="grid md:grid-cols-2 gap-8">
             {/* Shipping Address Form */}
@@ -294,7 +294,7 @@ const Checkout = () => {
                       Add {FREE_SHIPPING_THRESHOLD - totalItems} more item{FREE_SHIPPING_THRESHOLD - totalItems > 1 ? 's' : ''} for free shipping
                     </p>
                   )}
-                  <div className="flex justify-between text-lg font-bold pt-2 border-t">
+                  <div className="flex justify-between text-lg font-semibold pt-2 border-t">
                     <span>Total</span>
                     <span>{formatPrice(total)}</span>
                   </div>

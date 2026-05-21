@@ -31,7 +31,7 @@ const Settings = () => {
     <div className="min-h-screen">
       <Header />
       <div className="container mx-auto px-4 py-12 max-w-2xl">
-        <h1 className="text-4xl font-bold mb-8">Settings</h1>
+        <h1 className="text-4xl font-semibold mb-8">Settings</h1>
         
         <div className="space-y-6">
           {/* Account Settings */}

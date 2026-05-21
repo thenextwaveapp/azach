@@ -21,7 +21,7 @@ const Orders = () => {
     <div className="min-h-screen">
       <Header />
       <div className="container mx-auto px-4 py-12">
-        <h1 className="text-4xl font-bold mb-8">My Orders</h1>
+        <h1 className="text-4xl font-semibold mb-8">My Orders</h1>
         
         {isLoading ? (
           <Card>

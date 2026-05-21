@@ -9,7 +9,7 @@ export const Hero = () => {
         <div className="grid lg:grid-cols-2 gap-8 h-full items-center">
           {/* Left: Text Content */}
           <div className="space-y-6 lg:pr-12">
-            <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight leading-tight">
+            <h1 className="text-5xl md:text-6xl lg:text-7xl font-semibold tracking-tight leading-tight">
               RECONSTRUCTED.<br />NOT MASS PRODUCED.
             </h1>
             <div className="space-y-2 text-lg md:text-xl text-muted-foreground">
@@ -20,12 +20,12 @@ export const Hero = () => {
             </div>
             <div className="flex flex-col sm:flex-row gap-4 pt-4">
               <Link to="/shop-all">
-                <Button size="lg" className="bg-[#a97c50] text-white hover:bg-[#8b6440] uppercase font-bold px-8 w-full sm:w-auto">
+                <Button size="lg" className="bg-[#a97c50] text-white hover:bg-[#8b6440] uppercase font-semibold px-8 w-full sm:w-auto">
                   Shop New Pieces
                 </Button>
               </Link>
               <Link to="/bespoke">
-                <Button size="lg" variant="outline" className="border-2 border-foreground hover:bg-foreground hover:text-background uppercase font-bold px-8 w-full sm:w-auto">
+                <Button size="lg" variant="outline" className="border-2 border-foreground hover:bg-foreground hover:text-background uppercase font-semibold px-8 w-full sm:w-auto">
                   Custom Request
                 </Button>
               </Link>

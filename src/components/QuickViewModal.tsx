@@ -145,9 +145,9 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
               <p className="text-sm text-muted-foreground uppercase tracking-wider mb-2">
                 {product.category}
               </p>
-              <h2 className="text-3xl font-bold mb-4">{product.name}</h2>
+              <h2 className="text-3xl font-semibold mb-4">{product.name}</h2>
               <div className="flex items-baseline gap-3 mb-6">
-                <span className="text-2xl font-bold">
+                <span className="text-2xl font-semibold">
                   {formatPrice(product.price)}
                 </span>
                 {product.original_price && product.original_price > product.price && (

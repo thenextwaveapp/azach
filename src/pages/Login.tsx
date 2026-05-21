@@ -58,7 +58,7 @@ const Login = () => {
     <div className="min-h-screen flex items-center justify-center bg-muted px-4 py-12">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-1">
-          <CardTitle className="text-3xl font-bold text-center">AZACH</CardTitle>
+          <CardTitle className="text-3xl font-semibold text-center">AZACH</CardTitle>
           <CardDescription className="text-center">
             {isAdminLogin ? 'Sign in to manage your inventory' : 'Sign in to your account'}
           </CardDescription>

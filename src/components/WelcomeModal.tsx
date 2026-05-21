@@ -67,7 +67,7 @@ export const WelcomeModal = () => {
         <div className="relative bg-secondary text-secondary-foreground p-8 pb-12">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-secondary to-secondary/80" />
           <div className="relative z-10 text-center space-y-2">
-            <DialogTitle className="text-3xl font-bold">Welcome to AZACH</DialogTitle>
+            <DialogTitle className="text-3xl font-semibold">Welcome to AZACH</DialogTitle>
             <DialogDescription className="text-secondary-foreground/90 text-lg">
               Join our exclusive community
             </DialogDescription>
@@ -78,7 +78,7 @@ export const WelcomeModal = () => {
           <div className="bg-background rounded-lg shadow-lg p-6 space-y-4">
             <div className="text-center space-y-2">
               <div className="inline-block px-4 py-2 bg-muted rounded-full">
-                <p className="text-2xl font-bold">15% OFF</p>
+                <p className="text-2xl font-semibold">15% OFF</p>
               </div>
               <p className="text-muted-foreground">
                 Sign up for our newsletter and get 15% off your first order
@@ -115,8 +115,8 @@ export const WelcomeModal = () => {
         <div className="relative bg-secondary text-secondary-foreground p-8 pb-10">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-secondary to-secondary/80" />
           <div className="relative z-10 text-center space-y-3">
-            <div className="text-6xl font-bold">15% OFF</div>
-            <DialogTitle className="text-3xl font-bold">Wait! Don't Miss Out</DialogTitle>
+            <div className="text-6xl font-semibold">15% OFF</div>
+            <DialogTitle className="text-3xl font-semibold">Wait! Don't Miss Out</DialogTitle>
           </div>
         </div>
 

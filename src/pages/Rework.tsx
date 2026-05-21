@@ -77,7 +77,7 @@ const Rework = () => {
         />
         <div className="absolute inset-0 bg-black/50" />
         <div className="container mx-auto px-4 relative z-10 text-center text-white">
-          <h1 className="text-5xl md:text-7xl font-bold mb-4 uppercase">Rework & Repair</h1>
+          <h1 className="text-5xl md:text-7xl font-semibold mb-4 uppercase">Rework & Repair</h1>
           <p className="text-xl md:text-2xl font-light max-w-2xl mx-auto">
             Start from what you already own.
           </p>
@@ -88,7 +88,7 @@ const Rework = () => {
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-bold mb-6">This is for you if:</h2>
+            <h2 className="text-3xl md:text-4xl font-semibold mb-6">This is for you if:</h2>
             <div className="space-y-3 text-lg text-muted-foreground">
               <p>• You have denim you want to transform</p>
               <p>• Your piece needs adjustment, fixing, or redesign</p>
@@ -112,7 +112,7 @@ const Rework = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">Our Services</h2>
+              <h2 className="text-3xl md:text-4xl font-semibold mb-4">Our Services</h2>
               <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
                 We specialize in extending the life of your favorite pieces through expert repair and creative reworking
               </p>
@@ -176,7 +176,7 @@ const Rework = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-8">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">Request a Service</h2>
+              <h2 className="text-3xl md:text-4xl font-semibold mb-4">Request a Service</h2>
               <p className="text-lg text-muted-foreground">
                 Fill out the form below and we'll get back to you with a quote
               </p>

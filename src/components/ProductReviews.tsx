@@ -132,7 +132,7 @@ export const ProductReviews = ({
             {/* Rating Overview */}
             <div className="space-y-4">
               <div className="flex items-center gap-4">
-                <div className="text-5xl font-bold">{avgRating.toFixed(1)}</div>
+                <div className="text-5xl font-semibold">{avgRating.toFixed(1)}</div>
                 <div>
                   {renderStars(Math.round(avgRating))}
                   <p className="text-sm text-muted-foreground mt-1">

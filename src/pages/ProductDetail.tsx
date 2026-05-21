@@ -114,7 +114,7 @@ const ProductDetail = () => {
         <Header />
         <div className="container mx-auto px-4 py-12">
           <div className="text-center">
-            <h2 className="text-2xl font-bold mb-4">Product not found</h2>
+            <h2 className="text-2xl font-semibold mb-4">Product not found</h2>
             <Button onClick={() => navigate('/')}>Go to Home</Button>
           </div>
         </div>
@@ -239,9 +239,9 @@ const ProductDetail = () => {
               <p className="text-sm text-muted-foreground uppercase tracking-wider mb-2">
                 {product.category}
               </p>
-              <h1 className="text-4xl font-bold mb-4">{product.name}</h1>
+              <h1 className="text-4xl font-semibold mb-4">{product.name}</h1>
               <div className="flex items-baseline gap-3 mb-6">
-                <span className="text-3xl font-bold">
+                <span className="text-3xl font-semibold">
                   {formatPrice(product.price)}
                 </span>
                 {product.original_price && product.original_price > product.price && (

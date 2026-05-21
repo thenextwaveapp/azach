@@ -399,7 +399,7 @@ const Bespoke = () => {
         <div className="absolute inset-0 bg-gradient-to-br from-[#faf9f7] via-[#f5f3f0] to-[#f0ede8]"></div>
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center mb-16">
-            <h1 className="text-4xl md:text-6xl font-bold mb-6 uppercase">Custom (Bespoke)</h1>
+            <h1 className="text-4xl md:text-6xl font-semibold mb-6 uppercase">Custom (Bespoke)</h1>
             <p className="text-xl md:text-2xl text-muted-foreground mb-4">
               Start from an idea.
             </p>
@@ -440,7 +440,7 @@ const Bespoke = () => {
 
           <div className="max-w-4xl mx-auto">
             <div className="text-center mb-8">
-              <h2 className="text-3xl md:text-4xl font-bold mb-4">Start Your Request</h2>
+              <h2 className="text-3xl md:text-4xl font-semibold mb-4">Start Your Request</h2>
               <p className="text-lg text-muted-foreground">
                 Create your perfect custom piece with your measurements and style preferences
               </p>
@@ -563,7 +563,7 @@ const Bespoke = () => {
                         {formData.styleOption && getStyleDescription() && (
                           <div className="mt-6 space-y-6 pr-8">
                             <div className="space-y-3">
-                              <h4 className="text-lg font-display font-bold text-foreground tracking-tight">
+                              <h4 className="text-lg font-display font-semibold text-foreground tracking-tight">
                                 {formData.styleOption}
                               </h4>
                               <p className="text-base leading-relaxed text-foreground/90 font-sans">

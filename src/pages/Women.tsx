@@ -45,7 +45,7 @@ const Women = () => {
       <section className="py-24 bg-muted">
         <div className="container mx-auto px-4">
           <div className="text-center">
-            <h1 className="text-5xl md:text-6xl font-bold mb-4">Women's Collection</h1>
+            <h1 className="text-5xl md:text-6xl font-semibold mb-4">Women's Collection</h1>
             <p className="text-lg text-muted-foreground">
               Elegant and timeless pieces for the modern woman
             </p>

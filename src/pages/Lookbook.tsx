@@ -270,7 +270,7 @@ const Lookbook = () => {
       {/* Hero Section */}
       <div className="relative h-screen flex items-center justify-center bg-gradient-to-b from-black via-zinc-900 to-black">
         <div className="text-center space-y-6 px-4">
-          <h1 className="text-7xl md:text-9xl font-bold tracking-tighter font-display text-white">
+          <h1 className="text-7xl md:text-9xl font-semibold tracking-tighter font-display text-white">
             LOOKBOOK
           </h1>
           <p className="text-xl md:text-2xl text-zinc-400 max-w-2xl mx-auto">
@@ -352,7 +352,7 @@ const Lookbook = () => {
       {/* Footer CTA */}
       <div className="relative h-screen flex items-center justify-center bg-gradient-to-b from-black via-zinc-900 to-black">
         <div className="text-center space-y-8 px-4">
-          <h2 className="text-5xl md:text-7xl font-bold tracking-tighter text-white">
+          <h2 className="text-5xl md:text-7xl font-semibold tracking-tighter text-white">
             Ready to Shop?
           </h2>
           <p className="text-xl text-zinc-400 max-w-2xl mx-auto">

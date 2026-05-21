@@ -16,7 +16,7 @@ const Returns = () => {
       <section className="pt-32 pb-16 bg-gradient-to-b from-background to-muted">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto">
-            <h1 className="text-5xl md:text-6xl font-bold mb-6">Returns & Refunds</h1>
+            <h1 className="text-5xl md:text-6xl font-semibold mb-6">Returns & Refunds</h1>
             <p className="text-xl text-muted-foreground">
               Your satisfaction is our priority. We've made returns simple and hassle-free.
             </p>
@@ -54,7 +54,7 @@ const Returns = () => {
 
             {/* Return Eligibility */}
             <div className="mb-16">
-              <h2 className="text-3xl font-bold mb-6">Return Eligibility</h2>
+              <h2 className="text-3xl font-semibold mb-6">Return Eligibility</h2>
               <div className="bg-card p-8 rounded-lg border border-border">
                 <p className="mb-6 text-muted-foreground">
                   We accept returns within 30 days of the purchase date. To qualify for a return, items must meet the following criteria:
@@ -82,7 +82,7 @@ const Returns = () => {
 
             {/* Non-Returnable Items */}
             <div className="mb-16">
-              <h2 className="text-3xl font-bold mb-6">Non-Returnable Items</h2>
+              <h2 className="text-3xl font-semibold mb-6">Non-Returnable Items</h2>
               <div className="bg-amber-50 dark:bg-amber-950/20 p-8 rounded-lg border border-amber-200 dark:border-amber-900">
                 <p className="mb-4 text-amber-900 dark:text-amber-100">
                   The following items are considered final sale and cannot be returned or refunded unless defective or damaged:
@@ -110,11 +110,11 @@ const Returns = () => {
 
             {/* How to Return */}
             <div className="mb-16">
-              <h2 className="text-3xl font-bold mb-6">How to Return an Item</h2>
+              <h2 className="text-3xl font-semibold mb-6">How to Return an Item</h2>
               <div className="space-y-6">
                 <div className="bg-card p-6 rounded-lg border border-border">
                   <div className="flex items-start gap-4">
-                    <div className="flex-shrink-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold">
+                    <div className="flex-shrink-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-semibold">
                       1
                     </div>
                     <div>
@@ -128,7 +128,7 @@ const Returns = () => {
 
                 <div className="bg-card p-6 rounded-lg border border-border">
                   <div className="flex items-start gap-4">
-                    <div className="flex-shrink-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold">
+                    <div className="flex-shrink-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-semibold">
                       2
                     </div>
                     <div>
@@ -142,7 +142,7 @@ const Returns = () => {
 
                 <div className="bg-card p-6 rounded-lg border border-border">
                   <div className="flex items-start gap-4">
-                    <div className="flex-shrink-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold">
+                    <div className="flex-shrink-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-semibold">
                       3
                     </div>
                     <div>
@@ -162,7 +162,7 @@ const Returns = () => {
 
                 <div className="bg-card p-6 rounded-lg border border-border">
                   <div className="flex items-start gap-4">
-                    <div className="flex-shrink-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-bold">
+                    <div className="flex-shrink-0 w-8 h-8 bg-primary text-primary-foreground rounded-full flex items-center justify-center font-semibold">
                       4
                     </div>
                     <div>
@@ -178,7 +178,7 @@ const Returns = () => {
 
             {/* Refund Information */}
             <div className="mb-16">
-              <h2 className="text-3xl font-bold mb-6">Refund Processing</h2>
+              <h2 className="text-3xl font-semibold mb-6">Refund Processing</h2>
               <div className="bg-card p-8 rounded-lg border border-border">
                 <div className="space-y-6">
                   <div>
@@ -208,7 +208,7 @@ const Returns = () => {
 
             {/* Exchanges */}
             <div className="mb-16">
-              <h2 className="text-3xl font-bold mb-6">Exchanges</h2>
+              <h2 className="text-3xl font-semibold mb-6">Exchanges</h2>
               <div className="bg-card p-8 rounded-lg border border-border">
                 <p className="text-muted-foreground mb-4">
                   To ensure you receive your preferred item as quickly as possible, we recommend the following process for exchanges:
@@ -231,7 +231,7 @@ const Returns = () => {
 
             {/* Damaged or Defective Items */}
             <div className="mb-16">
-              <h2 className="text-3xl font-bold mb-6">Damaged or Defective Items</h2>
+              <h2 className="text-3xl font-semibold mb-6">Damaged or Defective Items</h2>
               <div className="bg-red-50 dark:bg-red-950/20 p-8 rounded-lg border border-red-200 dark:border-red-900">
                 <h3 className="font-semibold text-lg mb-3 text-red-900 dark:text-red-100">Received a Faulty Item?</h3>
                 <p className="text-red-800 dark:text-red-200 mb-4">
@@ -255,7 +255,7 @@ const Returns = () => {
       <section className="py-16 bg-muted">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl font-bold mb-6">Need Assistance?</h2>
+            <h2 className="text-3xl font-semibold mb-6">Need Assistance?</h2>
             <p className="text-muted-foreground mb-8">
               Our customer service team is here to help with your return or refund inquiry.
             </p>

@@ -28,7 +28,7 @@ export const RelatedProducts = ({ currentProduct, limit = 4 }: RelatedProductsPr
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-2xl font-bold mb-2">Complete the Look</h2>
+        <h2 className="text-2xl font-semibold mb-2">Complete the Look</h2>
         <p className="text-muted-foreground">
           Pair this item with complementary pieces
         </p>

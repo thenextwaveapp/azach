@@ -80,7 +80,7 @@ const CustomerService = () => {
       <section className="pt-32 pb-16 bg-gradient-to-b from-background to-muted">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto">
-            <h1 className="text-5xl md:text-6xl font-bold mb-6">Customer Service</h1>
+            <h1 className="text-5xl md:text-6xl font-semibold mb-6">Customer Service</h1>
             <p className="text-xl text-muted-foreground">
               We're here to help. Get in touch with us for any questions or concerns.
             </p>
@@ -127,7 +127,7 @@ const CustomerService = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-2xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold mb-4">Send Us a Message</h2>
+              <h2 className="text-4xl font-semibold mb-4">Send Us a Message</h2>
               <p className="text-muted-foreground">
                 Fill out the form below and we'll get back to you as soon as possible.
               </p>
@@ -216,7 +216,7 @@ const CustomerService = () => {
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto">
             <div className="text-center mb-12">
-              <h2 className="text-4xl font-bold mb-4">Frequently Asked Questions</h2>
+              <h2 className="text-4xl font-semibold mb-4">Frequently Asked Questions</h2>
               <p className="text-muted-foreground">
                 Find answers to common questions about orders, shipping, and returns.
               </p>

@@ -27,7 +27,7 @@ export const AdminRoute = ({ children }: AdminRouteProps) => {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold mb-2">Access Denied</h1>
+          <h1 className="text-2xl font-semibold mb-2">Access Denied</h1>
           <p className="text-muted-foreground mb-4">You do not have admin privileges.</p>
           <a href="/" className="text-primary hover:underline">Go to Home</a>
         </div>

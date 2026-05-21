@@ -191,7 +191,7 @@ const Admin = () => {
       <div className="container mx-auto px-4 py-12">
         <div className="flex justify-between items-center mb-8">
           <div>
-            <h1 className="text-4xl font-bold">Product Management</h1>
+            <h1 className="text-4xl font-semibold">Product Management</h1>
             {user && (
               <p className="text-sm text-muted-foreground mt-1">
                 Logged in as: {user.email}
