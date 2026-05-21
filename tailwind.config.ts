@@ -14,9 +14,9 @@ export default {
     },
     extend: {
       fontFamily: {
-        sans: ['Futura', 'Inter', 'system-ui', 'sans-serif'],
-        display: ['Space Grotesk', 'DM Sans', 'sans-serif'],
-        heading: ['Bebas Neue', 'Impact', 'sans-serif'],
+        sans: ['Futura', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
+        display: ['Futura', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
+        heading: ['Futura', '-apple-system', 'BlinkMacSystemFont', 'system-ui', 'sans-serif'],
       },
       colors: {
         brand: {
