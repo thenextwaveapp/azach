@@ -48,6 +48,10 @@ export const Newsletter = () => {
                 <img src="/tiktok.png" alt="TikTok" className="h-6 w-6" />
                 <span className="sr-only">TikTok</span>
               </a>
+              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
+                <img src="/x.png" alt="X" className="h-6 w-6" />
+                <span className="sr-only">X</span>
+              </a>
               <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
                 <img src="/facebook.png" alt="Facebook" className="h-6 w-6" />
                 <span className="sr-only">Facebook</span>

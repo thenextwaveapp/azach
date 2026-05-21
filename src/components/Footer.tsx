@@ -8,8 +8,8 @@ export const Footer = () => {
 
       <footer className="py-16 bg-black text-white">
         <div className="container mx-auto px-4">
-          {/* Top Section - Logo and Social */}
-          <div className="flex flex-col md:flex-row justify-between items-center mb-12 pb-12 border-b border-gray-800">
+          {/* Top Section - Logo */}
+          <div className="flex flex-col md:flex-row justify-center items-center mb-12 pb-12 border-b border-gray-800">
             <div className="mb-6 md:mb-0">
               <Link
                 to="/"
@@ -18,24 +18,6 @@ export const Footer = () => {
                 <img src="/Azach-Logo.png" alt="AZACH" className="h-16 w-auto brightness-0 invert" />
               </Link>
               <p className="text-xs tracking-wider text-gray-400 mt-2">EST. LAGOS, NIGERIA</p>
-            </div>
-            <div className="flex gap-6">
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
-                <img src="/instagram.png" alt="Instagram" className="h-6 w-6" />
-                <span className="sr-only">Instagram</span>
-              </a>
-              <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
-                <img src="/tiktok.png" alt="TikTok" className="h-6 w-6" />
-                <span className="sr-only">TikTok</span>
-              </a>
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
-                <img src="/x.png" alt="X" className="h-6 w-6" />
-                <span className="sr-only">X</span>
-              </a>
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
-                <img src="/facebook.png" alt="Facebook" className="h-6 w-6" />
-                <span className="sr-only">Facebook</span>
-              </a>
             </div>
           </div>
 
