@@ -17,10 +17,10 @@ export const Newsletter = () => {
   };
 
   return (
-    <section className="py-12 bg-white border-t border-border">
+    <section className="py-6 bg-white border-t border-border">
       <div className="container mx-auto px-4">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-semibold uppercase tracking-wide mb-8">Stay Connected</h2>
+          <h2 className="text-2xl md:text-3xl font-semibold uppercase tracking-wide mb-6">Stay Connected</h2>
 
           <div className="flex flex-col md:flex-row gap-8 items-center justify-between">
             {/* Left: Email Form */}

@@ -24,10 +24,10 @@ const Index = () => {
       <Hero />
       
       {/* NEW PIECES */}
-      <section className="py-12 bg-white">
+      <section className="py-8 bg-white">
         <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl md:text-4xl font-semibold uppercase tracking-wide">New Pieces</h2>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl md:text-3xl font-semibold uppercase tracking-wide">New Pieces</h2>
             <Link to="/shop-all" className="text-sm uppercase tracking-wider hover:text-secondary transition-colors">
               View All →
             </Link>
@@ -67,7 +67,7 @@ const Index = () => {
       </section>
 
       {/* Three Service Cards */}
-      <section className="py-12 bg-white">
+      <section className="py-6 bg-white">
         <div className="container mx-auto px-4">
           <div className="grid md:grid-cols-3 gap-6">
             <Link to="/bespoke" className="group relative h-64 overflow-hidden">
@@ -137,9 +137,9 @@ const Index = () => {
       </section>
 
       {/* SHOP BY TYPE */}
-      <section className="py-12 bg-muted">
+      <section className="py-8 bg-muted">
         <div className="container mx-auto px-4">
-          <h2 className="text-3xl md:text-4xl font-semibold uppercase tracking-wide mb-8">Shop by Type</h2>
+          <h2 className="text-2xl md:text-3xl font-semibold uppercase tracking-wide mb-6">Shop by Type</h2>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4 max-w-7xl mx-auto">
             <Link to="/shop-all?category=tops" className="group text-center">
               <div className="relative aspect-square mb-3 overflow-hidden">
@@ -236,17 +236,17 @@ const Index = () => {
       </section>
 
       {/* HOW IT WORKS */}
-      <section className="py-12 bg-white">
+      <section className="py-8 bg-white">
         <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center mb-8">
-            <h2 className="text-3xl md:text-4xl font-semibold uppercase tracking-wide">How It Works</h2>
+          <div className="flex justify-between items-center mb-6">
+            <h2 className="text-2xl md:text-3xl font-semibold uppercase tracking-wide">How It Works</h2>
             <Link to="/our-story" className="text-sm uppercase tracking-wider hover:text-secondary transition-colors hidden md:block">
               View Process →
             </Link>
           </div>
-          <div className="grid lg:grid-cols-[1fr,auto] gap-8 items-center">
+          <div className="grid lg:grid-cols-[1fr,auto] gap-6 items-center">
             {/* Steps - Horizontal */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               <div className="text-center">
                 <div className="w-16 h-16 rounded-full bg-foreground text-background flex items-center justify-center text-2xl font-semibold mx-auto mb-4">
                   1
@@ -279,7 +279,7 @@ const Index = () => {
             </div>
 
             {/* Image - Wide Rectangle */}
-            <div className="hidden lg:block w-96">
+            <div className="hidden lg:block w-72">
               <div className="aspect-[4/3] overflow-hidden">
                 <OptimizedImage
                   src="https://imagizer.imageshack.com/img922/6348/RmDO6F.jpg"
