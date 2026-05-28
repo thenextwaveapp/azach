@@ -19,36 +19,20 @@ const CustomerService = () => {
 
   const faqs = [
     {
-      question: "What is your return policy?",
-      answer: "We offer a 30-day return policy for all unworn items with original tags attached. Items must be in their original condition. Simply contact us to initiate a return and we'll provide you with a prepaid shipping label."
+      question: "What is RRS?",
+      answer: "RRS stands for Rework & Repair Service. It is AZACH's aftercare initiative designed to extend the life of garments through repairs, alterations, and creative reconstruction. Customers can bring in old garments, which we transform into something renewed, personalized, and wearable again."
     },
     {
-      question: "How long does shipping take?",
-      answer: "Standard shipping takes 5-7 business days. Express shipping (2-3 business days) is available at checkout. International orders typically arrive within 10-14 business days depending on customs processing."
+      question: "Where do we source materials?",
+      answer: "We source reclaimed denim, second-hand textiles, and discarded fabrics from local markets, our community, customers, and textile waste streams. These materials are carefully selected and transformed into reconstructed garments through upcycling and craftsmanship."
     },
     {
-      question: "Do you ship internationally?",
-      answer: "Yes! We ship to over 50 countries worldwide. International shipping rates and delivery times vary by destination. All duties and taxes are calculated at checkout."
+      question: "What makes AZACH a circular/sustainable brand?",
+      answer: "AZACH extends the life cycle of existing materials by transforming textile waste into wearable pieces. Through upcycling, repair, and intentional production, we reduce waste while encouraging more conscious fashion consumption."
     },
     {
-      question: "How do I track my order?",
-      answer: "Once your order ships, you'll receive a tracking number via email. You can also view your order status by logging into your account and visiting the Orders page."
-    },
-    {
-      question: "What payment methods do you accept?",
-      answer: "We accept all major credit cards (Visa, Mastercard, American Express, Discover), PayPal, Apple Pay, and Google Pay. All payments are processed securely through our encrypted payment gateway."
-    },
-    {
-      question: "How do I know my size?",
-      answer: "Each product page includes a detailed size guide. We recommend measuring yourself and comparing to our size charts. If you're between sizes, we generally recommend sizing up for a more comfortable fit."
-    },
-    {
-      question: "Can I modify or cancel my order?",
-      answer: "Orders can be modified or cancelled within 1 hour of placement. After that, your order enters our fulfillment process and cannot be changed. Please contact us immediately if you need to make changes."
-    },
-    {
-      question: "Do you offer gift cards?",
-      answer: "Yes! Gift cards are available in denominations of $25, $50, $100, and $200. Digital gift cards are delivered via email and can be used for any purchase on our site."
+      question: "How do we track impact?",
+      answer: "We track impact through the volume of materials repurposed, garments rescued from waste, and individuals trained through our upcycling initiatives. As we continue to grow, we are developing better systems to measure both our environmental and community impact."
     }
   ];
 

@@ -9,9 +9,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { OptimizedImage } from "@/components/OptimizedImage";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 
@@ -19,361 +18,38 @@ const Bespoke = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Set page title
-    document.title = "Bespoke Orders - AZACH";
-    // Scroll down to position the title at the top on page load
-    window.scrollTo(0, 120);
+    document.title = "Custom (Bespoke) - AZACH";
+    window.scrollTo(0, 0);
   }, []);
 
   const [formData, setFormData] = useState({
-    category: "",
-    itemType: "",
-    denimColor: "",
-    secondaryFabricColor: "",
-    patchOption: "",
-    styleOption: "",
-    measurements: {
-      chest: "",
-      waist: "",
-      hips: "",
-      shoulders: "",
-      sleeveLength: "",
-      inseam: "",
-      outseam: "",
-      neck: "",
-      shirtLength: "",
-      pantLength: "",
-      skirtLength: "",
-    },
-    notes: "",
+    fullName: "",
+    emailWhatsApp: "",
+    whatToCreate: "",
+    ideaDescription: "",
+    files: null as FileList | null,
+    silhouetteType: "",
+    location: "",
   });
 
-  const menUnisexItems = [
-    "Jackets",
-    "Vests",
-    "Shirts",
-    "Bags",
-    "Pants",
-    "Hats",
-    "Tote Bags",
-  ];
-
-  const womenItems = [
-    "Long-skirts",
-    "Skirts",
-    "Bottoms",
-    "Tops",
-  ];
-
-  const denimColors = [
-    "Light",
-    "Dark",
-    "Indigo",
-    "Brown",
-    "Black",
-    "Grey",
-  ];
-
-  const secondaryFabricColors = [
-    "Red",
-    "Pink",
-    "Orange",
-    "Blue",
-    "Green",
-    "Yellow",
-    "Purple",
-    "White",
-    "Black",
-  ];
-
-  const patchOptions = [
-    "Classic AZACH Logo",
-    "Vintage AZACH",
-    "Minimalist AZACH",
-    "Bold AZACH",
-    "Custom Text",
-    "No Patch",
-  ];
-
-  const getStyleOptions = () => {
-    if (formData.itemType === "Shirts") {
-      return ["Arizona Shirt", "Classic Shirt", "Oversized Shirt", "Fitted Shirt"];
-    } else if (formData.itemType === "Pants") {
-      return ["Patchwork Pant", "Classic Pant", "Wide Leg Pant", "Slim Fit Pant"];
-    } else if (formData.itemType === "Jackets") {
-      return ["Classic Jacket", "Denim Jacket", "Varsity Style", "Oversized Jacket"];
-    } else if (formData.itemType === "Vests") {
-      return ["Classic Vest", "Denim Vest", "Quilted Vest"];
-    } else if (formData.itemType === "Tops") {
-      return ["Classic Top", "Crop Top", "Oversized Top", "Fitted Top"];
-    } else if (formData.itemType === "Bottoms" || formData.itemType === "Skirts" || formData.itemType === "Long-skirts") {
-      return ["Classic Style", "A-Line", "Pencil", "Flared"];
-    }
-    return [];
-  };
-
-  const getItemTypeImage = () => {
-    if (!formData.itemType) {
-      // Fallback to category images
-      if (formData.category === "men-unisex") {
-        return "https://imagizer.imageshack.com/img922/2820/P7UF2l.jpg";
-      } else if (formData.category === "women") {
-        return "https://imagizer.imageshack.com/img922/6348/RmDO6F.jpg";
-      }
-      return null;
-    }
-
-    // Item type specific images
-    const imageMap: Record<string, string> = {
-      // Men/Unisex items
-      "Jackets": "https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=2070",
-      "Vests": "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=2070",
-      "Shirts": "https://images.unsplash.com/photo-1603252109303-2751441dd157?q=80&w=2070",
-      "Bags": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?q=80&w=2070",
-      "Pants": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?q=80&w=2070",
-      "Hats": "https://images.unsplash.com/photo-1588850561407-ed78c282e89b?q=80&w=2070",
-      "Tote Bags": "https://images.unsplash.com/photo-1590874103328-eac38a683ce7?q=80&w=2070",
-      // Women items
-      "Long-skirts": "https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=2070",
-      "Skirts": "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?q=80&w=2070",
-      "Bottoms": "https://images.unsplash.com/photo-1506629082955-511b1aa562c8?q=80&w=2070",
-      "Tops": "https://images.unsplash.com/photo-1594633313593-bab3825d0caf?q=80&w=2070",
-    };
-
-    return imageMap[formData.itemType] || null;
-  };
-
-  const getStyleImage = () => {
-    if (!formData.styleOption) return null;
-
-    // Style-specific images
-    const styleImageMap: Record<string, string> = {
-      // Shirt styles
-      "Arizona Shirt": "https://images.unsplash.com/photo-1603252109303-2751441dd157?q=80&w=500",
-      "Classic Shirt": "https://images.unsplash.com/photo-1594938291221-94f18c0d0edb?q=80&w=500",
-      "Oversized Shirt": "https://images.unsplash.com/photo-1602810318383-e386a2a75157?q=80&w=500",
-      "Fitted Shirt": "https://images.unsplash.com/photo-1603252109303-2751441dd157?q=80&w=500",
-      // Pant styles
-      "Patchwork Pant": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?q=80&w=500",
-      "Classic Pant": "https://images.unsplash.com/photo-1591195853828-11db59a44f6b?q=80&w=500",
-      "Wide Leg Pant": "https://images.unsplash.com/photo-1506629082955-511b1aa562c8?q=80&w=500",
-      "Slim Fit Pant": "https://images.unsplash.com/photo-1473966968600-fa801b869a1a?q=80&w=500",
-      // Jacket styles
-      "Classic Jacket": "https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=500",
-      "Denim Jacket": "https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?q=80&w=500",
-      "Varsity Style": "https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=500",
-      "Oversized Jacket": "https://images.unsplash.com/photo-1551028719-00167b16eac5?q=80&w=500",
-      // Vest styles
-      "Classic Vest": "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=500",
-      "Denim Vest": "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=500",
-      "Quilted Vest": "https://images.unsplash.com/photo-1556821840-3a63f95609a7?q=80&w=500",
-      // Top styles
-      "Classic Top": "https://images.unsplash.com/photo-1594633313593-bab3825d0caf?q=80&w=500",
-      "Crop Top": "https://images.unsplash.com/photo-1594633313593-bab3825d0caf?q=80&w=500",
-      "Oversized Top": "https://images.unsplash.com/photo-1594633313593-bab3825d0caf?q=80&w=500",
-      "Fitted Top": "https://images.unsplash.com/photo-1594633313593-bab3825d0caf?q=80&w=500",
-      // Skirt/Bottom styles
-      "Classic Style": "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?q=80&w=500",
-      "A-Line": "https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=500",
-      "Pencil": "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?q=80&w=500",
-      "Flared": "https://images.unsplash.com/photo-1595777457583-95e059d581b8?q=80&w=500",
-    };
-
-    return styleImageMap[formData.styleOption] || null;
-  };
-
-  const getStyleDescription = () => {
-    if (!formData.styleOption) return null;
-
-    const descriptions: Record<string, { description: string; fit: string; denimColor: string; fabric: string; patch: string }> = {
-      "Arizona Shirt": {
-        description: "A bold statement piece featuring unique patchwork detailing and vintage-inspired design.",
-        fit: "Relaxed fit with slightly dropped shoulders for a comfortable, street-ready silhouette.",
-        denimColor: "Recommended: Indigo or Dark denim for maximum contrast with patchwork accents.",
-        fabric: "Works beautifully with Red, Orange, or Blue secondary fabrics for vibrant energy.",
-        patch: "Bold AZACH or Vintage AZACH patches complement this style perfectly."
-      },
-      "Classic Shirt": {
-        description: "Timeless design with clean lines and versatile styling options.",
-        fit: "Standard fit with traditional tailoring for a polished, everyday look.",
-        denimColor: "Light or Indigo denim creates a fresh, classic aesthetic.",
-        fabric: "Neutral tones like White, Black, or subtle Blue work best.",
-        patch: "Classic AZACH Logo or Minimalist AZACH for understated elegance."
-      },
-      "Oversized Shirt": {
-        description: "Contemporary oversized silhouette perfect for layering and street style.",
-        fit: "Generous fit with extended length and relaxed shoulders for effortless cool.",
-        denimColor: "Dark or Black denim provides a sleek, modern foundation.",
-        fabric: "Bold colors like Red, Orange, or Pink add playful contrast.",
-        patch: "Bold AZACH or Custom Text patches for a statement look."
-      },
-      "Fitted Shirt": {
-        description: "Tailored silhouette that accentuates your form with precision craftsmanship.",
-        fit: "Slim fit with structured shoulders for a refined, body-conscious shape.",
-        denimColor: "Indigo or Brown denim offers sophisticated depth.",
-        fabric: "Subtle accents in Blue, Purple, or White maintain elegance.",
-        patch: "Minimalist AZACH or Classic AZACH Logo for refined detail."
-      },
-      "Patchwork Pant": {
-        description: "Artisanal patchwork design showcasing upcycled denim in creative patterns.",
-        fit: "Straight leg with comfortable waist for versatile styling.",
-        denimColor: "Mix of Light, Dark, and Indigo creates the signature patchwork effect.",
-        fabric: "Accent patches in Red, Orange, or Blue enhance the patchwork aesthetic.",
-        patch: "Multiple Bold AZACH patches or Vintage AZACH for maximum impact."
-      },
-      "Classic Pant": {
-        description: "Essential straight-leg design with timeless appeal and durability.",
-        fit: "Standard fit through hip and thigh, straight leg opening.",
-        denimColor: "Classic Indigo or Dark denim for everyday versatility.",
-        fabric: "Minimal secondary fabric - Black or White for subtle contrast.",
-        patch: "Classic AZACH Logo or no patch for clean simplicity."
-      },
-      "Wide Leg Pant": {
-        description: "Modern wide-leg silhouette with flowing movement and contemporary edge.",
-        fit: "Relaxed through hip and thigh, dramatic wide leg opening.",
-        denimColor: "Light or Grey denim creates a fresh, airy feel.",
-        fabric: "Bold secondary fabrics like Red, Orange, or Pink for statement style.",
-        patch: "Bold AZACH or Custom Text for a fashion-forward look."
-      },
-      "Slim Fit Pant": {
-        description: "Streamlined silhouette with modern tailoring and sleek lines.",
-        fit: "Tapered fit from hip to ankle for a contemporary, body-conscious shape.",
-        denimColor: "Dark or Black denim for a sleek, sophisticated look.",
-        fabric: "Subtle accents in Blue, Purple, or White maintain the clean aesthetic.",
-        patch: "Minimalist AZACH or Classic AZACH Logo for refined detail."
-      },
-      "Classic Jacket": {
-        description: "Versatile outerwear piece with timeless design and functional details.",
-        fit: "Standard fit with structured shoulders and comfortable room for layering.",
-        denimColor: "Indigo or Dark denim for classic appeal.",
-        fabric: "Neutral secondary fabrics like Black, White, or subtle Blue.",
-        patch: "Classic AZACH Logo or Vintage AZACH for heritage feel."
-      },
-      "Denim Jacket": {
-        description: "Iconic denim jacket reimagined through upcycling with unique character.",
-        fit: "Relaxed fit with slightly boxy silhouette for casual comfort.",
-        denimColor: "Classic Indigo or Light denim for traditional denim jacket aesthetic.",
-        fabric: "Contrasting patches in Red, Orange, or Blue add personality.",
-        patch: "Bold AZACH or Vintage AZACH patches on chest and back."
-      },
-      "Varsity Style": {
-        description: "Sporty varsity-inspired design with bold color blocking and athletic details.",
-        fit: "Relaxed fit with slightly oversized silhouette for street style appeal.",
-        denimColor: "Dark or Black denim as the base for high contrast.",
-        fabric: "Vibrant secondary fabrics in Red, Blue, or Orange for varsity stripes.",
-        patch: "Bold AZACH patches on sleeves or chest for team spirit."
-      },
-      "Oversized Jacket": {
-        description: "Statement oversized jacket with dramatic proportions and modern edge.",
-        fit: "Generous fit with extended length and dropped shoulders for maximum impact.",
-        denimColor: "Dark or Black denim creates a sleek, powerful silhouette.",
-        fabric: "Bold secondary fabrics like Red, Orange, or Pink for contrast.",
-        patch: "Large Bold AZACH or Custom Text patches for maximum visibility."
-      },
-      "Classic Vest": {
-        description: "Versatile layering piece with clean lines and timeless appeal.",
-        fit: "Standard fit with comfortable armholes for easy layering.",
-        denimColor: "Indigo or Light denim for a fresh, casual look.",
-        fabric: "Subtle secondary fabrics in Black, White, or Blue.",
-        patch: "Classic AZACH Logo or Minimalist AZACH for subtle branding."
-      },
-      "Denim Vest": {
-        description: "Sleeveless denim vest perfect for layering and street style.",
-        fit: "Relaxed fit with open sides for ventilation and movement.",
-        denimColor: "Classic Indigo or Dark denim for traditional appeal.",
-        fabric: "Contrasting patches in Red, Orange, or Blue add edge.",
-        patch: "Bold AZACH or Vintage AZACH patches on back panel."
-      },
-      "Quilted Vest": {
-        description: "Textured quilted design with dimensional interest and warmth.",
-        fit: "Standard fit with structured quilting for shape retention.",
-        denimColor: "Dark or Brown denim provides rich, earthy tones.",
-        fabric: "Warm secondary fabrics in Orange, Red, or Yellow for cozy feel.",
-        patch: "Classic AZACH Logo or Vintage AZACH for artisanal touch."
-      },
-      "Classic Top": {
-        description: "Essential top with versatile styling and comfortable fit.",
-        fit: "Standard fit with comfortable ease for everyday wear.",
-        denimColor: "Light or Indigo denim creates a fresh, feminine look.",
-        fabric: "Soft secondary fabrics in Pink, Blue, or White.",
-        patch: "Classic AZACH Logo or Minimalist AZACH for subtle elegance."
-      },
-      "Crop Top": {
-        description: "Modern cropped silhouette perfect for layering and contemporary styling.",
-        fit: "Fitted through body with cropped length for versatile pairing.",
-        denimColor: "Light or Indigo denim for a fresh, youthful aesthetic.",
-        fabric: "Playful secondary fabrics in Pink, Orange, or Yellow.",
-        patch: "Bold AZACH or Custom Text for statement style."
-      },
-      "Oversized Top": {
-        description: "Relaxed oversized top with effortless drape and modern appeal.",
-        fit: "Generous fit with extended length for comfortable, laid-back style.",
-        denimColor: "Dark or Grey denim for a sophisticated, modern look.",
-        fabric: "Bold secondary fabrics in Red, Orange, or Pink for energy.",
-        patch: "Bold AZACH or Vintage AZACH for street style edge."
-      },
-      "Fitted Top": {
-        description: "Tailored top that accentuates your silhouette with precision fit.",
-        fit: "Slim fit with structured seams for a body-conscious shape.",
-        denimColor: "Indigo or Dark denim for sophisticated depth.",
-        fabric: "Elegant secondary fabrics in Blue, Purple, or White.",
-        patch: "Minimalist AZACH or Classic AZACH Logo for refined detail."
-      },
-      "Classic Style": {
-        description: "Timeless skirt design with versatile styling and elegant silhouette.",
-        fit: "Standard fit through waist with comfortable ease through hips.",
-        denimColor: "Light or Indigo denim for a fresh, classic look.",
-        fabric: "Soft secondary fabrics in Pink, Blue, or White.",
-        patch: "Classic AZACH Logo or Minimalist AZACH for subtle elegance."
-      },
-      "A-Line": {
-        description: "Flattering A-line silhouette that flows gracefully from waist to hem.",
-        fit: "Fitted at waist, gradually flares to create the A-line shape.",
-        denimColor: "Light or Indigo denim enhances the flowing movement.",
-        fabric: "Feminine secondary fabrics in Pink, Orange, or Yellow.",
-        patch: "Classic AZACH Logo or Vintage AZACH for timeless appeal."
-      },
-      "Pencil": {
-        description: "Sleek pencil silhouette with sophisticated tailoring and modern edge.",
-        fit: "Fitted through hip and thigh, straight to hem for streamlined look.",
-        denimColor: "Dark or Black denim for a sleek, sophisticated aesthetic.",
-        fabric: "Elegant secondary fabrics in Blue, Purple, or White.",
-        patch: "Minimalist AZACH or Classic AZACH Logo for refined detail."
-      },
-      "Flared": {
-        description: "Dramatic flared silhouette with movement and retro-inspired appeal.",
-        fit: "Fitted at waist and hip, dramatic flare from mid-thigh to hem.",
-        denimColor: "Light or Indigo denim showcases the flared movement beautifully.",
-        fabric: "Bold secondary fabrics in Red, Orange, or Pink for statement style.",
-        patch: "Bold AZACH or Vintage AZACH for maximum impact."
-      }
-    };
-
-    return descriptions[formData.styleOption] || null;
-  };
-
   const handleInputChange = (field: string, value: string) => {
-    if (field.includes(".")) {
-      const [parent, child] = field.split(".");
-      setFormData((prev) => ({
-        ...prev,
-        [parent]: {
-          ...prev[parent as keyof typeof prev],
-          [child]: value,
-        },
-      }));
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        [field]: value,
-      }));
-    }
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({
+      ...prev,
+      files: e.target.files,
+    }));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Validate required fields
-    if (!formData.category || !formData.itemType || !formData.denimColor) {
+
+    if (!formData.fullName || !formData.emailWhatsApp || !formData.whatToCreate || !formData.ideaDescription) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields.",
@@ -382,11 +58,21 @@ const Bespoke = () => {
       return;
     }
 
-    // Here you would typically send the data to your backend
-    console.log("Bespoke Order:", formData);
+    console.log("Custom Request:", formData);
     toast({
-      title: "Order Submitted!",
-      description: "Your bespoke order has been received. We'll contact you soon!",
+      title: "Request Submitted!",
+      description: "We'll get back to you soon to discuss your custom piece.",
+    });
+
+    // Reset form
+    setFormData({
+      fullName: "",
+      emailWhatsApp: "",
+      whatToCreate: "",
+      ideaDescription: "",
+      files: null,
+      silhouetteType: "",
+      location: "",
     });
   };
 
@@ -395,488 +81,254 @@ const Bespoke = () => {
       <Header />
 
       {/* Hero Section */}
-      <section className="pt-32 pb-16 relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#faf9f7] via-[#f5f3f0] to-[#f0ede8]"></div>
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="max-w-4xl mx-auto text-center mb-16">
-            <h1 className="text-4xl md:text-6xl font-semibold mb-6 uppercase">Custom (Bespoke)</h1>
-            <p className="text-xl md:text-2xl text-muted-foreground mb-4">
-              Start from an idea.
-            </p>
+      <section className="pt-32 pb-16 bg-gradient-to-b from-background to-muted">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <h1 className="text-4xl md:text-6xl font-semibold mb-6 uppercase tracking-tight">
+              Custom (Bespoke)
+            </h1>
+            <h2 className="text-2xl md:text-3xl font-light mb-6">
+              Create Something New
+            </h2>
             <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              This is for you if you want a completely new piece, have a vision or concept, or want something made specifically for you.
+              Custom is for people who want a completely new piece made with AZACH.<br />
+              You bring the idea, reference, or vision — we work with you to create a one-off piece using our reconstruction style and existing AZACH silhouettes.
             </p>
           </div>
+        </div>
+      </section>
 
-          {/* Info Cards */}
-          <div className="max-w-5xl mx-auto grid md:grid-cols-2 gap-8 mb-16">
-            <Card className="bg-white/80 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle>What You Get</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-sm text-muted-foreground">
-                <p>• Design and build using existing AZACH silhouettes</p>
-                <p>• Completely new piece made specifically for you</p>
-                <p>• Collaborative design process</p>
-                <p>• Custom silhouettes available at additional cost</p>
-                <p>• Available worldwide</p>
-              </CardContent>
-            </Card>
-
-            <Card className="bg-white/80 backdrop-blur-sm">
-              <CardHeader>
-                <CardTitle>How It Works</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3 text-sm text-muted-foreground">
-                <p><strong>1.</strong> Fill the form below with your idea</p>
-                <p><strong>2.</strong> Choose your silhouette from our designs</p>
-                <p><strong>3.</strong> We take your measurements</p>
-                <p><strong>4.</strong> Design approval before production</p>
-                <p><strong>5.</strong> Production: 7–10 working days</p>
-                <p><strong>6.</strong> Delivery to your location</p>
-              </CardContent>
-            </Card>
-          </div>
-
-          <div className="max-w-4xl mx-auto">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl md:text-4xl font-semibold mb-4">Start Your Request</h2>
-              <p className="text-lg text-muted-foreground">
-                Create your perfect custom piece with your measurements and style preferences
+      {/* This Is For You Section */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="max-w-3xl mx-auto">
+            <h3 className="text-2xl font-semibold mb-6 text-center">This is for you if:</h3>
+            <div className="space-y-3 text-lg">
+              <p className="flex items-start gap-3">
+                <span className="text-[#a97c50]">•</span>
+                <span>You want a new custom piece</span>
+              </p>
+              <p className="flex items-start gap-3">
+                <span className="text-[#a97c50]">•</span>
+                <span>You have an idea or inspiration</span>
+              </p>
+              <p className="flex items-start gap-3">
+                <span className="text-[#a97c50]">•</span>
+                <span>You want something made specifically for you</span>
+              </p>
+              <p className="flex items-start gap-3">
+                <span className="text-[#a97c50]">•</span>
+                <span>You want a one-of-one AZACH piece</span>
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-8">
-              {/* Category Selection */}
-              <Card className="bg-white/80 backdrop-blur-sm border-border/50 shadow-lg">
-                <CardHeader>
-                  <CardTitle>1. Select Category</CardTitle>
-                  <CardDescription>Choose your category</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-6">
-                  <div className="grid grid-cols-2 gap-4">
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className={`h-20 focus:outline-none focus:ring-0 ${
-                        formData.category === "men-unisex"
-                          ? "bg-foreground text-background border-foreground hover:bg-foreground/90"
-                          : "hover:bg-muted hover:text-foreground"
-                      }`}
-                      onClick={() => {
-                        handleInputChange("category", "men-unisex");
-                        handleInputChange("itemType", "");
-                        handleInputChange("styleOption", "");
-                      }}
-                    >
-                      Men/Unisex
-                    </Button>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      className={`h-20 focus:outline-none focus:ring-0 ${
-                        formData.category === "women"
-                          ? "bg-foreground text-background border-foreground hover:bg-foreground/90"
-                          : "hover:bg-muted hover:text-foreground"
-                      }`}
-                      onClick={() => {
-                        handleInputChange("category", "women");
-                        handleInputChange("itemType", "");
-                        handleInputChange("styleOption", "");
-                      }}
-                    >
-                      Women
-                    </Button>
+            <div className="mt-8 p-6 bg-muted rounded-lg">
+              <h4 className="font-semibold mb-3">Important Notes</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>• Pieces are created using existing AZACH silhouettes</li>
+                <li>• Fully new/custom silhouettes outside our standard designs come at an additional cost</li>
+                <li>• Denim shades and textures may vary due to upcycling</li>
+                <li>• Available worldwide</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How Custom Works */}
+      <section className="py-16 bg-muted">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <h3 className="text-3xl font-semibold mb-12 text-center uppercase tracking-tight">
+              How Custom Works
+            </h3>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+              <div className="text-center">
+                <div className="w-12 h-12 rounded-full bg-[#a97c50] text-white flex items-center justify-center text-xl font-semibold mx-auto mb-4">
+                  1
+                </div>
+                <h4 className="font-semibold mb-2">Start the conversation</h4>
+                <p className="text-sm text-muted-foreground">Tell us what you want to create.</p>
+              </div>
+
+              <div className="text-center">
+                <div className="w-12 h-12 rounded-full bg-[#a97c50] text-white flex items-center justify-center text-xl font-semibold mx-auto mb-4">
+                  2
+                </div>
+                <h4 className="font-semibold mb-2">Share your idea</h4>
+                <p className="text-sm text-muted-foreground">Send references, sketches, inspiration, or concepts.</p>
+              </div>
+
+              <div className="text-center">
+                <div className="w-12 h-12 rounded-full bg-[#a97c50] text-white flex items-center justify-center text-xl font-semibold mx-auto mb-4">
+                  3
+                </div>
+                <h4 className="font-semibold mb-2">Choose your silhouette</h4>
+                <p className="text-sm text-muted-foreground">Select from available AZACH silhouettes.</p>
+              </div>
+
+              <div className="text-center">
+                <div className="w-12 h-12 rounded-full bg-[#a97c50] text-white flex items-center justify-center text-xl font-semibold mx-auto mb-4">
+                  4
+                </div>
+                <h4 className="font-semibold mb-2">Measurements & fit</h4>
+                <p className="text-sm text-muted-foreground">We take your measurements for the right fit.</p>
+              </div>
+
+              <div className="text-center">
+                <div className="w-12 h-12 rounded-full bg-[#a97c50] text-white flex items-center justify-center text-xl font-semibold mx-auto mb-4">
+                  5
+                </div>
+                <h4 className="font-semibold mb-2">Design approval</h4>
+                <p className="text-sm text-muted-foreground">We confirm all details before production.</p>
+              </div>
+
+              <div className="text-center">
+                <div className="w-12 h-12 rounded-full bg-[#a97c50] text-white flex items-center justify-center text-xl font-semibold mx-auto mb-4">
+                  6
+                </div>
+                <h4 className="font-semibold mb-2">Production</h4>
+                <p className="text-sm text-muted-foreground">Your piece is made within 7–10 working days.</p>
+              </div>
+
+              <div className="text-center">
+                <div className="w-12 h-12 rounded-full bg-[#a97c50] text-white flex items-center justify-center text-xl font-semibold mx-auto mb-4">
+                  7
+                </div>
+                <h4 className="font-semibold mb-2">Delivery</h4>
+                <p className="text-sm text-muted-foreground">Your piece gets shipped to you once ready.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Custom Request Form */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="max-w-3xl mx-auto">
+            <div className="text-center mb-12">
+              <h3 className="text-3xl font-semibold mb-4 uppercase tracking-tight">
+                Custom Request Form
+              </h3>
+              <p className="text-lg text-muted-foreground">
+                Let's create something together.
+              </p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <Card>
+                <CardContent className="pt-6 space-y-6">
+                  <div className="space-y-2">
+                    <Label htmlFor="fullName">Full Name *</Label>
+                    <Input
+                      id="fullName"
+                      type="text"
+                      placeholder="Your full name"
+                      value={formData.fullName}
+                      onChange={(e) => handleInputChange("fullName", e.target.value)}
+                      required
+                    />
                   </div>
-                  
-                  {/* Image Block */}
-                  {formData.category && getItemTypeImage() && (
-                    <div className="relative aspect-[4/3] rounded-lg overflow-hidden bg-muted">
-                      <OptimizedImage
-                        key={formData.itemType || formData.category}
-                        src={getItemTypeImage() || ""}
-                        alt={formData.itemType ? `${formData.itemType} Collection` : `${formData.category === "men-unisex" ? "Men's" : "Women's"} Collection`}
-                        aspectRatio="landscape"
-                        className="w-full h-full transition-opacity duration-500"
-                        loading="lazy"
-                      />
-                    </div>
-                  )}
+
+                  <div className="space-y-2">
+                    <Label htmlFor="emailWhatsApp">Email / WhatsApp *</Label>
+                    <Input
+                      id="emailWhatsApp"
+                      type="text"
+                      placeholder="your.email@example.com or +234 XXX XXX XXXX"
+                      value={formData.emailWhatsApp}
+                      onChange={(e) => handleInputChange("emailWhatsApp", e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="whatToCreate">What would you like to create? *</Label>
+                    <Select
+                      value={formData.whatToCreate}
+                      onValueChange={(value) => handleInputChange("whatToCreate", value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select an option" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="top">Top</SelectItem>
+                        <SelectItem value="bottom">Bottom</SelectItem>
+                        <SelectItem value="jacket">Jacket</SelectItem>
+                        <SelectItem value="full-look">Full Look</SelectItem>
+                        <SelectItem value="bag-accessory">Bag / Accessory</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="ideaDescription">Tell us about your idea *</Label>
+                    <Textarea
+                      id="ideaDescription"
+                      placeholder="Describe your vision, references, or concept..."
+                      className="min-h-[120px]"
+                      value={formData.ideaDescription}
+                      onChange={(e) => handleInputChange("ideaDescription", e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="files">Upload references (optional)</Label>
+                    <Input
+                      id="files"
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="cursor-pointer"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Upload images, sketches, or inspiration references
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="silhouetteType">Do you want to use: *</Label>
+                    <Select
+                      value={formData.silhouetteType}
+                      onValueChange={(value) => handleInputChange("silhouetteType", value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select an option" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="existing">Existing AZACH silhouette</SelectItem>
+                        <SelectItem value="custom">Fully custom silhouette</SelectItem>
+                        <SelectItem value="not-sure">Not sure yet</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="location">Location *</Label>
+                    <Input
+                      id="location"
+                      type="text"
+                      placeholder="City, Country"
+                      value={formData.location}
+                      onChange={(e) => handleInputChange("location", e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <Button
+                    type="submit"
+                    className="w-full bg-[#a97c50] hover:bg-[#8b6440] text-white uppercase font-semibold"
+                    size="lg"
+                  >
+                    Start Your Request
+                  </Button>
                 </CardContent>
               </Card>
-
-              {/* Item Type Selection */}
-              {formData.category && (
-                <Card className="bg-white/80 backdrop-blur-sm border-border/50 shadow-lg">
-                  <CardHeader>
-                    <CardTitle>2. Select Item Type</CardTitle>
-                    <CardDescription>Choose the item you want to customize</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Select
-                      value={formData.itemType}
-                      onValueChange={(value) => {
-                        handleInputChange("itemType", value);
-                        handleInputChange("styleOption", "");
-                      }}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select an item type" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {(formData.category === "men-unisex" ? menUnisexItems : womenItems).map((item) => (
-                          <SelectItem key={item} value={item}>
-                            {item}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Style Option */}
-              {formData.itemType && getStyleOptions().length > 0 && (
-                <Card className="bg-white/80 backdrop-blur-sm border-border/50 shadow-lg">
-                  <CardHeader>
-                    <CardTitle>3. Select Style</CardTitle>
-                    <CardDescription>Choose your preferred style</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <div className="flex gap-4 items-start">
-                      <div className="flex-1">
-                        <Select
-                          value={formData.styleOption}
-                          onValueChange={(value) => handleInputChange("styleOption", value)}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select a style" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {getStyleOptions().map((style) => (
-                              <SelectItem key={style} value={style}>
-                                {style}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        {formData.styleOption && getStyleDescription() && (
-                          <div className="mt-6 space-y-6 pr-8">
-                            <div className="space-y-3">
-                              <h4 className="text-lg font-display font-semibold text-foreground tracking-tight">
-                                {formData.styleOption}
-                              </h4>
-                              <p className="text-base leading-relaxed text-foreground/90 font-sans">
-                                {getStyleDescription()?.description}
-                              </p>
-                            </div>
-                            
-                            <div className="space-y-4 pt-2 border-t border-border/50">
-                              <div className="space-y-2">
-                                <h5 className="text-sm font-display font-semibold text-foreground">
-                                  Fit & Silhouette
-                                </h5>
-                                <p className="text-sm leading-relaxed text-muted-foreground font-sans">
-                                  {getStyleDescription()?.fit}
-                                </p>
-                              </div>
-                              
-                              <div className="space-y-2">
-                                <h5 className="text-sm font-display font-semibold text-foreground">
-                                  Denim Recommendation
-                                </h5>
-                                <p className="text-sm leading-relaxed text-muted-foreground font-sans">
-                                  {getStyleDescription()?.denimColor}
-                                </p>
-                              </div>
-                              
-                              <div className="space-y-2">
-                                <h5 className="text-sm font-display font-semibold text-foreground">
-                                  Secondary Fabric
-                                </h5>
-                                <p className="text-sm leading-relaxed text-muted-foreground font-sans">
-                                  {getStyleDescription()?.fabric}
-                                </p>
-                              </div>
-                              
-                              <div className="space-y-2">
-                                <h5 className="text-sm font-display font-semibold text-foreground">
-                                  Patch Suggestion
-                                </h5>
-                                <p className="text-sm leading-relaxed text-muted-foreground font-sans">
-                                  {getStyleDescription()?.patch}
-                                </p>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                      {formData.styleOption && getStyleImage() && (
-                        <div className="flex-shrink-0 w-96">
-                          <div className="w-full aspect-square rounded-lg overflow-hidden bg-muted shadow-md border border-border/20">
-                            <OptimizedImage
-                              key={formData.styleOption}
-                              src={getStyleImage() || ""}
-                              alt={formData.styleOption}
-                              aspectRatio="square"
-                              className="w-full h-full object-cover transition-all duration-300 hover:scale-105"
-                              loading="lazy"
-                            />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Color Selection */}
-              {formData.itemType && (
-                <>
-                  <Card className="bg-white/80 backdrop-blur-sm border-border/50 shadow-lg">
-                    <CardHeader>
-                      <CardTitle>4. Denim Color</CardTitle>
-                      <CardDescription>Choose your primary denim color</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
-                        {denimColors.map((color) => (
-                          <Button
-                            key={color}
-                            type="button"
-                            variant="outline"
-                            onClick={() => handleInputChange("denimColor", color.toLowerCase())}
-                            className={`capitalize focus:outline-none focus:ring-0 ${
-                              formData.denimColor === color.toLowerCase()
-                                ? "bg-foreground text-background border-foreground hover:bg-foreground/90"
-                                : "hover:bg-muted hover:text-foreground"
-                            }`}
-                          >
-                            {color}
-                          </Button>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-
-                  <Card className="bg-white/80 backdrop-blur-sm border-border/50 shadow-lg">
-                    <CardHeader>
-                      <CardTitle>5. Accent Color</CardTitle>
-                      <CardDescription>Choose an accent color (optional)</CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                      <div className="grid grid-cols-3 md:grid-cols-5 gap-3">
-                        {secondaryFabricColors.map((color) => (
-                          <Button
-                            key={color}
-                            type="button"
-                            variant="outline"
-                            onClick={() => handleInputChange(
-                              "secondaryFabricColor",
-                              formData.secondaryFabricColor === color.toLowerCase() ? "" : color.toLowerCase()
-                            )}
-                            className={`capitalize focus:outline-none focus:ring-0 ${
-                              formData.secondaryFabricColor === color.toLowerCase()
-                                ? "bg-foreground text-background border-foreground hover:bg-foreground/90"
-                                : "hover:bg-muted hover:text-foreground"
-                            }`}
-                          >
-                            {color}
-                          </Button>
-                        ))}
-                      </div>
-                    </CardContent>
-                  </Card>
-                </>
-              )}
-
-              {/* Patch Selection */}
-              {formData.itemType && (
-                <Card className="bg-white/80 backdrop-blur-sm border-border/50 shadow-lg">
-                  <CardHeader>
-                    <CardTitle>6. AZACH Patch Option</CardTitle>
-                    <CardDescription>Choose your custom patch style</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Select
-                      value={formData.patchOption}
-                      onValueChange={(value) => handleInputChange("patchOption", value)}
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a patch option" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {patchOptions.map((option) => (
-                          <SelectItem key={option} value={option}>
-                            {option}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Measurements */}
-              {formData.itemType && (
-                <Card className="bg-white/80 backdrop-blur-sm border-border/50 shadow-lg">
-                  <CardHeader>
-                    <CardTitle>7. Your Measurements</CardTitle>
-                    <CardDescription>Please provide your measurements in inches or centimeters</CardDescription>
-                  </CardHeader>
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="chest">Chest (inches)</Label>
-                        <Input
-                          id="chest"
-                          type="number"
-                          placeholder="e.g., 40"
-                          value={formData.measurements.chest}
-                          onChange={(e) => handleInputChange("measurements.chest", e.target.value)}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="waist">Waist (inches)</Label>
-                        <Input
-                          id="waist"
-                          type="number"
-                          placeholder="e.g., 32"
-                          value={formData.measurements.waist}
-                          onChange={(e) => handleInputChange("measurements.waist", e.target.value)}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="hips">Hips (inches)</Label>
-                        <Input
-                          id="hips"
-                          type="number"
-                          placeholder="e.g., 38"
-                          value={formData.measurements.hips}
-                          onChange={(e) => handleInputChange("measurements.hips", e.target.value)}
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <Label htmlFor="shoulders">Shoulders (inches)</Label>
-                        <Input
-                          id="shoulders"
-                          type="number"
-                          placeholder="e.g., 18"
-                          value={formData.measurements.shoulders}
-                          onChange={(e) => handleInputChange("measurements.shoulders", e.target.value)}
-                        />
-                      </div>
-                      {(formData.itemType === "Shirts" || formData.itemType === "Tops" || formData.itemType === "Jackets" || formData.itemType === "Vests") && (
-                        <>
-                          <div className="space-y-2">
-                            <Label htmlFor="sleeveLength">Sleeve Length (inches)</Label>
-                            <Input
-                              id="sleeveLength"
-                              type="number"
-                              placeholder="e.g., 24"
-                              value={formData.measurements.sleeveLength}
-                              onChange={(e) => handleInputChange("measurements.sleeveLength", e.target.value)}
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="shirtLength">Shirt/Top Length (inches)</Label>
-                            <Input
-                              id="shirtLength"
-                              type="number"
-                              placeholder="e.g., 28"
-                              value={formData.measurements.shirtLength}
-                              onChange={(e) => handleInputChange("measurements.shirtLength", e.target.value)}
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="neck">Neck (inches)</Label>
-                            <Input
-                              id="neck"
-                              type="number"
-                              placeholder="e.g., 16"
-                              value={formData.measurements.neck}
-                              onChange={(e) => handleInputChange("measurements.neck", e.target.value)}
-                            />
-                          </div>
-                        </>
-                      )}
-                      {(formData.itemType === "Pants" || formData.itemType === "Bottoms") && (
-                        <>
-                          <div className="space-y-2">
-                            <Label htmlFor="inseam">Inseam (inches)</Label>
-                            <Input
-                              id="inseam"
-                              type="number"
-                              placeholder="e.g., 32"
-                              value={formData.measurements.inseam}
-                              onChange={(e) => handleInputChange("measurements.inseam", e.target.value)}
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="outseam">Outseam (inches)</Label>
-                            <Input
-                              id="outseam"
-                              type="number"
-                              placeholder="e.g., 42"
-                              value={formData.measurements.outseam}
-                              onChange={(e) => handleInputChange("measurements.outseam", e.target.value)}
-                            />
-                          </div>
-                          <div className="space-y-2">
-                            <Label htmlFor="pantLength">Pant Length (inches)</Label>
-                            <Input
-                              id="pantLength"
-                              type="number"
-                              placeholder="e.g., 40"
-                              value={formData.measurements.pantLength}
-                              onChange={(e) => handleInputChange("measurements.pantLength", e.target.value)}
-                            />
-                          </div>
-                        </>
-                      )}
-                      {(formData.itemType === "Skirts" || formData.itemType === "Long-skirts") && (
-                        <div className="space-y-2">
-                          <Label htmlFor="skirtLength">Skirt Length (inches)</Label>
-                          <Input
-                            id="skirtLength"
-                            type="number"
-                            placeholder="e.g., 24"
-                            value={formData.measurements.skirtLength}
-                            onChange={(e) => handleInputChange("measurements.skirtLength", e.target.value)}
-                          />
-                        </div>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Additional Notes */}
-              {formData.itemType && (
-                <Card className="bg-white/80 backdrop-blur-sm border-border/50 shadow-lg">
-                  <CardHeader>
-                    <CardTitle>8. Additional Notes</CardTitle>
-                    <CardDescription>Any special requests or details?</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Textarea
-                      className="min-h-[100px]"
-                      placeholder="Tell us about any special requests, preferred fit, or other details..."
-                      value={formData.notes}
-                      onChange={(e) => handleInputChange("notes", e.target.value)}
-                    />
-                  </CardContent>
-                </Card>
-              )}
-
-              {/* Submit Button */}
-              {formData.itemType && (
-                <div className="flex justify-end">
-                  <Button type="submit" size="lg" className="px-8">
-                    Submit Bespoke Order
-                  </Button>
-                </div>
-              )}
             </form>
           </div>
         </div>
@@ -886,4 +338,3 @@ const Bespoke = () => {
 };
 
 export default Bespoke;
-

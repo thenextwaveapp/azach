@@ -54,7 +54,7 @@ export const Header = () => {
         isVisible ? "top-0 translate-y-0" : "-top-20 -translate-y-full"
       }`}>
         <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between relative">
+        <div className="flex h-16 items-center justify-between">
           {/* Mobile Menu */}
           <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
             <SheetTrigger asChild className="lg:hidden">
@@ -68,6 +68,7 @@ export const Header = () => {
                 <Link to="/bespoke" className="text-lg hover:text-secondary transition-colors uppercase tracking-wide" onClick={() => setMobileMenuOpen(false)}>Custom</Link>
                 <Link to="/rework" className="text-lg hover:text-secondary transition-colors uppercase tracking-wide" onClick={() => setMobileMenuOpen(false)}>Rework</Link>
                 <Link to="/our-story" className="text-lg hover:text-secondary transition-colors uppercase tracking-wide" onClick={() => setMobileMenuOpen(false)}>About</Link>
+                <Link to="/customer-service" className="text-lg hover:text-secondary transition-colors uppercase tracking-wide" onClick={() => setMobileMenuOpen(false)}>Help</Link>
                 <div className="border-t border-border mt-2 pt-2">
                   <Link to="/women" className="text-lg hover:text-secondary transition-colors block mb-3" onClick={() => setMobileMenuOpen(false)}>Women</Link>
                   <Link to="/men" className="text-lg hover:text-secondary transition-colors block mb-3" onClick={() => setMobileMenuOpen(false)}>Men</Link>
@@ -162,8 +163,22 @@ export const Header = () => {
             </SheetContent>
           </Sheet>
 
-          {/* Desktop Navigation - LEFT */}
-          <nav className="hidden lg:flex gap-8">
+          {/* Logo - LEFT */}
+          <div className="flex flex-col items-start">
+            <Link
+              to="/"
+              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+              className="hover:opacity-80 transition-opacity"
+            >
+              <img src="/Azach-Logo.png" alt="AZACH" className="h-10 w-auto" />
+            </Link>
+            <div className="hidden lg:block text-[10px] tracking-wider text-muted-foreground mt-0.5">
+              EST. LAGOS, NIGERIA
+            </div>
+          </div>
+
+          {/* Desktop Navigation - CENTER */}
+          <nav className="hidden lg:flex gap-8 absolute left-1/2 -translate-x-1/2">
             <Link
               to="/shop-all"
               className="relative text-sm font-medium transition-all duration-300 hover:text-secondary group uppercase tracking-wide"
@@ -192,23 +207,16 @@ export const Header = () => {
               About
               <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all duration-300 group-hover:w-full"></span>
             </Link>
+            <Link
+              to="/customer-service"
+              className="relative text-sm font-medium transition-all duration-300 hover:text-secondary group uppercase tracking-wide"
+            >
+              Help
+              <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-secondary transition-all duration-300 group-hover:w-full"></span>
+            </Link>
           </nav>
 
-          {/* Logo - CENTER */}
-          <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-3">
-            <Link
-              to="/"
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="hover:opacity-80 transition-opacity"
-            >
-              <img src="/Azach-Logo.png" alt="AZACH" className="h-10 w-auto" />
-            </Link>
-            <div className="hidden lg:block text-xs tracking-wider text-muted-foreground">
-              EST. LAGOS, NIGERIA
-            </div>
-          </div>
-
-          {/* Actions - hidden on mobile, shown in drawer instead */}
+          {/* Actions - RIGHT */}
           <div className="hidden lg:flex items-center gap-2">
             <Button variant="ghost" size="icon" onClick={() => setSearchOpen(true)} className="hover:bg-muted hover:text-foreground">
               <Search className="h-5 w-5" />

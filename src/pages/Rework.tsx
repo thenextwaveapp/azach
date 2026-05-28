@@ -2,28 +2,35 @@ import { Header } from "@/components/Header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import { OptimizedImage } from "@/components/OptimizedImage";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
-import { Link } from "react-router-dom";
 
 const Rework = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    document.title = "Rework & Repair - AZACH";
-    window.scrollTo(0, 120);
+    document.title = "Rework & Repair (RRS) - AZACH";
+    window.scrollTo(0, 0);
   }, []);
 
   const [formData, setFormData] = useState({
-    name: "",
+    fullName: "",
     email: "",
-    phone: "",
+    whatsapp: "",
     serviceType: "",
-    itemDescription: "",
-    additionalNotes: "",
+    pieceType: "",
+    workDescription: "",
+    files: null as FileList | null,
+    location: "",
   });
 
   const handleInputChange = (field: string, value: string) => {
@@ -33,10 +40,17 @@ const Rework = () => {
     }));
   };
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFormData((prev) => ({
+      ...prev,
+      files: e.target.files,
+    }));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!formData.name || !formData.email || !formData.serviceType || !formData.itemDescription) {
+    if (!formData.fullName || !formData.email || !formData.serviceType || !formData.workDescription) {
       toast({
         title: "Missing Information",
         description: "Please fill in all required fields.",
@@ -45,7 +59,7 @@ const Rework = () => {
       return;
     }
 
-    console.log("Rework Request:", formData);
+    console.log("RRS Request:", formData);
     toast({
       title: "Request Submitted!",
       description: "We'll contact you soon to discuss your rework/repair needs.",
@@ -53,12 +67,14 @@ const Rework = () => {
 
     // Reset form
     setFormData({
-      name: "",
+      fullName: "",
       email: "",
-      phone: "",
+      whatsapp: "",
       serviceType: "",
-      itemDescription: "",
-      additionalNotes: "",
+      pieceType: "",
+      workDescription: "",
+      files: null,
+      location: "",
     });
   };
 
@@ -67,138 +83,174 @@ const Rework = () => {
       <Header />
 
       {/* Hero Section */}
-      <section className="relative h-[50vh] flex items-center justify-center overflow-hidden">
-        <OptimizedImage
-          src="https://imagizer.imageshack.com/img922/6348/RmDO6F.jpg"
-          alt="Rework & Repair"
-          aspectRatio="landscape"
-          className="absolute inset-0 w-full h-full object-cover"
-          loading="eager"
-        />
-        <div className="absolute inset-0 bg-black/50" />
-        <div className="container mx-auto px-4 relative z-10 text-center text-white">
-          <h1 className="text-5xl md:text-7xl font-semibold mb-4 uppercase">Rework & Repair</h1>
-          <p className="text-xl md:text-2xl font-light max-w-2xl mx-auto">
-            Start from what you already own.
-          </p>
+      <section className="pt-32 pb-16 bg-gradient-to-b from-background to-muted">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto text-center">
+            <h1 className="text-4xl md:text-6xl font-semibold mb-6 uppercase tracking-tight">
+              Rework & Repair (RRS)
+            </h1>
+            <h2 className="text-2xl md:text-3xl font-light mb-6">
+              Transform What You Already Own
+            </h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+              RRS is for people who already have garments they want to update, repair, or reconstruct.<br />
+              Instead of starting from scratch, we work with your existing piece and give it a new life through reconstruction and redesign.
+            </p>
+          </div>
         </div>
       </section>
 
-      {/* Intro Section */}
+      {/* This Is For You Section */}
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="max-w-3xl mx-auto">
+            <h3 className="text-2xl font-semibold mb-6 text-center">This is for you if:</h3>
+            <div className="space-y-3 text-lg">
+              <p className="flex items-start gap-3">
+                <span className="text-[#a97c50]">•</span>
+                <span>You have denim you want transformed</span>
+              </p>
+              <p className="flex items-start gap-3">
+                <span className="text-[#a97c50]">•</span>
+                <span>Your garment needs repair or adjustment</span>
+              </p>
+              <p className="flex items-start gap-3">
+                <span className="text-[#a97c50]">•</span>
+                <span>You want to redesign an existing piece</span>
+              </p>
+              <p className="flex items-start gap-3">
+                <span className="text-[#a97c50]">•</span>
+                <span>You want to extend the life of something you already wear</span>
+              </p>
+            </div>
+
+            <div className="mt-8 p-6 bg-muted rounded-lg">
+              <h4 className="font-semibold mb-3">Important Notes</h4>
+              <ul className="space-y-2 text-sm text-muted-foreground">
+                <li>• Pieces are reworked using existing AZACH silhouettes and reconstruction styles</li>
+                <li>• Fully custom redesigns outside our standard styles come at an additional cost</li>
+                <li>• Currently available only within Lagos, Nigeria</li>
+                <li>• Denim shades and textures may vary due to upcycling</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* How RRS Works */}
+      <section className="py-16 bg-muted">
+        <div className="container mx-auto px-4">
+          <div className="max-w-4xl mx-auto">
+            <h3 className="text-3xl font-semibold mb-12 text-center uppercase tracking-tight">
+              How RRS Works
+            </h3>
+
+            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6 mb-16">
+              <div className="text-center">
+                <div className="w-12 h-12 rounded-full bg-[#a97c50] text-white flex items-center justify-center text-xl font-semibold mx-auto mb-4">
+                  1
+                </div>
+                <h4 className="font-semibold mb-2">Start the conversation</h4>
+                <p className="text-sm text-muted-foreground">Tell us about the piece you want reworked or repaired.</p>
+              </div>
+
+              <div className="text-center">
+                <div className="w-12 h-12 rounded-full bg-[#a97c50] text-white flex items-center justify-center text-xl font-semibold mx-auto mb-4">
+                  2
+                </div>
+                <h4 className="font-semibold mb-2">Send or drop off your item</h4>
+                <p className="text-sm text-muted-foreground">RRS is currently Lagos-only.</p>
+              </div>
+
+              <div className="text-center">
+                <div className="w-12 h-12 rounded-full bg-[#a97c50] text-white flex items-center justify-center text-xl font-semibold mx-auto mb-4">
+                  3
+                </div>
+                <h4 className="font-semibold mb-2">Choose your reconstruction style</h4>
+                <p className="text-sm text-muted-foreground">We guide you through the best AZACH silhouette or redesign direction.</p>
+              </div>
+
+              <div className="text-center">
+                <div className="w-12 h-12 rounded-full bg-[#a97c50] text-white flex items-center justify-center text-xl font-semibold mx-auto mb-4">
+                  4
+                </div>
+                <h4 className="font-semibold mb-2">Measurements & adjustments</h4>
+                <p className="text-sm text-muted-foreground">We confirm fit and changes needed.</p>
+              </div>
+
+              <div className="text-center">
+                <div className="w-12 h-12 rounded-full bg-[#a97c50] text-white flex items-center justify-center text-xl font-semibold mx-auto mb-4">
+                  5
+                </div>
+                <h4 className="font-semibold mb-2">Design approval</h4>
+                <p className="text-sm text-muted-foreground">We finalize all details before production.</p>
+              </div>
+
+              <div className="text-center">
+                <div className="w-12 h-12 rounded-full bg-[#a97c50] text-white flex items-center justify-center text-xl font-semibold mx-auto mb-4">
+                  6
+                </div>
+                <h4 className="font-semibold mb-2">Rework process</h4>
+                <p className="text-sm text-muted-foreground">Your piece is reconstructed within 7–10 working days.</p>
+              </div>
+
+              <div className="text-center">
+                <div className="w-12 h-12 rounded-full bg-[#a97c50] text-white flex items-center justify-center text-xl font-semibold mx-auto mb-4">
+                  7
+                </div>
+                <h4 className="font-semibold mb-2">Delivery / Pickup</h4>
+                <p className="text-sm text-muted-foreground">Your updated piece is delivered or picked up once ready.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* What to Expect */}
       <section className="py-16 bg-white">
         <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto text-center">
-            <h2 className="text-3xl md:text-4xl font-semibold mb-6">This is for you if:</h2>
-            <div className="space-y-3 text-lg text-muted-foreground">
-              <p>• You have denim you want to transform</p>
-              <p>• Your piece needs adjustment, fixing, or redesign</p>
-              <p>• You want to give new life to something you already wear</p>
-            </div>
-            <div className="mt-8 p-6 bg-muted rounded-lg">
-              <p className="text-sm text-muted-foreground">
-                <strong className="text-foreground">Note:</strong> Your piece is reworked using our existing silhouettes and reconstruction styles.
-                If you want a fully custom redesign outside our standard silhouettes, this will come at an additional cost.
-              </p>
-              <p className="text-sm text-muted-foreground mt-4">
-                <strong className="text-foreground">Location:</strong> Due to logistics, Rework & Repair is currently available only within Lagos, Nigeria.
-              </p>
+            <h3 className="text-3xl font-semibold mb-8 uppercase tracking-tight">
+              What to Expect
+            </h3>
+            <div className="space-y-4 text-lg text-muted-foreground">
+              <p>Every piece is one-of-one</p>
+              <p>Upcycled materials naturally vary in shade and texture</p>
+              <p>Each piece is built through collaboration and process</p>
+              <p>Thoughtful craftsmanship takes time and attention</p>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Services Section */}
+      {/* RRS Request Form */}
       <section className="py-16 bg-muted">
         <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto">
-            <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-semibold mb-4">Our Services</h2>
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-                We specialize in extending the life of your favorite pieces through expert repair and creative reworking
-              </p>
-            </div>
-
-            <div className="grid md:grid-cols-3 gap-8 mb-16">
-              <Card className="bg-white">
-                <CardHeader>
-                  <CardTitle>Repair & Mending</CardTitle>
-                  <CardDescription>Fix tears, replace zippers, patch holes</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2 text-sm text-muted-foreground">
-                    <li>• Zipper replacement</li>
-                    <li>• Tear and rip repair</li>
-                    <li>• Button replacement</li>
-                    <li>• Seam reinforcement</li>
-                    <li>• Patch work</li>
-                  </ul>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-white">
-                <CardHeader>
-                  <CardTitle>Alterations</CardTitle>
-                  <CardDescription>Perfect fit for your garments</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2 text-sm text-muted-foreground">
-                    <li>• Hemming</li>
-                    <li>• Taking in/letting out</li>
-                    <li>• Sleeve adjustments</li>
-                    <li>• Waist adjustments</li>
-                    <li>• Length modifications</li>
-                  </ul>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-white">
-                <CardHeader>
-                  <CardTitle>Creative Rework</CardTitle>
-                  <CardDescription>Transform old pieces into new styles</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2 text-sm text-muted-foreground">
-                    <li>• Add custom patches</li>
-                    <li>• Distressing & aging</li>
-                    <li>• Color blocking</li>
-                    <li>• Style transformation</li>
-                    <li>• Embellishments</li>
-                  </ul>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Request Form Section */}
-      <section className="py-16 bg-gradient-to-b from-white to-muted">
-        <div className="container mx-auto px-4">
           <div className="max-w-3xl mx-auto">
-            <div className="text-center mb-8">
-              <h2 className="text-3xl md:text-4xl font-semibold mb-4">Request a Service</h2>
+            <div className="text-center mb-12">
+              <h3 className="text-3xl font-semibold mb-4 uppercase tracking-tight">
+                RRS Request Form
+              </h3>
               <p className="text-lg text-muted-foreground">
-                Fill out the form below and we'll get back to you with a quote
+                Let's give your piece a new life.
               </p>
             </div>
 
             <form onSubmit={handleSubmit} className="space-y-6">
-              <Card className="bg-white">
-                <CardHeader>
-                  <CardTitle>Contact Information</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
+              <Card>
+                <CardContent className="pt-6 space-y-6">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Full Name *</Label>
+                    <Label htmlFor="fullName">Full Name *</Label>
                     <Input
-                      id="name"
+                      id="fullName"
                       type="text"
-                      placeholder="Your name"
-                      value={formData.name}
-                      onChange={(e) => handleInputChange("name", e.target.value)}
+                      placeholder="Your full name"
+                      value={formData.fullName}
+                      onChange={(e) => handleInputChange("fullName", e.target.value)}
                       required
                     />
                   </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="email">Email *</Label>
                     <Input
@@ -210,206 +262,108 @@ const Rework = () => {
                       required
                     />
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="phone">Phone Number</Label>
-                    <Input
-                      id="phone"
-                      type="tel"
-                      placeholder="+1 (555) 000-0000"
-                      value={formData.phone}
-                      onChange={(e) => handleInputChange("phone", e.target.value)}
-                    />
-                  </div>
-                </CardContent>
-              </Card>
 
-              <Card className="bg-white">
-                <CardHeader>
-                  <CardTitle>Service Details</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="serviceType">Service Type *</Label>
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className={`h-20 ${
-                          formData.serviceType === "repair"
-                            ? "bg-foreground text-background border-foreground"
-                            : ""
-                        }`}
-                        onClick={() => handleInputChange("serviceType", "repair")}
-                      >
-                        Repair & Mending
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className={`h-20 ${
-                          formData.serviceType === "alteration"
-                            ? "bg-foreground text-background border-foreground"
-                            : ""
-                        }`}
-                        onClick={() => handleInputChange("serviceType", "alteration")}
-                      >
-                        Alterations
-                      </Button>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className={`h-20 ${
-                          formData.serviceType === "rework"
-                            ? "bg-foreground text-background border-foreground"
-                            : ""
-                        }`}
-                        onClick={() => handleInputChange("serviceType", "rework")}
-                      >
-                        Creative Rework
-                      </Button>
-                    </div>
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="itemDescription">Item Description *</Label>
-                    <Textarea
-                      id="itemDescription"
-                      placeholder="Describe the item and what service you need (e.g., 'Blue denim jacket with broken zipper')"
-                      className="min-h-[100px]"
-                      value={formData.itemDescription}
-                      onChange={(e) => handleInputChange("itemDescription", e.target.value)}
+                    <Label htmlFor="whatsapp">WhatsApp *</Label>
+                    <Input
+                      id="whatsapp"
+                      type="text"
+                      placeholder="+234 XXX XXX XXXX"
+                      value={formData.whatsapp}
+                      onChange={(e) => handleInputChange("whatsapp", e.target.value)}
                       required
                     />
                   </div>
+
                   <div className="space-y-2">
-                    <Label htmlFor="additionalNotes">Additional Notes</Label>
+                    <Label htmlFor="serviceType">What would you like us to work on? *</Label>
+                    <Select
+                      value={formData.serviceType}
+                      onValueChange={(value) => handleInputChange("serviceType", value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select an option" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="repair">Repair</SelectItem>
+                        <SelectItem value="rework-redesign">Rework / Redesign</SelectItem>
+                        <SelectItem value="adjustment">Adjustment / Resizing</SelectItem>
+                        <SelectItem value="not-sure">Not sure yet</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="pieceType">What type of piece is it? *</Label>
+                    <Select
+                      value={formData.pieceType}
+                      onValueChange={(value) => handleInputChange("pieceType", value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select an option" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="jeans">Jeans</SelectItem>
+                        <SelectItem value="jacket">Jacket</SelectItem>
+                        <SelectItem value="top">Top</SelectItem>
+                        <SelectItem value="bag">Bag</SelectItem>
+                        <SelectItem value="other">Other</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="workDescription">Tell us what you want done *</Label>
                     <Textarea
-                      id="additionalNotes"
-                      placeholder="Any other details or special requests..."
-                      className="min-h-[80px]"
-                      value={formData.additionalNotes}
-                      onChange={(e) => handleInputChange("additionalNotes", e.target.value)}
+                      id="workDescription"
+                      placeholder="Describe what you want us to do with your piece..."
+                      className="min-h-[120px]"
+                      value={formData.workDescription}
+                      onChange={(e) => handleInputChange("workDescription", e.target.value)}
+                      required
                     />
                   </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="files">Upload images of the piece (optional)</Label>
+                    <Input
+                      id="files"
+                      type="file"
+                      multiple
+                      accept="image/*"
+                      onChange={handleFileChange}
+                      className="cursor-pointer"
+                    />
+                    <p className="text-xs text-muted-foreground">
+                      Upload photos of your garment
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="location">Location *</Label>
+                    <Input
+                      id="location"
+                      type="text"
+                      placeholder="Lagos, Nigeria"
+                      value={formData.location}
+                      onChange={(e) => handleInputChange("location", e.target.value)}
+                      required
+                    />
+                  </div>
+
+                  <Button
+                    type="submit"
+                    className="w-full bg-[#a97c50] hover:bg-[#8b6440] text-white uppercase font-semibold"
+                    size="lg"
+                  >
+                    Start RRS Request
+                  </Button>
                 </CardContent>
               </Card>
-
-              <div className="flex flex-col sm:flex-row gap-4 justify-end">
-                <Link to="/customer-service">
-                  <Button type="button" variant="outline">
-                    Questions? Contact Us
-                  </Button>
-                </Link>
-                <Button type="submit" size="lg" className="px-8">
-                  Submit Request
-                </Button>
-              </div>
             </form>
           </div>
         </div>
       </section>
-
-      {/* Info Section */}
-      <section className="py-16 bg-muted">
-        <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <div className="grid md:grid-cols-2 gap-8">
-              <Card className="bg-white">
-                <CardHeader>
-                  <CardTitle>How It Works</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3 text-sm text-muted-foreground">
-                  <p><strong className="text-foreground">1. Start the conversation:</strong> Fill the form with details about your item</p>
-                  <p><strong className="text-foreground">2. Send your item:</strong> Drop off or send your piece to us (Lagos only)</p>
-                  <p><strong className="text-foreground">3. Choose your silhouette:</strong> Select from our available AZACH silhouettes</p>
-                  <p><strong className="text-foreground">4. Measurements & fit:</strong> We take your measurements to ensure proper fit</p>
-                  <p><strong className="text-foreground">5. Design & approval:</strong> We confirm all details before production</p>
-                  <p><strong className="text-foreground">6. Production:</strong> Your piece is made within 7–10 working days</p>
-                  <p><strong className="text-foreground">7. Delivery:</strong> We return your transformed piece</p>
-                </CardContent>
-              </Card>
-
-              <Card className="bg-white">
-                <CardHeader>
-                  <CardTitle>Pricing & Timeline</CardTitle>
-                </CardHeader>
-                <CardContent className="space-y-3 text-sm text-muted-foreground">
-                  <p><strong className="text-foreground">Pricing:</strong> Varies by service complexity. Simple repairs start at $20. We'll provide a quote before starting work.</p>
-                  <p><strong className="text-foreground">Timeline:</strong> Most repairs take 1-2 weeks. Complex rework projects may take 3-4 weeks.</p>
-                  <p><strong className="text-foreground">Rush Service:</strong> Available for an additional fee. Contact us for details.</p>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer */}
-      <footer className="py-16 bg-black text-white">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row justify-between items-center mb-12 pb-12 border-b border-gray-800">
-            <Link
-              to="/"
-              onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-              className="mb-6 md:mb-0"
-            >
-              <img src="/Azach-Logo.png" alt="AZACH" className="h-16 w-auto brightness-0 invert" />
-            </Link>
-            <div className="flex gap-6">
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
-                <img src="/instagram.png" alt="Instagram" className="h-6 w-6" />
-                <span className="sr-only">Instagram</span>
-              </a>
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
-                <img src="/facebook.png" alt="Facebook" className="h-6 w-6" />
-                <span className="sr-only">Facebook</span>
-              </a>
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
-                <img src="/x.png" alt="X" className="h-6 w-6" />
-                <span className="sr-only">X</span>
-              </a>
-              <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
-                <img src="/tiktok.png" alt="TikTok" className="h-6 w-6" />
-                <span className="sr-only">TikTok</span>
-              </a>
-              <a href="https://snapchat.com" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
-                <img src="/snapchat.png" alt="Snapchat" className="h-6 w-6" />
-                <span className="sr-only">Snapchat</span>
-              </a>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12 mb-12">
-            <div>
-              <h4 className="font-semibold mb-4 text-white uppercase tracking-wider text-sm">Shop</h4>
-              <ul className="space-y-3 text-sm text-gray-400">
-                <li><Link to="/shop-all" className="hover:text-white transition-colors">Shop All</Link></li>
-                <li><Link to="/women" className="hover:text-white transition-colors">Women</Link></li>
-                <li><Link to="/men" className="hover:text-white transition-colors">Men</Link></li>
-                <li><Link to="/sale" className="hover:text-white transition-colors">Sale</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4 text-white uppercase tracking-wider text-sm">Help</h4>
-              <ul className="space-y-3 text-sm text-gray-400">
-                <li><Link to="/customer-service" className="hover:text-white transition-colors">Customer Service</Link></li>
-                <li><Link to="/returns" className="hover:text-white transition-colors">Returns</Link></li>
-                <li><Link to="/size-guide" className="hover:text-white transition-colors">Size Guide</Link></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-semibold mb-4 text-white uppercase tracking-wider text-sm">Company</h4>
-              <ul className="space-y-3 text-sm text-gray-400">
-                <li><Link to="/our-story" className="hover:text-white transition-colors">Our Story</Link></li>
-                <li><Link to="/lookbook" className="hover:text-white transition-colors">Lookbook</Link></li>
-              </ul>
-            </div>
-          </div>
-
-          <div className="pt-8 border-t border-gray-800 text-center text-sm text-gray-400">
-            <p>&copy; 2024 AZACH. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 };

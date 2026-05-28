@@ -1,15 +1,12 @@
 import { Link } from "react-router-dom";
-import { GoldDivider } from "./GoldDivider";
 
 export const Footer = () => {
   return (
     <>
-      <GoldDivider />
-
-      <footer className="py-16 bg-black text-white">
+      <footer className="py-16 bg-[#a97c50] text-white">
         <div className="container mx-auto px-4">
           {/* Top Section - Logo */}
-          <div className="flex flex-col md:flex-row justify-center items-center mb-12 pb-12 border-b border-gray-800">
+          <div className="flex flex-col md:flex-row justify-start items-center mb-12 pb-12 border-b border-gray-800">
             <div className="mb-6 md:mb-0">
               <Link
                 to="/"
@@ -67,7 +64,6 @@ export const Footer = () => {
           {/* Copyright */}
           <div className="pt-8 border-t border-gray-800 text-center text-sm text-gray-400">
             <p>&copy; 2026 AZACH. All rights reserved.</p>
-            <p className="mt-2 text-xs uppercase tracking-wider">Reconstructed. Not Mass Produced.</p>
           </div>
         </div>
       </footer>
