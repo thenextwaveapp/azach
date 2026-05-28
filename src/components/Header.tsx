@@ -178,7 +178,7 @@ export const Header = () => {
           </div>
 
           {/* Desktop Navigation - CENTER */}
-          <nav className="hidden lg:flex gap-8 absolute left-1/2 -translate-x-1/2">
+          <nav className="hidden lg:flex gap-12 absolute left-1/2 -translate-x-1/2">
             <Link
               to="/shop-all"
               className="relative text-sm font-medium transition-all duration-300 hover:text-secondary group uppercase tracking-wide"

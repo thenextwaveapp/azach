@@ -20,10 +20,11 @@ export const Newsletter = () => {
     <section className="py-6 bg-white border-t border-border">
       <div className="container mx-auto px-4">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-2xl md:text-3xl font-semibold uppercase tracking-wide mb-6">Stay Connected</h2>
+          <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
+            {/* Left: Stay Connected */}
+            <h2 className="text-2xl md:text-3xl font-semibold uppercase tracking-wide">Stay Connected</h2>
 
-          <div className="flex flex-col md:flex-row gap-8 items-center justify-between">
-            {/* Left: Email Form */}
+            {/* Center: Email Form */}
             <form onSubmit={handleSubmit} className="flex gap-2 w-full md:w-auto md:flex-1 max-w-md">
               <Input
                 type="email"
