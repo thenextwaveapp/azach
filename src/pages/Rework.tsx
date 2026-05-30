@@ -87,9 +87,11 @@ const Rework = () => {
       <section className="pt-32 pb-16 bg-gradient-to-b from-background to-muted">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl md:text-6xl font-semibold mb-6 uppercase tracking-tight">
-              Rework & Repair (RRS)
-            </h1>
+            <img
+              src="/header-rrs.png"
+              alt="Rework & Repair (RRS)"
+              className="w-full max-w-2xl mx-auto mb-6"
+            />
             <h2 className="text-2xl md:text-3xl font-light mb-6">
               Transform What You Already Own
             </h2>

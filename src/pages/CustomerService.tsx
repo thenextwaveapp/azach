@@ -65,7 +65,11 @@ const CustomerService = () => {
       <section className="pt-32 pb-16 bg-gradient-to-b from-background to-muted">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto">
-            <h1 className="text-5xl md:text-6xl font-semibold mb-6">Customer Service</h1>
+            <img
+              src="/header-customer-service.png"
+              alt="Customer Service"
+              className="w-full max-w-2xl mx-auto mb-6"
+            />
             <p className="text-xl text-muted-foreground">
               We're here to help. Get in touch with us for any questions or concerns.
             </p>

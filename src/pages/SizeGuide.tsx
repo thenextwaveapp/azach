@@ -55,7 +55,11 @@ const SizeGuide = () => {
       <section className="pt-32 pb-16 bg-gradient-to-b from-background to-muted">
         <div className="container mx-auto px-4">
           <div className="text-center max-w-3xl mx-auto">
-            <h1 className="text-5xl md:text-6xl font-semibold mb-6">Size Guide</h1>
+            <img
+              src="/header-size-guide.png"
+              alt="Size Guide"
+              className="w-full max-w-2xl mx-auto mb-6"
+            />
             <p className="text-xl text-muted-foreground">
               Find your perfect fit with our comprehensive sizing charts
             </p>

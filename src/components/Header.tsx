@@ -172,9 +172,6 @@ export const Header = () => {
             >
               <img src="/Azach-Logo.png" alt="AZACH" className="h-10 w-auto" />
             </Link>
-            <div className="hidden lg:block text-[10px] tracking-wider text-muted-foreground mt-0.5">
-              EST. LAGOS, NIGERIA
-            </div>
           </div>
 
           {/* Desktop Navigation - CENTER */}

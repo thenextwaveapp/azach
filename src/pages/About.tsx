@@ -18,9 +18,11 @@ const About = () => {
       <section className="pt-32 pb-16 bg-gradient-to-b from-background to-muted">
         <div className="container mx-auto px-4">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-4xl md:text-6xl font-semibold mb-6 uppercase tracking-tight">
-              About
-            </h1>
+            <img
+              src="/header-about.png"
+              alt="About"
+              className="w-full max-w-2xl mx-auto mb-6"
+            />
             <h2 className="text-2xl md:text-3xl font-light mb-6">
               Reconstructing What Already Exists
             </h2>

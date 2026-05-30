@@ -14,7 +14,6 @@ export const Footer = () => {
               >
                 <img src="/Azach-Logo.png" alt="AZACH" className="h-16 w-auto brightness-0 invert" />
               </Link>
-              <p className="text-xs tracking-wider text-white mt-2">EST. LAGOS, NIGERIA</p>
             </div>
           </div>
 
