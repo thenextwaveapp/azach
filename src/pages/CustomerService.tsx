@@ -97,7 +97,7 @@ const CustomerService = () => {
                 <Mail className="w-6 h-6 text-primary" />
               </div>
               <h3 className="font-semibold mb-2">Email Us</h3>
-              <p className="text-sm text-muted-foreground mb-2">support@azach.com</p>
+              <p className="text-sm text-muted-foreground mb-2">info@azach.ng</p>
               <p className="text-xs text-muted-foreground">We'll respond within 24 hours</p>
             </div>
 
@@ -106,8 +106,9 @@ const CustomerService = () => {
                 <Phone className="w-6 h-6 text-primary" />
               </div>
               <h3 className="font-semibold mb-2">Call Us</h3>
-              <p className="text-sm text-muted-foreground mb-2">1-800-AZACH-01</p>
-              <p className="text-xs text-muted-foreground">Mon-Fri, 9am-6pm EST</p>
+              <p className="text-sm text-muted-foreground mb-1">+234 806 479 2146</p>
+              <p className="text-sm text-muted-foreground mb-2">+1 (403) 827-9068</p>
+              <p className="text-xs text-muted-foreground">Mon-Fri, 9am-6pm</p>
             </div>
 
             <div className="text-center p-6 bg-background rounded-lg shadow-sm">
@@ -115,8 +116,10 @@ const CustomerService = () => {
                 <MapPin className="w-6 h-6 text-primary" />
               </div>
               <h3 className="font-semibold mb-2">Visit Us</h3>
-              <p className="text-sm text-muted-foreground mb-2">123 Fashion Avenue</p>
-              <p className="text-xs text-muted-foreground">New York, NY 10001</p>
+              <p className="text-sm text-muted-foreground mb-1">32 Musa Adewoku Street</p>
+              <p className="text-xs text-muted-foreground mb-3">Ojota Lagos, Nigeria</p>
+              <p className="text-sm text-muted-foreground mb-1">1400 Na'a Drive SW</p>
+              <p className="text-xs text-muted-foreground">Calgary, AB, Canada</p>
             </div>
           </div>
         </div>
