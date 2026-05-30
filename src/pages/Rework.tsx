@@ -84,18 +84,26 @@ const Rework = () => {
       <Header />
 
       {/* Hero Section */}
-      <section className="pt-32 pb-16 bg-gradient-to-b from-background to-muted">
-        <div className="container mx-auto px-4">
+      <section className="relative pt-32 pb-16 overflow-hidden">
+        {/* Background Image */}
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: 'url(/header-rrs.png)' }}
+        />
+        {/* Blue Overlay */}
+        <div className="absolute inset-0 bg-blue-900/40" />
+
+        <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
-            <img
-              src="/header-rrs.png"
-              alt="Rework & Repair (RRS)"
-              className="w-full max-w-2xl mx-auto mb-6"
-            />
-            <h2 className="text-2xl md:text-3xl font-light mb-6">
+            <h1 className="text-4xl md:text-6xl font-semibold mb-6 uppercase tracking-tight text-white"
+              style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}
+            >
+              Rework & Repair (RRS)
+            </h1>
+            <h2 className="text-2xl md:text-3xl font-light mb-6 text-white">
               Transform What You Already Own
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg text-white/90 max-w-2xl mx-auto">
               RRS is for people who already have garments they want to update, repair, or reconstruct.<br />
               Instead of starting from scratch, we work with your existing piece and give it a new life through reconstruction and redesign.
             </p>

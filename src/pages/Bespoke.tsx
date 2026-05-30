@@ -82,18 +82,26 @@ const Bespoke = () => {
       <Header />
 
       {/* Hero Section */}
-      <section className="pt-32 pb-16 bg-gradient-to-b from-background to-muted">
-        <div className="container mx-auto px-4">
+      <section className="relative pt-32 pb-16 overflow-hidden">
+        {/* Background Image */}
+        <div
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: 'url(/header-custom.png)' }}
+        />
+        {/* Blue Overlay */}
+        <div className="absolute inset-0 bg-blue-900/40" />
+
+        <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
-            <img
-              src="/header-custom.png"
-              alt="Custom (Bespoke)"
-              className="w-full max-w-2xl mx-auto mb-6"
-            />
-            <h2 className="text-2xl md:text-3xl font-light mb-6">
+            <h1 className="text-4xl md:text-6xl font-semibold mb-6 uppercase tracking-tight text-white"
+              style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}
+            >
+              Custom (Bespoke)
+            </h1>
+            <h2 className="text-2xl md:text-3xl font-light mb-6 text-white">
               Create Something New
             </h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+            <p className="text-lg text-white/90 max-w-2xl mx-auto">
               Custom is for people who want a completely new piece made with AZACH.<br />
               You bring the idea, reference, or vision — we work with you to create a one-off piece using our reconstruction style and existing AZACH silhouettes.
             </p>
