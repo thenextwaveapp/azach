@@ -72,7 +72,7 @@ const Index = () => {
           <div className="grid md:grid-cols-3 gap-6">
             <Link to="/bespoke" className="group relative h-64 overflow-hidden">
               <OptimizedImage
-                src="https://imagizer.imageshack.com/img922/6348/RmDO6F.jpg"
+                src="/homepage-custom.png"
                 alt="Bespoke"
                 aspectRatio="landscape"
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -93,7 +93,7 @@ const Index = () => {
 
             <Link to="/rework" className="group relative h-64 overflow-hidden">
               <OptimizedImage
-                src="https://imagizer.imageshack.com/img922/2820/P7UF2l.jpg"
+                src="/homepage-rrs.png"
                 alt="Rework & Repair"
                 aspectRatio="landscape"
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -114,7 +114,7 @@ const Index = () => {
 
             <Link to="/donate-garments" className="group relative h-64 overflow-hidden">
               <OptimizedImage
-                src="https://imagizer.imageshack.com/img922/6348/RmDO6F.jpg"
+                src="/homepage-donate.png"
                 alt="Donate Garments"
                 aspectRatio="landscape"
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -243,7 +243,7 @@ const Index = () => {
             <div className="hidden lg:block w-72">
               <div className="aspect-[4/3] overflow-hidden">
                 <OptimizedImage
-                  src="https://imagizer.imageshack.com/img922/6348/RmDO6F.jpg"
+                  src="/how-it-works.png"
                   alt="How AZACH Works"
                   aspectRatio="landscape"
                   className="w-full h-full object-cover"
