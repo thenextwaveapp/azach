@@ -247,6 +247,7 @@ const Index = () => {
                   alt="How AZACH Works"
                   aspectRatio="landscape"
                   className="w-full h-full object-cover"
+                  style={{ objectPosition: 'center 10%' }}
                   loading="lazy"
                 />
               </div>
