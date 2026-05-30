@@ -140,11 +140,11 @@ const Index = () => {
       <section className="py-8 bg-muted">
         <div className="container mx-auto px-4">
           <h2 className="text-2xl md:text-3xl font-semibold uppercase tracking-wide mb-6">Shop by Type</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-4 max-w-7xl mx-auto">
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
             <Link to="/shop-all?category=tops" className="group text-center">
               <div className="relative aspect-square mb-3 overflow-hidden">
                 <OptimizedImage
-                  src="https://imagizer.imageshack.com/img922/6348/RmDO6F.jpg"
+                  src="/category-tops.png"
                   alt="Tops"
                   aspectRatio="square"
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -157,7 +157,7 @@ const Index = () => {
             <Link to="/shop-all?category=bottoms" className="group text-center">
               <div className="relative aspect-square mb-3 overflow-hidden">
                 <OptimizedImage
-                  src="https://imagizer.imageshack.com/img922/2820/P7UF2l.jpg"
+                  src="/category-bottoms.png"
                   alt="Bottoms"
                   aspectRatio="square"
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -167,23 +167,10 @@ const Index = () => {
               <span className="text-sm font-medium uppercase tracking-wide">Bottoms</span>
             </Link>
 
-            <Link to="/shop-all?category=outerwear" className="group text-center">
-              <div className="relative aspect-square mb-3 overflow-hidden">
-                <OptimizedImage
-                  src="https://imagizer.imageshack.com/img922/6348/RmDO6F.jpg"
-                  alt="Outerwear"
-                  aspectRatio="square"
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  loading="lazy"
-                />
-              </div>
-              <span className="text-sm font-medium uppercase tracking-wide">Outerwear</span>
-            </Link>
-
             <Link to="/shop-all?category=sets" className="group text-center">
               <div className="relative aspect-square mb-3 overflow-hidden">
                 <OptimizedImage
-                  src="https://imagizer.imageshack.com/img922/2820/P7UF2l.jpg"
+                  src="/category-sets.png"
                   alt="Sets"
                   aspectRatio="square"
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -196,7 +183,7 @@ const Index = () => {
             <Link to="/shop-all?category=accessories" className="group text-center">
               <div className="relative aspect-square mb-3 overflow-hidden">
                 <OptimizedImage
-                  src="https://imagizer.imageshack.com/img922/6348/RmDO6F.jpg"
+                  src="/category-accessories.png"
                   alt="Accessories"
                   aspectRatio="square"
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -204,32 +191,6 @@ const Index = () => {
                 />
               </div>
               <span className="text-sm font-medium uppercase tracking-wide">Accessories</span>
-            </Link>
-
-            <Link to="/shop-all?category=hats" className="group text-center">
-              <div className="relative aspect-square mb-3 overflow-hidden">
-                <OptimizedImage
-                  src="https://imagizer.imageshack.com/img922/2820/P7UF2l.jpg"
-                  alt="Hats"
-                  aspectRatio="square"
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  loading="lazy"
-                />
-              </div>
-              <span className="text-sm font-medium uppercase tracking-wide">Hats</span>
-            </Link>
-
-            <Link to="/shop-all?category=keychains" className="group text-center">
-              <div className="relative aspect-square mb-3 overflow-hidden">
-                <OptimizedImage
-                  src="https://imagizer.imageshack.com/img922/6348/RmDO6F.jpg"
-                  alt="Keychains"
-                  aspectRatio="square"
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  loading="lazy"
-                />
-              </div>
-              <span className="text-sm font-medium uppercase tracking-wide">Keychains</span>
             </Link>
           </div>
         </div>

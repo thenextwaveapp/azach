@@ -40,25 +40,28 @@ const ShopAll = () => {
       <Header />
       
       {/* Hero Section */}
-      <section className="relative py-24 overflow-hidden">
+      <section className="relative min-h-[400px] flex items-center overflow-hidden">
         {/* Background Image */}
         <div
-          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: 'url(/header-shop.png)' }}
+          className="absolute inset-0 bg-cover bg-no-repeat"
+          style={{
+            backgroundImage: 'url(/header-shop.png)',
+            backgroundPosition: 'center 15%'
+          }}
         />
-        {/* Blue Overlay */}
-        <div className="absolute inset-0 bg-blue-900/40" />
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-slate-900/35" />
 
-        <div className="container mx-auto px-4 relative z-10">
+        <div className="container mx-auto px-4 relative z-10 py-20">
           <div className="text-center">
-            <h1 className="text-5xl md:text-6xl font-semibold mb-4 text-white"
+            <h1 className="text-5xl md:text-6xl font-semibold text-white"
               style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}
             >
               The Collection
             </h1>
-            <p className="text-lg text-white/90">
-              Discover our complete range of upcycled denim pieces
-            </p>
+            <h2 className="text-2xl md:text-3xl font-light mt-4 text-white">
+              Discover Our Complete Range
+            </h2>
           </div>
         </div>
       </section>
