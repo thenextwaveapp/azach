@@ -178,7 +178,7 @@ serve(async (req) => {
 
     const authString = btoa(`${dhlApiKey}:${dhlApiSecret}`);
 
-    const dhlResponse = await fetch('https://express.api.dhl.com/mydhlapi/rates', {
+    const dhlResponse = await fetch('https://express.api.dhl.com/mydhlapi/test/rates', {
       method: 'POST',
       headers: {
         Authorization: `Basic ${authString}`,
