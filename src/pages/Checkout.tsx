@@ -8,45 +8,60 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCurrency } from '@/contexts/CurrencyContext';
-import { createCheckoutSession, stripePromise } from '@/lib/stripe';
-import { Loader2 } from 'lucide-react';
+import { initializePaystackTransaction, loadPaystackScript, openPaystackPopup } from '@/lib/paystack';
+import { getDHLRates, calculateCartHash, formatDeliveryEstimate, type DHLShippingRate } from '@/lib/dhl';
+import { Loader2, Package, Truck } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface ShippingAddress {
   email: string;
   fullName: string;
-  addressLine1: string;
-  addressLine2: string;
+  address: string; // Combined address line
   city: string;
   state: string;
   postalCode: string;
   country: string;
 }
 
+// Expanded country list for global shipping
 const COUNTRIES = [
-  'Canada',
-  'United States'
+  { code: 'NG', name: 'Nigeria' },
+  { code: 'US', name: 'United States' },
+  { code: 'GB', name: 'United Kingdom' },
+  { code: 'CA', name: 'Canada' },
+  { code: 'GH', name: 'Ghana' },
+  { code: 'KE', name: 'Kenya' },
+  { code: 'ZA', name: 'South Africa' },
+  { code: 'AE', name: 'United Arab Emirates' },
+  { code: 'AU', name: 'Australia' },
+  { code: 'FR', name: 'France' },
+  { code: 'DE', name: 'Germany' },
+  { code: 'IN', name: 'India' },
+  { code: 'IT', name: 'Italy' },
+  { code: 'JP', name: 'Japan' },
+  { code: 'NL', name: 'Netherlands' },
+  { code: 'ES', name: 'Spain' },
+  { code: 'CH', name: 'Switzerland' },
 ];
-
-const FREE_SHIPPING_THRESHOLD = 3;
-const SHIPPING_COST_CAD = 15; // Base shipping cost in CAD
 
 const Checkout = () => {
   const navigate = useNavigate();
   const { items, getTotalPrice, getTotalItems } = useCart();
   const { user } = useAuth();
-  const { formatPrice, currency, convertPrice } = useCurrency();
+  const { formatPrice } = useCurrency();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [loadingShipping, setLoadingShipping] = useState(false);
+  const [shippingRates, setShippingRates] = useState<DHLShippingRate[]>([]);
+  const [selectedShippingRate, setSelectedShippingRate] = useState<DHLShippingRate | null>(null);
   const [shippingAddress, setShippingAddress] = useState<ShippingAddress>({
     email: user?.email || '',
     fullName: '',
-    addressLine1: '',
-    addressLine2: '',
+    address: '',
     city: '',
     state: '',
     postalCode: '',
-    country: 'Canada',
+    country: 'NG', // Default to Nigeria
   });
 
   // Set page title
@@ -61,10 +76,60 @@ const Checkout = () => {
     }
   }, [user]);
 
+  // Load Paystack script on mount
+  useEffect(() => {
+    loadPaystackScript().catch(console.error);
+  }, []);
+
+  // Fetch shipping rates when destination changes
+  useEffect(() => {
+    const fetchShippingRates = async () => {
+      if (!shippingAddress.country || items.length === 0) return;
+
+      setLoadingShipping(true);
+      setShippingRates([]);
+      setSelectedShippingRate(null);
+
+      try {
+        const cartItems = items.map(item => ({
+          id: item.id,
+          quantity: item.quantity,
+        }));
+
+        const result = await getDHLRates({
+          destinationCountry: shippingAddress.country,
+          destinationPostalCode: shippingAddress.postalCode || undefined,
+          destinationCity: shippingAddress.city || undefined,
+          items: cartItems,
+        });
+
+        setShippingRates(result.rates);
+
+        // Auto-select cheapest rate
+        if (result.rates.length > 0) {
+          const cheapest = result.rates.sort((a, b) => a.totalPrice - b.totalPrice)[0];
+          setSelectedShippingRate(cheapest);
+        }
+      } catch (error: any) {
+        console.error('Error fetching shipping rates:', error);
+        toast({
+          title: 'Shipping rates unavailable',
+          description: error.message || 'Could not calculate shipping. Please try again.',
+          variant: 'destructive',
+        });
+      } finally {
+        setLoadingShipping(false);
+      }
+    };
+
+    // Debounce shipping rate fetch
+    const timeoutId = setTimeout(fetchShippingRates, 800);
+    return () => clearTimeout(timeoutId);
+  }, [shippingAddress.country, shippingAddress.postalCode, shippingAddress.city, items]);
+
   const totalItems = getTotalItems();
-  const isFreeShipping = totalItems >= FREE_SHIPPING_THRESHOLD;
-  const shippingCost = isFreeShipping ? 0 : SHIPPING_COST_CAD;
   const subtotal = getTotalPrice();
+  const shippingCost = selectedShippingRate?.totalPrice || 0;
   const total = subtotal + shippingCost;
 
   useEffect(() => {
@@ -77,7 +142,7 @@ const Checkout = () => {
   const handleCheckout = async () => {
     try {
       // Validate shipping address
-      if (!shippingAddress.email || !shippingAddress.fullName || !shippingAddress.addressLine1 ||
+      if (!shippingAddress.email || !shippingAddress.fullName || !shippingAddress.address ||
           !shippingAddress.city || !shippingAddress.state ||
           !shippingAddress.postalCode || !shippingAddress.country) {
         toast({
@@ -88,41 +153,54 @@ const Checkout = () => {
         return;
       }
 
+      // Validate shipping rate selected
+      if (!selectedShippingRate) {
+        toast({
+          title: 'No shipping method selected',
+          description: 'Please wait for shipping rates to load or select a shipping method.',
+          variant: 'destructive',
+        });
+        return;
+      }
+
       setLoading(true);
 
-      // Convert all items to the selected currency
-      const itemsInSelectedCurrency = items.map(item => ({
-        ...item,
-        price: convertPrice(item.price) // Convert CAD (DB) to selected currency
+      // Prepare cart items (prices are already in NGN from database)
+      const cartItems = items.map(item => ({
+        id: item.id,
+        name: item.name,
+        price: item.price, // Already in NGN
+        quantity: item.quantity,
+        image: item.image,
       }));
 
-      // Add shipping as a line item if not free (also converted)
-      const convertedShippingCost = convertPrice(shippingCost);
-      if (shippingCost > 0) {
-        itemsInSelectedCurrency.push({
-          id: 'shipping',
-          name: 'Shipping',
-          price: convertedShippingCost,
-          quantity: 1,
-          image: '',
-          category: 'shipping',
-        });
-      }
-
-      // Send prices in the selected currency to Stripe
-      const { url } = await createCheckoutSession(
-        itemsInSelectedCurrency,
-        user?.email,
-        currency, // Charge in the user's selected currency
-        shippingAddress
+      // Initialize Paystack transaction
+      const checkoutData = await initializePaystackTransaction(
+        cartItems,
+        shippingAddress.email,
+        'NGN', // Always use NGN for Paystack (Nigerian gateway)
+        shippingAddress,
+        shippingCost
       );
 
-      // Redirect to Stripe Checkout URL
-      if (url) {
-        window.location.href = url;
-      } else {
-        throw new Error('No checkout URL returned');
-      }
+      // Open Paystack popup
+      openPaystackPopup(
+        checkoutData,
+        shippingAddress.email,
+        total,
+        (reference: string) => {
+          // Payment successful - redirect to success page
+          navigate(`/checkout/success?reference=${reference}`);
+        },
+        () => {
+          // Payment cancelled
+          setLoading(false);
+          toast({
+            title: 'Payment cancelled',
+            description: 'You cancelled the payment. Your cart is still saved.',
+          });
+        }
+      );
     } catch (error: any) {
       console.error('Checkout error:', error);
       toast({
@@ -173,22 +251,31 @@ const Checkout = () => {
                   />
                 </div>
                 <div>
-                  <Label htmlFor="addressLine1">Address Line 1 *</Label>
-                  <Input
-                    id="addressLine1"
-                    value={shippingAddress.addressLine1}
-                    onChange={(e) => setShippingAddress({ ...shippingAddress, addressLine1: e.target.value })}
-                    placeholder="123 Main St"
-                    required
-                  />
+                  <Label htmlFor="country">Country *</Label>
+                  <Select
+                    value={shippingAddress.country}
+                    onValueChange={(value) => setShippingAddress({ ...shippingAddress, country: value })}
+                  >
+                    <SelectTrigger id="country">
+                      <SelectValue placeholder="Select country" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {COUNTRIES.map((country) => (
+                        <SelectItem key={country.code} value={country.code}>
+                          {country.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
                 <div>
-                  <Label htmlFor="addressLine2">Address Line 2</Label>
+                  <Label htmlFor="address">Address *</Label>
                   <Input
-                    id="addressLine2"
-                    value={shippingAddress.addressLine2}
-                    onChange={(e) => setShippingAddress({ ...shippingAddress, addressLine2: e.target.value })}
-                    placeholder="Apt 4B"
+                    id="address"
+                    value={shippingAddress.address}
+                    onChange={(e) => setShippingAddress({ ...shippingAddress, address: e.target.value })}
+                    placeholder="123 Main St, Apt 4B"
+                    required
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -198,7 +285,7 @@ const Checkout = () => {
                       id="city"
                       value={shippingAddress.city}
                       onChange={(e) => setShippingAddress({ ...shippingAddress, city: e.target.value })}
-                      placeholder="New York"
+                      placeholder="Lagos"
                       required
                     />
                   </div>
@@ -208,49 +295,79 @@ const Checkout = () => {
                       id="state"
                       value={shippingAddress.state}
                       onChange={(e) => setShippingAddress({ ...shippingAddress, state: e.target.value })}
-                      placeholder="NY"
+                      placeholder="Lagos"
                       required
                     />
                   </div>
                 </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="postalCode">Postal Code *</Label>
-                    <Input
-                      id="postalCode"
-                      value={shippingAddress.postalCode}
-                      onChange={(e) => setShippingAddress({ ...shippingAddress, postalCode: e.target.value })}
-                      placeholder="10001"
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="country">Country *</Label>
-                    <Select
-                      value={shippingAddress.country}
-                      onValueChange={(value) => setShippingAddress({ ...shippingAddress, country: value })}
-                    >
-                      <SelectTrigger id="country">
-                        <SelectValue placeholder="Select country" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {COUNTRIES.map((country) => (
-                          <SelectItem key={country} value={country}>
-                            {country}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                <div>
+                  <Label htmlFor="postalCode">Postal Code *</Label>
+                  <Input
+                    id="postalCode"
+                    value={shippingAddress.postalCode}
+                    onChange={(e) => setShippingAddress({ ...shippingAddress, postalCode: e.target.value })}
+                    placeholder="100001"
+                    required
+                  />
                 </div>
               </div>
+
+              {/* Shipping Options */}
+              {shippingAddress.country && (
+                <div className="mt-6">
+                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
+                    <Truck className="w-5 h-5" />
+                    Shipping Method
+                  </h3>
+                  {loadingShipping ? (
+                    <div className="flex items-center justify-center p-6 bg-muted rounded-lg">
+                      <Loader2 className="w-6 h-6 animate-spin mr-2" />
+                      <span>Calculating shipping rates...</span>
+                    </div>
+                  ) : shippingRates.length > 0 ? (
+                    <div className="space-y-2">
+                      {shippingRates.map((rate, index) => (
+                        <div
+                          key={index}
+                          className={`p-4 border rounded-lg cursor-pointer transition-colors ${
+                            selectedShippingRate?.productCode === rate.productCode
+                              ? 'border-primary bg-primary/5'
+                              : 'border-muted hover:border-primary/50'
+                          }`}
+                          onClick={() => setSelectedShippingRate(rate)}
+                        >
+                          <div className="flex justify-between items-center">
+                            <div>
+                              <p className="font-medium">{rate.productName}</p>
+                              <p className="text-sm text-muted-foreground">
+                                Estimated: {formatDeliveryEstimate(rate.estimatedDeliveryDays)}
+                              </p>
+                            </div>
+                            <div className="text-right">
+                              <p className="font-semibold">{formatPrice(rate.totalPrice)}</p>
+                              <p className="text-xs text-muted-foreground">
+                                {rate.estimatedDeliveryDays} {rate.estimatedDeliveryDays === 1 ? 'day' : 'days'}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="p-6 bg-muted rounded-lg text-center text-muted-foreground">
+                      <Package className="w-8 h-8 mx-auto mb-2 opacity-50" />
+                      <p>Enter your postal code to see shipping options</p>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Order Summary */}
             <div>
               <div className="bg-muted rounded-lg p-6 mb-6 sticky top-24">
                 <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
-                <div className="space-y-4 mb-4">
+                <div className="space-y-4 mb-4 max-h-64 overflow-y-auto">
                   {items.map((item) => (
                     <div key={item.id} className="flex justify-between items-center">
                       <div className="flex items-center gap-4">
@@ -275,23 +392,23 @@ const Checkout = () => {
 
                 <div className="border-t pt-4 space-y-2">
                   <div className="flex justify-between text-sm">
-                    <span>Subtotal</span>
+                    <span>Subtotal ({totalItems} {totalItems === 1 ? 'item' : 'items'})</span>
                     <span>{formatPrice(subtotal)}</span>
                   </div>
                   <div className="flex justify-between text-sm">
                     <span>Shipping</span>
-                    <span className={isFreeShipping ? 'text-green-600 font-semibold' : ''}>
-                      {isFreeShipping ? 'FREE' : formatPrice(shippingCost)}
-                    </span>
+                    {loadingShipping ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : selectedShippingRate ? (
+                      <span>{formatPrice(shippingCost)}</span>
+                    ) : (
+                      <span className="text-muted-foreground">Calculate</span>
+                    )}
                   </div>
-                  {isFreeShipping && (
-                    <p className="text-xs text-green-600">
-                      🎉 You've qualified for free shipping!
-                    </p>
-                  )}
-                  {!isFreeShipping && totalItems < FREE_SHIPPING_THRESHOLD && (
-                    <p className="text-xs text-muted-foreground">
-                      Add {FREE_SHIPPING_THRESHOLD - totalItems} more item{FREE_SHIPPING_THRESHOLD - totalItems > 1 ? 's' : ''} for free shipping
+                  {selectedShippingRate && (
+                    <p className="text-xs text-muted-foreground flex items-center gap-1">
+                      <Truck className="w-3 h-3" />
+                      via {selectedShippingRate.productName}
                     </p>
                   )}
                   <div className="flex justify-between text-lg font-semibold pt-2 border-t">
@@ -305,7 +422,7 @@ const Checkout = () => {
                   size="lg"
                   className="w-full mt-6"
                   onClick={handleCheckout}
-                  disabled={loading}
+                  disabled={loading || loadingShipping || !selectedShippingRate}
                 >
                   {loading ? (
                     <>
@@ -313,12 +430,12 @@ const Checkout = () => {
                       Processing...
                     </>
                   ) : (
-                    'Proceed to Payment'
+                    'Pay with Paystack'
                   )}
                 </Button>
 
                 <p className="text-center text-xs text-muted-foreground mt-4">
-                  You will be redirected to Stripe to complete your payment securely.
+                  Secure payment powered by Paystack. Your payment information is encrypted and secure.
                 </p>
               </div>
             </div>

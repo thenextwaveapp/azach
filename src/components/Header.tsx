@@ -1,14 +1,12 @@
-import { ShoppingBag, Menu, Search, User, LogIn, Heart, Package, Settings, LogOut, DollarSign } from "lucide-react";
+import { ShoppingBag, Menu, Search, User, LogIn, Heart, Package, Settings, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { SearchDialog } from "@/components/SearchDialog";
 import { AccountDropdown } from "@/components/AccountDropdown";
-import { CurrencySwitcher } from "@/components/CurrencySwitcher";
 import { useCart } from "@/contexts/CartContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { useCurrency } from "@/contexts/CurrencyContext";
 import { ShippingBanner } from "@/components/ShippingBanner";
 import { CartDrawer } from "@/components/CartDrawer";
 
@@ -20,7 +18,6 @@ export const Header = () => {
   const [lastScrollY, setLastScrollY] = useState(0);
   const { getTotalItems } = useCart();
   const { user, signOut } = useAuth();
-  const { currency, setCurrency } = useCurrency();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -138,27 +135,6 @@ export const Header = () => {
                     </Link>
                   </>
                 )}
-
-                {/* Currency Switcher */}
-                <div className="border-t border-border mt-3 pt-3">
-                  <p className="text-sm text-muted-foreground mb-2">Currency</p>
-                  <div className="flex gap-2">
-                    <button
-                      className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${currency === 'USD' ? 'bg-muted' : 'hover:bg-muted/50'}`}
-                      onClick={() => setCurrency('USD')}
-                    >
-                      <DollarSign className="h-4 w-4" />
-                      USD
-                    </button>
-                    <button
-                      className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${currency === 'CAD' ? 'bg-muted' : 'hover:bg-muted/50'}`}
-                      onClick={() => setCurrency('CAD')}
-                    >
-                      <DollarSign className="h-4 w-4" />
-                      CAD
-                    </button>
-                  </div>
-                </div>
               </div>
             </SheetContent>
           </Sheet>
@@ -232,7 +208,6 @@ export const Header = () => {
                 </span>
               )}
             </Button>
-            <CurrencySwitcher />
           </div>
         </div>
       </div>

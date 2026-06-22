@@ -14,6 +14,11 @@ export interface Product {
   on_sale: boolean;
   gender?: 'men' | 'women' | 'unisex';
   tags?: string[];
+  // Shipping fields for DHL Express integration
+  weight_kg?: number;
+  length_cm?: number;
+  width_cm?: number;
+  height_cm?: number;
   created_at: string;
   updated_at: string;
 }
@@ -33,6 +38,11 @@ export interface ProductInsert {
   on_sale?: boolean;
   gender?: 'men' | 'women' | 'unisex';
   tags?: string[];
+  // Shipping fields for DHL Express integration
+  weight_kg?: number;
+  length_cm?: number;
+  width_cm?: number;
+  height_cm?: number;
 }
 
 export interface ProductUpdate extends Partial<ProductInsert> {
