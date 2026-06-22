@@ -84,7 +84,7 @@ const Checkout = () => {
   // Fetch shipping rates when destination changes
   useEffect(() => {
     const fetchShippingRates = async () => {
-      if (!shippingAddress.country || items.length === 0) return;
+      if (!shippingAddress.country || !shippingAddress.city || !shippingAddress.postalCode || items.length === 0) return;
 
       setLoadingShipping(true);
       setShippingRates([]);

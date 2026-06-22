@@ -153,27 +153,7 @@ serve(async (req) => {
     const dhlApiSecret = Deno.env.get('DHL_API_SECRET');
 
     if (!dhlApiKey || !dhlApiSecret) {
-      console.error('DHL API credentials not configured');
-
-      // Return fallback rate while credentials are being configured
-      const fallbackRate = destinationCountry === 'NG' ? 5000 : 15000;
-      return new Response(
-        JSON.stringify({
-          rates: [
-            {
-              productCode: 'FALLBACK',
-              productName: 'Standard Shipping (DHL setup pending)',
-              totalPrice: fallbackRate,
-              currencyCode: 'NGN',
-              estimatedDeliveryDate: '',
-              estimatedDeliveryDays: destinationCountry === 'NG' ? 3 : 7,
-            },
-          ],
-          totalWeight,
-          cacheHit: false,
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      throw new Error('DHL API credentials not configured');
     }
 
     const authString = btoa(`${dhlApiKey}:${dhlApiSecret}`);
@@ -190,33 +170,7 @@ serve(async (req) => {
     if (!dhlResponse.ok) {
       const errorText = await dhlResponse.text();
       console.error('DHL API error:', dhlResponse.status, errorText);
-      console.error('DHL Request body:', JSON.stringify(dhlRequestBody));
-      console.error('DHL Credentials check:', {
-        hasApiKey: !!dhlApiKey,
-        hasApiSecret: !!dhlApiSecret,
-        hasAccountNumber: !!Deno.env.get('DHL_ACCOUNT_NUMBER'),
-      });
-
-      // Return fallback rate for now while we debug
-      const fallbackRate = destinationCountry === 'NG' ? 5000 : 15000;
-      return new Response(
-        JSON.stringify({
-          rates: [
-            {
-              productCode: 'FALLBACK',
-              productName: 'Standard Shipping (DHL unavailable)',
-              totalPrice: fallbackRate,
-              currencyCode: 'NGN',
-              estimatedDeliveryDate: '',
-              estimatedDeliveryDays: destinationCountry === 'NG' ? 3 : 7,
-            },
-          ],
-          totalWeight,
-          cacheHit: false,
-          dhlError: errorText,
-        }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      );
+      throw new Error(`DHL API error: ${errorText}`);
     }
 
     const dhlData = await dhlResponse.json();
@@ -226,21 +180,21 @@ serve(async (req) => {
       throw new Error('No shipping rates available from DHL');
     }
 
-    // Convert DHL rates to NGN (DHL returns USD)
-    const usdToNgnRate = 1450; // Update this with live rate or fetch from API
-    const rates = products.map((product: any) => {
-      const priceUsd = product.totalPrice?.[0]?.price || 0;
-      const priceNgn = Math.ceil(priceUsd * usdToNgnRate);
+    const rates = products
+      .filter((product: any) => !product.isCustomerAgreement)
+      .map((product: any) => {
+        const price = product.totalPrice?.[0]?.price || 0;
 
-      return {
-        productCode: product.productCode,
-        productName: product.productName,
-        totalPrice: priceNgn,
-        currencyCode: 'NGN',
-        estimatedDeliveryDate: product.deliveryCapabilities?.estimatedDeliveryDateAndTime || '',
-        estimatedDeliveryDays: product.deliveryCapabilities?.totalTransitDays || 5,
-      };
-    });
+        return {
+          productCode: product.productCode,
+          productName: product.productName,
+          totalPrice: Math.ceil(price),
+          currencyCode: 'NGN',
+          estimatedDeliveryDate: product.deliveryCapabilities?.estimatedDeliveryDateAndTime || '',
+          estimatedDeliveryDays: product.deliveryCapabilities?.totalTransitDays || 5,
+        };
+      })
+      .filter((rate) => rate.totalPrice > 0);
 
     // Cache the best rate (lowest price)
     const bestRate = rates.sort((a: any, b: any) => a.totalPrice - b.totalPrice)[0];
