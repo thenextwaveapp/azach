@@ -154,11 +154,25 @@ serve(async (req) => {
 
     if (!dhlApiKey || !dhlApiSecret) {
       console.error('DHL API credentials not configured');
+
+      // Return fallback rate while credentials are being configured
+      const fallbackRate = destinationCountry === 'NG' ? 5000 : 15000;
       return new Response(
         JSON.stringify({
-          error: 'Shipping service not configured. Please contact support.',
+          rates: [
+            {
+              productCode: 'FALLBACK',
+              productName: 'Standard Shipping (DHL setup pending)',
+              totalPrice: fallbackRate,
+              currencyCode: 'NGN',
+              estimatedDeliveryDate: '',
+              estimatedDeliveryDays: destinationCountry === 'NG' ? 3 : 7,
+            },
+          ],
+          totalWeight,
+          cacheHit: false,
         }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 500 }
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
@@ -176,12 +190,32 @@ serve(async (req) => {
     if (!dhlResponse.ok) {
       const errorText = await dhlResponse.text();
       console.error('DHL API error:', dhlResponse.status, errorText);
+      console.error('DHL Request body:', JSON.stringify(dhlRequestBody));
+      console.error('DHL Credentials check:', {
+        hasApiKey: !!dhlApiKey,
+        hasApiSecret: !!dhlApiSecret,
+        hasAccountNumber: !!Deno.env.get('DHL_ACCOUNT_NUMBER'),
+      });
 
+      // Return fallback rate for now while we debug
+      const fallbackRate = destinationCountry === 'NG' ? 5000 : 15000;
       return new Response(
         JSON.stringify({
-          error: `Failed to get shipping rates: ${errorText}`,
+          rates: [
+            {
+              productCode: 'FALLBACK',
+              productName: 'Standard Shipping (DHL unavailable)',
+              totalPrice: fallbackRate,
+              currencyCode: 'NGN',
+              estimatedDeliveryDate: '',
+              estimatedDeliveryDays: destinationCountry === 'NG' ? 3 : 7,
+            },
+          ],
+          totalWeight,
+          cacheHit: false,
+          dhlError: errorText,
         }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: dhlResponse.status }
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
