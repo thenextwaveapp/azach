@@ -146,7 +146,7 @@ export const Header = () => {
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
               className="hover:opacity-80 transition-opacity"
             >
-              <img src="/Azach-Logo.png" alt="AZACH" className="h-8 w-auto" />
+              <img src="/Azach-Logo.png" alt="AZACH" className="h-4 md:h-8 w-auto" />
             </Link>
           </div>
 
