@@ -129,7 +129,8 @@ const Checkout = () => {
 
   const totalItems = getTotalItems();
   const subtotal = getTotalPrice();
-  const shippingCost = selectedShippingRate?.totalPrice || 0;
+  // TEMPORARY: Disable shipping cost for testing
+  const shippingCost = 0; // selectedShippingRate?.totalPrice || 0;
   const total = subtotal + shippingCost;
 
   useEffect(() => {
@@ -153,15 +154,16 @@ const Checkout = () => {
         return;
       }
 
+      // TEMPORARY: Commented out for testing
       // Validate shipping rate selected
-      if (!selectedShippingRate) {
-        toast({
-          title: 'No shipping method selected',
-          description: 'Please wait for shipping rates to load or select a shipping method.',
-          variant: 'destructive',
-        });
-        return;
-      }
+      // if (!selectedShippingRate) {
+      //   toast({
+      //     title: 'No shipping method selected',
+      //     description: 'Please wait for shipping rates to load or select a shipping method.',
+      //     variant: 'destructive',
+      //   });
+      //   return;
+      // }
 
       setLoading(true);
 
@@ -422,7 +424,7 @@ const Checkout = () => {
                   size="lg"
                   className="w-full mt-6"
                   onClick={handleCheckout}
-                  disabled={loading || loadingShipping || !selectedShippingRate}
+                  disabled={loading || loadingShipping}
                 >
                   {loading ? (
                     <>
