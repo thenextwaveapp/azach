@@ -23,6 +23,7 @@ import Orders from "./pages/Orders";
 import Wishlist from "./pages/Wishlist";
 import Settings from "./pages/Settings";
 import Admin from "./pages/Admin";
+import OrdersAdmin from "./pages/OrdersAdmin";
 import OurStory from "./pages/About";
 import Lookbook from "./pages/Lookbook";
 import CustomerService from "./pages/CustomerService";
@@ -93,6 +94,14 @@ const App = () => (
                 element={
                   <AdminRoute>
                     <Admin />
+                  </AdminRoute>
+                }
+              />
+              <Route
+                path="/admin/orders"
+                element={
+                  <AdminRoute>
+                    <OrdersAdmin />
                   </AdminRoute>
                 }
               />
