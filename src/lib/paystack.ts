@@ -65,16 +65,18 @@ export const initializePaystackTransaction = async (
       },
     });
 
-    if (error) {
-      console.error('Paystack initialization error:', error);
-      console.error('Error details:', JSON.stringify(error));
-      throw new Error(error.message || 'Failed to initialize payment');
-    }
-
-    // Check if function returned an error in the response
+    // Check if function returned an error in the response body
     if (data && data.error) {
       console.error('Paystack API returned error:', data.error);
       throw new Error(data.error);
+    }
+
+    // Check for error from Supabase (non-2xx status)
+    if (error) {
+      console.error('Paystack initialization error:', error);
+      // Extract the actual error message from the response if available
+      const errorMessage = data?.error || error.message || 'Failed to initialize payment';
+      throw new Error(errorMessage);
     }
 
     if (!data || !data.reference) {

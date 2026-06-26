@@ -106,9 +106,14 @@ export const getDHLRates = async (
       },
     });
 
+    if (data && data.error) {
+      throw new Error(data.error);
+    }
+
     if (error) {
       console.error('DHL rates error:', error);
-      throw new Error(error.message || 'Failed to get shipping rates');
+      const errorMessage = data?.error || error.message || 'Failed to get shipping rates';
+      throw new Error(errorMessage);
     }
 
     if (!data || !data.rates || data.rates.length === 0) {
@@ -209,9 +214,14 @@ export const trackDHLShipment = async (
       body: { trackingNumber },
     });
 
+    if (data && data.error) {
+      throw new Error(data.error);
+    }
+
     if (error) {
       console.error('DHL tracking error:', error);
-      throw new Error(error.message || 'Failed to track shipment');
+      const errorMessage = data?.error || error.message || 'Failed to track shipment';
+      throw new Error(errorMessage);
     }
 
     if (!data) {
@@ -281,9 +291,14 @@ export const createDHLShipment = async (
       body: { orderId },
     });
 
+    if (data && data.error) {
+      throw new Error(data.error);
+    }
+
     if (error) {
       console.error('DHL shipment creation error:', error);
-      throw new Error(error.message || 'Failed to create shipment');
+      const errorMessage = data?.error || error.message || 'Failed to create shipment';
+      throw new Error(errorMessage);
     }
 
     if (!data || !data.success) {
@@ -315,9 +330,14 @@ export const validateDHLAddress = async (
       },
     });
 
+    if (data && data.error) {
+      throw new Error(data.error);
+    }
+
     if (error) {
       console.error('DHL address validation error:', error);
-      throw new Error(error.message || 'Failed to validate address');
+      const errorMessage = data?.error || error.message || 'Failed to validate address';
+      throw new Error(errorMessage);
     }
 
     if (!data) {
