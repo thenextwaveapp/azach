@@ -257,6 +257,7 @@ const OrdersAdmin = () => {
         order.status.toLowerCase().includes(query) ||
         order.payment_status.toLowerCase().includes(query) ||
         order.payment_provider.toLowerCase().includes(query) ||
+        shippingAddress?.fullName?.toLowerCase().includes(query) ||
         shippingAddress?.name?.toLowerCase().includes(query) ||
         shippingAddress?.email?.toLowerCase().includes(query) ||
         billingAddress?.name?.toLowerCase().includes(query) ||
@@ -429,7 +430,7 @@ const OrdersAdmin = () => {
                       </TableCell>
                       <TableCell>
                         <div className="text-sm max-w-[200px]">
-                          <p className="font-medium">{shippingAddress?.name || 'N/A'}</p>
+                          <p className="font-medium">{shippingAddress?.fullName || shippingAddress?.name || 'N/A'}</p>
                           <p className="text-muted-foreground text-xs truncate">
                             {shippingAddress?.email || ''}
                           </p>
