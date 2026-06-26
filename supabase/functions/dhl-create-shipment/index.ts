@@ -154,8 +154,10 @@ serve(async (req) => {
       plannedShippingDate.setDate(plannedShippingDate.getDate() + 2); // Monday
     }
 
-    // Parse shipping address
-    const shippingAddress = JSON.parse(order.shipping_address || '{}');
+    // Parse shipping address (handle both string and object)
+    const shippingAddress = typeof order.shipping_address === 'string'
+      ? JSON.parse(order.shipping_address || '{}')
+      : (order.shipping_address || {});
 
     // Prepare DHL shipment request
     const dhlShipmentRequest = {
