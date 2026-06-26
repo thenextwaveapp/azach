@@ -138,6 +138,11 @@ export const openPaystackPopup = (
     return;
   }
 
+  console.log('Opening Paystack popup with:', {
+    access_code: checkoutData.access_code,
+    reference: checkoutData.reference,
+  });
+
   // Use access_code from backend initialization
   // Don't pass email/amount when using access_code - it's already in the transaction
   const handler = (window as any).PaystackPop.setup({
