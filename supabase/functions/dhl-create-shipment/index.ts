@@ -210,7 +210,8 @@ serve(async (req) => {
       pickup: {
         isRequested: false, // Can be changed to true to auto-schedule pickup
       },
-      productCode: order.shipping_service_code || 'P', // P = Express Worldwide
+      // Use domestic product for Nigeria, international for others
+      productCode: countryCode === 'NG' ? 'N' : 'P', // N = Domestic 12:00, P = Worldwide
       accounts: [
         {
           typeCode: 'shipper',
