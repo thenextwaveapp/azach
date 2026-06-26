@@ -18,6 +18,7 @@ export interface PaystackCheckoutRequest {
   shippingAddress: {
     fullName: string;
     email: string;
+    phone: string;
     address: string;
     city: string;
     state: string;
