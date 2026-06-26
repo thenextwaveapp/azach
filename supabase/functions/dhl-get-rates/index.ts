@@ -157,8 +157,9 @@ serve(async (req) => {
     }
 
     const authString = btoa(`${dhlApiKey}:${dhlApiSecret}`);
+    const dhlApiUrl = Deno.env.get('DHL_API_URL') || 'https://express.api.dhl.com/mydhlapi/test';
 
-    const dhlResponse = await fetch('https://express.api.dhl.com/mydhlapi/test/rates', {
+    const dhlResponse = await fetch(`${dhlApiUrl}/rates`, {
       method: 'POST',
       headers: {
         Authorization: `Basic ${authString}`,
