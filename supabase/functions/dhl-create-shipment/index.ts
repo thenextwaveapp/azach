@@ -359,7 +359,6 @@ serve(async (req) => {
         dhl_tracking_number: dhlData.shipmentTrackingNumber,
         dhl_shipment_id: dhlData.shipmentTrackingNumber, // Same as tracking for DHL
         dhl_label_url: labelUrl,
-        shipping_status: 'label_created',
         updated_at: new Date().toISOString(),
       })
       .eq('id', orderId);
