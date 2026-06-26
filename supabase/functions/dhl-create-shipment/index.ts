@@ -189,18 +189,16 @@ serve(async (req) => {
         },
         receiverDetails: {
           postalAddress: {
-            postalCode: shippingAddress.postalCode || '',
+            postalCode: shippingAddress.postalCode || order.shipping_postal_code || '',
             cityName: shippingAddress.city || order.shipping_city || '',
             countryCode: shippingAddress.country || order.shipping_country || '',
-            addressLine1: shippingAddress.addressLine1 || order.shipping_address_line1 || '',
-            addressLine2: shippingAddress.addressLine2 || order.shipping_address_line2 || '',
-            addressLine3: shippingAddress.addressLine3 || '',
+            addressLine1: shippingAddress.address || order.shipping_address || '',
           },
           contactInformation: {
-            email: order.customer_email || '',
-            phone: order.customer_phone || shippingAddress.phone || '',
-            companyName: shippingAddress.company || '',
-            fullName: order.customer_name || shippingAddress.name || '',
+            email: shippingAddress.email || order.customer_email || '',
+            phone: order.customer_phone || '',
+            companyName: order.customer_name || '',
+            fullName: shippingAddress.fullName || order.customer_name || '',
           },
         },
       },
@@ -215,8 +213,8 @@ serve(async (req) => {
             },
           },
         ],
-        isCustomsDeclarable: order.shipping_country !== 'NG',
-        ...(order.shipping_country !== 'NG' && {
+        isCustomsDeclarable: (shippingAddress.country || order.shipping_country) !== 'NG',
+        ...((shippingAddress.country || order.shipping_country) !== 'NG' && {
           declaredValue: order.total_amount,
           declaredValueCurrency: 'NGN',
           exportDeclaration: {
