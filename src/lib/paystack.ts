@@ -142,11 +142,11 @@ export const openPaystackPopup = (
     return;
   }
 
+  // Use access_code from backend initialization
+  // Don't re-initialize with amount/email/ref - this causes conflicts
   const handler = (window as any).PaystackPop.setup({
     key: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY,
-    email: email,
-    amount: amount * 100, // Convert to kobo (smallest currency unit)
-    ref: checkoutData.reference,
+    access_code: checkoutData.access_code,
     callback: (response: any) => {
       onSuccess(response.reference);
     },
