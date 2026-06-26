@@ -92,10 +92,18 @@ serve(async (req) => {
     }, 0);
     const total = subtotal + shippingCost;
 
+    console.log('Payment calculation:', {
+      subtotal,
+      shippingCost,
+      total,
+    });
+
     // Convert to kobo (Paystack uses smallest currency unit)
     // For NGN: 1 NGN = 100 kobo
     // For USD: 1 USD = 100 cents
     const amountInKobo = Math.round(total * 100);
+
+    console.log('Amount in kobo:', amountInKobo);
 
     // Prepare Paystack request
     const paystackSecretKey = Deno.env.get('PAYSTACK_SECRET_KEY');
@@ -134,6 +142,12 @@ serve(async (req) => {
       },
     };
 
+    console.log('Paystack request:', JSON.stringify({
+      email: paystackRequestBody.email,
+      amount: paystackRequestBody.amount,
+      currency: paystackRequestBody.currency,
+    }));
+
     // Initialize Paystack transaction
     const paystackResponse = await fetch(
       'https://api.paystack.co/transaction/initialize',
@@ -149,7 +163,7 @@ serve(async (req) => {
 
     if (!paystackResponse.ok) {
       const errorData = await paystackResponse.json();
-      console.error('Paystack API error:', errorData);
+      console.error('Paystack API error:', JSON.stringify(errorData));
 
       // Release stock reservations on failure
       await supabase.rpc('release_reservation', { p_session_id: tempSessionId });

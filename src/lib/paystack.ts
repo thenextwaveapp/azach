@@ -139,11 +139,10 @@ export const openPaystackPopup = (
   }
 
   // Use access_code from backend initialization
-  // Email is still required for verification even with access_code
+  // Don't pass email/amount when using access_code - it's already in the transaction
   const handler = (window as any).PaystackPop.setup({
     key: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY,
     access_code: checkoutData.access_code,
-    email: email, // Required for verification
     callback: (response: any) => {
       onSuccess(response.reference);
     },
