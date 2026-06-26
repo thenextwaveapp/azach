@@ -110,9 +110,17 @@ serve(async (req) => {
     // Ensure minimum weight for DHL API (0.1 kg)
     totalWeight = Math.max(totalWeight, 0.1);
 
-    // Prepare DHL API request
+    // Prepare DHL API request - use next business day
     const plannedShippingDate = new Date();
     plannedShippingDate.setDate(plannedShippingDate.getDate() + 1); // Next day
+
+    // Skip weekends - DHL doesn't pickup on Saturday/Sunday
+    const dayOfWeek = plannedShippingDate.getDay();
+    if (dayOfWeek === 0) { // Sunday
+      plannedShippingDate.setDate(plannedShippingDate.getDate() + 1); // Monday
+    } else if (dayOfWeek === 6) { // Saturday
+      plannedShippingDate.setDate(plannedShippingDate.getDate() + 2); // Monday
+    }
 
     const dhlRequestBody = {
       customerDetails: {

@@ -152,6 +152,14 @@ serve(async (req) => {
     const plannedShippingDate = new Date();
     plannedShippingDate.setDate(plannedShippingDate.getDate() + 1);
 
+    // Skip weekends - DHL doesn't pickup on Saturday/Sunday
+    const dayOfWeek = plannedShippingDate.getDay();
+    if (dayOfWeek === 0) { // Sunday
+      plannedShippingDate.setDate(plannedShippingDate.getDate() + 1); // Monday
+    } else if (dayOfWeek === 6) { // Saturday
+      plannedShippingDate.setDate(plannedShippingDate.getDate() + 2); // Monday
+    }
+
     // Parse shipping address
     const shippingAddress = JSON.parse(order.shipping_address || '{}');
 

@@ -61,7 +61,7 @@ const Checkout = () => {
     city: '',
     state: '',
     postalCode: '',
-    country: 'NG', // Default to Nigeria
+    country: '', // No default - user must select to avoid autofill conflicts
   });
 
   // Set page title
@@ -80,6 +80,20 @@ const Checkout = () => {
   useEffect(() => {
     loadPaystackScript().catch(console.error);
   }, []);
+
+  // Clear location fields when country changes to prevent autofill conflicts
+  const [previousCountry, setPreviousCountry] = useState<string>('');
+  useEffect(() => {
+    if (shippingAddress.country && previousCountry && shippingAddress.country !== previousCountry) {
+      setShippingAddress(prev => ({
+        ...prev,
+        city: '',
+        state: '',
+        postalCode: '',
+      }));
+    }
+    setPreviousCountry(shippingAddress.country);
+  }, [shippingAddress.country]);
 
   // Fetch shipping rates when destination changes
   useEffect(() => {
