@@ -16,6 +16,7 @@ import { useToast } from '@/hooks/use-toast';
 interface ShippingAddress {
   email: string;
   fullName: string;
+  phone: string;
   address: string; // Combined address line
   city: string;
   state: string;
@@ -57,6 +58,7 @@ const Checkout = () => {
   const [shippingAddress, setShippingAddress] = useState<ShippingAddress>({
     email: user?.email || '',
     fullName: '',
+    phone: '',
     address: '',
     city: '',
     state: '',
@@ -156,8 +158,8 @@ const Checkout = () => {
   const handleCheckout = async () => {
     try {
       // Validate shipping address
-      if (!shippingAddress.email || !shippingAddress.fullName || !shippingAddress.address ||
-          !shippingAddress.city || !shippingAddress.state ||
+      if (!shippingAddress.email || !shippingAddress.fullName || !shippingAddress.phone ||
+          !shippingAddress.address || !shippingAddress.city || !shippingAddress.state ||
           !shippingAddress.postalCode || !shippingAddress.country) {
         toast({
           title: 'Missing information',
@@ -262,6 +264,17 @@ const Checkout = () => {
                     value={shippingAddress.fullName}
                     onChange={(e) => setShippingAddress({ ...shippingAddress, fullName: e.target.value })}
                     placeholder="John Doe"
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="phone">Phone Number *</Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    value={shippingAddress.phone}
+                    onChange={(e) => setShippingAddress({ ...shippingAddress, phone: e.target.value })}
+                    placeholder="+1 234 567 8900"
                     required
                   />
                 </div>
