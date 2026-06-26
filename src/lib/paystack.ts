@@ -66,26 +66,17 @@ export const initializePaystackTransaction = async (
       },
     });
 
-    // Check if function returned an error in the response body
-    if (data && data.error) {
-      console.error('Paystack API returned error:', data.error);
-      // If it's a string, use it; if it's an object, stringify or extract message
-      const errorMsg = typeof data.error === 'string' ? data.error : (data.error.message || JSON.stringify(data.error));
-      throw new Error(errorMsg);
+    // Always check data.error first (this is where edge function errors go)
+    if (data?.error) {
+      throw new Error(data.error);
     }
 
-    // Check for error from Supabase (non-2xx status)
+    // Check for HTTP errors
     if (error) {
-      console.error('Paystack initialization error:', error);
-      console.error('Response data:', data);
-      // Extract the actual error message from the response if available
-      const errorMessage = data?.error || data?.message || error.message || 'Failed to initialize payment';
-      console.error('Extracted error message:', errorMessage);
-      throw new Error(errorMessage);
+      throw new Error(data?.error || data?.message || error.message || 'Failed to initialize payment');
     }
 
-    if (!data || !data.reference) {
-      console.error('Invalid response data:', data);
+    if (!data?.reference) {
       throw new Error('Invalid response from payment server');
     }
 
@@ -95,7 +86,7 @@ export const initializePaystackTransaction = async (
       authorization_url: data.authorization_url,
     };
   } catch (error) {
-    console.error('Error initializing Paystack transaction:', error);
+    console.error('Paystack error:', error);
     throw error;
   }
 };
