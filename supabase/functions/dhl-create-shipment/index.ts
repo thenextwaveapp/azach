@@ -69,17 +69,9 @@ serve(async (req) => {
       .select(`
         *,
         order_items (
+          product_name,
           quantity,
-          price,
-          product:product_id (
-            id,
-            name,
-            weight_kg,
-            length_cm,
-            width_cm,
-            height_cm,
-            price
-          )
+          price
         )
       `)
       .eq('id', orderId)
@@ -105,26 +97,29 @@ serve(async (req) => {
     }
 
     // Calculate total weight and dimensions
+    // Using default values since order_items don't link to products table
+    const DEFAULT_WEIGHT_KG = 0.5; // 500g per item
+    const DEFAULT_LENGTH_CM = 30;
+    const DEFAULT_WIDTH_CM = 25;
+    const DEFAULT_HEIGHT_CM = 5;
+
     let totalWeight = 0;
-    let maxLength = 0;
-    let maxWidth = 0;
-    let maxHeight = 0;
+    let maxLength = DEFAULT_LENGTH_CM;
+    let maxWidth = DEFAULT_WIDTH_CM;
+    let maxHeight = DEFAULT_HEIGHT_CM;
     const itemsForCustoms: any[] = [];
 
     for (const orderItem of order.order_items) {
-      const product = orderItem.product;
       const quantity = orderItem.quantity;
+      const itemWeight = DEFAULT_WEIGHT_KG * quantity;
 
-      totalWeight += (product.weight_kg || 0.5) * quantity;
-      maxLength = Math.max(maxLength, product.length_cm || 20);
-      maxWidth = Math.max(maxWidth, product.width_cm || 15);
-      maxHeight = Math.max(maxHeight, product.height_cm || 10);
+      totalWeight += itemWeight;
 
       // Add to customs declaration
       itemsForCustoms.push({
         number: itemsForCustoms.length + 1,
-        description: product.name,
-        price: product.price,
+        description: orderItem.product_name,
+        price: orderItem.price,
         quantity: {
           value: quantity,
           unitOfMeasurement: 'PCS',
@@ -138,8 +133,8 @@ serve(async (req) => {
         exportReasonType: 'permanent',
         manufacturerCountry: 'NG',
         weight: {
-          netValue: (product.weight_kg || 0.5) * quantity,
-          grossValue: (product.weight_kg || 0.5) * quantity,
+          netValue: itemWeight,
+          grossValue: itemWeight,
         },
       });
     }
