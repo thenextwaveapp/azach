@@ -159,6 +159,30 @@ serve(async (req) => {
       ? JSON.parse(order.shipping_address || '{}')
       : (order.shipping_address || {});
 
+    // Map full country names to ISO 2-letter codes
+    const countryCodeMap: Record<string, string> = {
+      'Nigeria': 'NG',
+      'United States': 'US',
+      'United Kingdom': 'GB',
+      'Canada': 'CA',
+      'Ghana': 'GH',
+      'Kenya': 'KE',
+      'South Africa': 'ZA',
+      'United Arab Emirates': 'AE',
+      'Australia': 'AU',
+      'France': 'FR',
+      'Germany': 'DE',
+      'India': 'IN',
+      'Italy': 'IT',
+      'Japan': 'JP',
+      'Netherlands': 'NL',
+      'Spain': 'ES',
+      'Switzerland': 'CH',
+    };
+
+    const countryName = shippingAddress.country || '';
+    const countryCode = countryCodeMap[countryName] || countryName.substring(0, 2).toUpperCase();
+
     // Prepare DHL shipment request
     const dhlShipmentRequest = {
       plannedShippingDateAndTime: plannedShippingDate.toISOString(),
@@ -189,16 +213,16 @@ serve(async (req) => {
         },
         receiverDetails: {
           postalAddress: {
-            postalCode: shippingAddress.postalCode || order.shipping_postal_code || '',
-            cityName: shippingAddress.city || order.shipping_city || '',
-            countryCode: shippingAddress.country || order.shipping_country || '',
-            addressLine1: shippingAddress.address || order.shipping_address || '',
+            postalCode: shippingAddress.postalCode || '',
+            cityName: shippingAddress.city || '',
+            countryCode: countryCode,
+            addressLine1: shippingAddress.address || '',
           },
           contactInformation: {
-            email: shippingAddress.email || order.customer_email || '',
-            phone: order.customer_phone || '',
-            companyName: order.customer_name || '',
-            fullName: shippingAddress.fullName || order.customer_name || '',
+            email: shippingAddress.email || '',
+            phone: shippingAddress.phone || '',
+            companyName: shippingAddress.name || '',
+            fullName: shippingAddress.name || '',
           },
         },
       },
@@ -213,9 +237,9 @@ serve(async (req) => {
             },
           },
         ],
-        isCustomsDeclarable: (shippingAddress.country || order.shipping_country) !== 'NG',
-        ...((shippingAddress.country || order.shipping_country) !== 'NG' && {
-          declaredValue: order.total_amount,
+        isCustomsDeclarable: countryCode !== 'NG',
+        ...(countryCode !== 'NG' && {
+          declaredValue: order.total || 0,
           declaredValueCurrency: 'NGN',
           exportDeclaration: {
             lineItems: itemsForCustoms,
