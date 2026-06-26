@@ -71,7 +71,7 @@ serve(async (req) => {
         order_items (
           quantity,
           price,
-          products (
+          product:product_id (
             id,
             name,
             weight_kg,
@@ -112,7 +112,7 @@ serve(async (req) => {
     const itemsForCustoms: any[] = [];
 
     for (const orderItem of order.order_items) {
-      const product = orderItem.products;
+      const product = orderItem.product;
       const quantity = orderItem.quantity;
 
       totalWeight += (product.weight_kg || 0.5) * quantity;
