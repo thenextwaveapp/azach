@@ -74,7 +74,6 @@ serve(async (req) => {
           products (
             id,
             name,
-            sku,
             weight_kg,
             length_cm,
             width_cm,
