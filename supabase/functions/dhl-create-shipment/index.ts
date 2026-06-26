@@ -272,7 +272,7 @@ serve(async (req) => {
           exportDeclaration: {
             lineItems: itemsForCustoms,
             invoice: {
-              number: order.id,
+              number: order.id.replace(/-/g, '').substring(0, 35), // Remove hyphens, max 35 chars
               date: order.created_at.split('T')[0],
             },
             exportReason: 'Sale of goods',
