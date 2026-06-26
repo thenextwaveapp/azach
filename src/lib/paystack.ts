@@ -130,34 +130,8 @@ export const openPaystackPopup = (
   onSuccess: (reference: string) => void,
   onClose: () => void
 ): void => {
-  // Check if Paystack Inline JS is loaded
-  if (typeof (window as any).PaystackPop === 'undefined') {
-    console.error('Paystack Inline JS not loaded');
-    // Fallback to redirect
-    window.location.href = checkoutData.authorization_url;
-    return;
-  }
-
-  console.log('Opening Paystack popup with:', {
-    access_code: checkoutData.access_code,
-    reference: checkoutData.reference,
-  });
-
-  // Use access_code from backend initialization
-  // Don't pass email/amount when using access_code - it's already in the transaction
-  const handler = (window as any).PaystackPop.setup({
-    key: import.meta.env.VITE_PAYSTACK_PUBLIC_KEY,
-    access_code: checkoutData.access_code,
-    callback: (response: any) => {
-      onSuccess(response.reference);
-    },
-    onClose: () => {
-      console.log('Payment popup closed');
-      onClose();
-    },
-  });
-
-  handler.openIframe();
+  // Just redirect to Paystack checkout page
+  window.location.href = checkoutData.authorization_url;
 };
 
 /**
