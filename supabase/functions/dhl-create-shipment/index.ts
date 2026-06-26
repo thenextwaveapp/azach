@@ -201,8 +201,14 @@ serve(async (req) => {
       'Switzerland': 'CH',
     };
 
+    // Handle both full country names and codes
     const countryName = shippingAddress.country || '';
-    const countryCode = countryCodeMap[countryName] || countryName.substring(0, 2).toUpperCase();
+    const countryCode = countryCodeMap[countryName] || (countryName.length === 2 ? countryName.toUpperCase() : countryName.substring(0, 2).toUpperCase());
+
+    // Handle both "name" and "fullName" fields
+    const customerName = shippingAddress.fullName || shippingAddress.name || '';
+    const customerPhone = shippingAddress.phone || '+234 000 000 0000'; // Fallback if missing
+    const customerEmail = shippingAddress.email || '';
 
     // Prepare DHL shipment request
     const dhlShipmentRequest = {
@@ -241,10 +247,10 @@ serve(async (req) => {
             addressLine1: shippingAddress.address || '',
           },
           contactInformation: {
-            email: shippingAddress.email || '',
-            phone: shippingAddress.phone || '',
-            companyName: shippingAddress.name || '',
-            fullName: shippingAddress.name || '',
+            email: customerEmail,
+            phone: customerPhone,
+            companyName: customerName,
+            fullName: customerName,
           },
         },
       },
