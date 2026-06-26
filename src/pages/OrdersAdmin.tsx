@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
+import { createDHLShipment } from '@/lib/dhl';
 import {
   Table,
   TableBody,
@@ -77,6 +78,49 @@ const OrdersAdmin = () => {
     estimated_delivery_date: '',
   });
   const [orderNotes, setOrderNotes] = useState('');
+  const [isCreatingShipment, setIsCreatingShipment] = useState(false);
+
+  const handleCreateShipment = async () => {
+    if (!selectedOrder) return;
+
+    if (selectedOrder.dhl_tracking_number) {
+      toast({
+        title: 'Shipment Already Created',
+        description: `Tracking number: ${selectedOrder.dhl_tracking_number}`,
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    try {
+      setIsCreatingShipment(true);
+      const result = await createDHLShipment(selectedOrder.id);
+
+      setShippingFormData({
+        dhl_tracking_number: result.trackingNumber,
+        dhl_shipment_id: result.shipmentId,
+        dhl_label_url: result.labelUrl || '',
+        estimated_delivery_date: shippingFormData.estimated_delivery_date,
+      });
+
+      toast({
+        title: 'Success',
+        description: 'DHL shipment created successfully!',
+      });
+
+      // Refresh order data
+      setIsDetailsOpen(false);
+      setTimeout(() => setIsDetailsOpen(true), 100);
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: error.message || 'Failed to create DHL shipment',
+        variant: 'destructive',
+      });
+    } finally {
+      setIsCreatingShipment(false);
+    }
+  };
 
   const handleLogout = async () => {
     await signOut();
@@ -574,6 +618,35 @@ const OrdersAdmin = () => {
                 {/* Shipping Info Form */}
                 <div>
                   <h3 className="font-semibold mb-3">DHL Shipping Information</h3>
+
+                  {/* Create Shipment Button */}
+                  {!selectedOrder?.dhl_tracking_number && (
+                    <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                      <p className="text-sm text-blue-700 mb-3">
+                        No shipment created yet. Create a DHL shipment to automatically generate a label and tracking number.
+                      </p>
+                      <Button
+                        onClick={handleCreateShipment}
+                        disabled={isCreatingShipment}
+                        className="w-full"
+                      >
+                        <Package className="mr-2 h-4 w-4" />
+                        {isCreatingShipment ? 'Creating Shipment...' : 'Create DHL Shipment'}
+                      </Button>
+                    </div>
+                  )}
+
+                  {selectedOrder?.dhl_tracking_number && (
+                    <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
+                      <p className="text-sm text-green-700 font-semibold">
+                        ✓ Shipment Created
+                      </p>
+                      <p className="text-xs text-green-600 mt-1">
+                        Tracking: {selectedOrder.dhl_tracking_number}
+                      </p>
+                    </div>
+                  )}
+
                   <div className="space-y-3">
                     <div>
                       <Label htmlFor="tracking">Tracking Number</Label>
@@ -587,6 +660,8 @@ const OrdersAdmin = () => {
                           })
                         }
                         placeholder="Enter DHL tracking number"
+                        readOnly={!!selectedOrder?.dhl_tracking_number}
+                        className={selectedOrder?.dhl_tracking_number ? 'bg-gray-100' : ''}
                       />
                     </div>
                     <div>
@@ -601,6 +676,8 @@ const OrdersAdmin = () => {
                           })
                         }
                         placeholder="Enter DHL shipment ID"
+                        readOnly={!!selectedOrder?.dhl_tracking_number}
+                        className={selectedOrder?.dhl_tracking_number ? 'bg-gray-100' : ''}
                       />
                     </div>
                     <div>
@@ -615,7 +692,9 @@ const OrdersAdmin = () => {
                               dhl_label_url: e.target.value,
                             })
                           }
-                          placeholder="Enter DHL label URL"
+                          placeholder="Enter DHL label URL or create shipment"
+                          readOnly={!!selectedOrder?.dhl_tracking_number}
+                          className={selectedOrder?.dhl_tracking_number ? 'bg-gray-100' : ''}
                         />
                         {shippingFormData.dhl_label_url && (
                           <Button

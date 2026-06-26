@@ -129,8 +129,7 @@ const Checkout = () => {
 
   const totalItems = getTotalItems();
   const subtotal = getTotalPrice();
-  // TEMPORARY: Disable shipping cost for testing
-  const shippingCost = 0; // selectedShippingRate?.totalPrice || 0;
+  const shippingCost = selectedShippingRate?.totalPrice || 0;
   const total = subtotal + shippingCost;
 
   useEffect(() => {
