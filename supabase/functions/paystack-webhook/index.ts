@@ -137,7 +137,7 @@ serve(async (req) => {
         userId = userData?.id;
       }
 
-      // Create order
+      // Create order (use shipping address as billing address by default)
       const { data: order, error: orderError } = await supabaseAdmin
         .from('orders')
         .insert({
@@ -151,6 +151,7 @@ serve(async (req) => {
           paystack_reference: data.reference,
           paystack_access_code: data.access_code,
           shipping_address: shippingAddress,
+          billing_address: shippingAddress, // Same as shipping for now
         })
         .select()
         .single();

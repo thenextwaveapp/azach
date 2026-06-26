@@ -55,6 +55,7 @@ const Checkout = () => {
   const [loadingShipping, setLoadingShipping] = useState(false);
   const [shippingRates, setShippingRates] = useState<DHLShippingRate[]>([]);
   const [selectedShippingRate, setSelectedShippingRate] = useState<DHLShippingRate | null>(null);
+  const [billingSameAsShipping, setBillingSameAsShipping] = useState(true);
   const [shippingAddress, setShippingAddress] = useState<ShippingAddress>({
     email: user?.email || '',
     fullName: '',
@@ -190,6 +191,9 @@ const Checkout = () => {
         quantity: item.quantity,
         image: item.image,
       }));
+
+      // Use shipping address as billing address (can be enhanced later for separate billing)
+      const billingAddress = shippingAddress;
 
       // Initialize Paystack transaction
       const checkoutData = await initializePaystackTransaction(
