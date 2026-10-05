@@ -8,6 +8,8 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import { CurrencyProvider } from "@/contexts/CurrencyContext";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { AdminRoute } from "@/components/AdminRoute";
+import { CookieConsent } from "@/components/CookieConsent";
+import { SmoothScroll } from "@/components/SmoothScroll";
 import Index from "./pages/Index";
 import ShopAll from "./pages/ShopAll";
 import Women from "./pages/Women";
@@ -18,16 +20,21 @@ import Checkout from "./pages/Checkout";
 import CheckoutSuccess from "./pages/CheckoutSuccess";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
+import SetPassword from "./pages/SetPassword";
 import Account from "./pages/Account";
 import Orders from "./pages/Orders";
+import OrderDetail from "./pages/OrderDetail";
 import Wishlist from "./pages/Wishlist";
 import Settings from "./pages/Settings";
 import Admin from "./pages/Admin";
 import OrdersAdmin from "./pages/OrdersAdmin";
+import ReviewsAdmin from "./pages/ReviewsAdmin";
 import OurStory from "./pages/About";
 import Lookbook from "./pages/Lookbook";
 import CustomerService from "./pages/CustomerService";
 import Returns from "./pages/Returns";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
 import SizeGuide from "./pages/SizeGuide";
 import ProductDetail from "./pages/ProductDetail";
 import Bespoke from "./pages/Bespoke";
@@ -46,6 +53,8 @@ const App = () => (
             <Toaster />
             <Sonner />
             <BrowserRouter>
+            <SmoothScroll />
+            <CookieConsent />
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/shop-all" element={<ShopAll />} />
@@ -57,6 +66,7 @@ const App = () => (
               <Route path="/checkout/success" element={<CheckoutSuccess />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/set-password" element={<SetPassword />} />
               <Route
                 path="/account"
                 element={
@@ -70,6 +80,14 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <Orders />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/orders/:orderId"
+                element={
+                  <ProtectedRoute>
+                    <OrderDetail />
                   </ProtectedRoute>
                 }
               />
@@ -105,10 +123,20 @@ const App = () => (
                   </AdminRoute>
                 }
               />
+              <Route
+                path="/admin/reviews"
+                element={
+                  <AdminRoute>
+                    <ReviewsAdmin />
+                  </AdminRoute>
+                }
+              />
               <Route path="/our-story" element={<OurStory />} />
               <Route path="/lookbook" element={<Lookbook />} />
               <Route path="/customer-service" element={<CustomerService />} />
               <Route path="/returns" element={<Returns />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/terms-of-service" element={<TermsOfService />} />
               <Route path="/size-guide" element={<SizeGuide />} />
               <Route path="/bespoke" element={<Bespoke />} />
               <Route path="/rework" element={<Rework />} />

@@ -5,6 +5,8 @@ import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
 import { X } from "lucide-react";
+import { invokeFunction } from "@/lib/functionError";
+import { COOKIE_CONSENT_KEY, COOKIE_CONSENT_RESOLVED_EVENT } from "@/components/CookieConsent";
 
 const emailSchema = z.object({
   email: z.string().trim().email({ message: "Please enter a valid email address" }).max(255, { message: "Email must be less than 255 characters" }),
@@ -15,13 +17,29 @@ export const WelcomeModal = () => {
   const [showConfirmClose, setShowConfirmClose] = useState(false);
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
     const hasSeenModal = localStorage.getItem("hasSeenWelcomeModal");
-    if (!hasSeenModal) {
-      setTimeout(() => setIsOpen(true), 1500);
+    if (hasSeenModal) return;
+
+    // Radix's modal Dialog blocks interaction with everything outside itself while open,
+    // so this can never show while the cookie banner is still up — it would trap the user.
+    let timeoutId: ReturnType<typeof setTimeout>;
+    const scheduleOpen = () => {
+      timeoutId = setTimeout(() => setIsOpen(true), 1500);
+    };
+
+    if (localStorage.getItem(COOKIE_CONSENT_KEY)) {
+      scheduleOpen();
+    } else {
+      const onResolved = () => scheduleOpen();
+      window.addEventListener(COOKIE_CONSENT_RESOLVED_EVENT, onResolved, { once: true });
+      return () => window.removeEventListener(COOKIE_CONSENT_RESOLVED_EVENT, onResolved);
     }
+
+    return () => clearTimeout(timeoutId);
   }, []);
 
   const handleClose = () => {
@@ -34,23 +52,35 @@ export const WelcomeModal = () => {
     setShowConfirmClose(true);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
     const result = emailSchema.safeParse({ email });
-    
+
     if (!result.success) {
       setError(result.error.errors[0].message);
       return;
     }
 
-    toast({
-      title: "Welcome to AZACH!",
-      description: "Check your email for your 15% discount code.",
-    });
-    
-    handleClose();
+    setSubmitting(true);
+    try {
+      await invokeFunction("subscribe-newsletter", { email, withDiscount: true });
+
+      toast({
+        title: "Welcome to AZACH!",
+        description: "Check your email for your 15% discount code.",
+      });
+      handleClose();
+    } catch (err) {
+      toast({
+        title: "Something went wrong",
+        description: err instanceof Error ? err.message : "We couldn't send your discount code. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -96,8 +126,8 @@ export const WelcomeModal = () => {
                 />
                 {error && <p className="text-sm text-destructive mt-1">{error}</p>}
               </div>
-              <Button type="submit" className="w-full">
-                Get My Discount
+              <Button type="submit" className="w-full" disabled={submitting}>
+                {submitting ? "Sending..." : "Get My Discount"}
               </Button>
             </form>
 

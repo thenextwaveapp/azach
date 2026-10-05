@@ -1,47 +1,37 @@
-/* Futura Font Faces */
+/* Jost Font Faces (variable weight 100-900) */
 @font-face {
-  font-family: 'Futura';
-  src: url('/fonts/futura-light.otf') format('opentype');
-  font-weight: 300;
+  font-family: 'Jost';
+  src: url('/fonts/jost-variable.ttf') format('truetype-variations');
+  font-weight: 100 900;
   font-style: normal;
   font-display: swap;
 }
 
 @font-face {
-  font-family: 'Futura';
-  src: url('/fonts/futura-book.otf') format('opentype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Futura';
-  src: url('/fonts/futura-heavy.ttf') format('truetype');
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Futura';
-  src: url('/fonts/futura-bold.otf') format('opentype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
-}
-
-@font-face {
-  font-family: 'Futura';
-  src: url('/fonts/futura-black.ttf') format('truetype');
-  font-weight: 900;
-  font-style: normal;
+  font-family: 'Jost';
+  src: url('/fonts/jost-italic-variable.ttf') format('truetype-variations');
+  font-weight: 100 900;
+  font-style: italic;
   font-display: swap;
 }
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Lenis smooth scroll — recommended global styles */
+html.lenis, html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
 
 /* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
 All colors MUST be HSL.
@@ -227,5 +217,30 @@ All colors MUST be HSL.
   /* Slower scroll feel for images and cards */
   img, [class*="card"], [class*="Card"] {
     transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  /* Looping diagonal shine sweep, e.g. for a hero CTA */
+  .btn-shine {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-shine::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    width: 45%;
+    background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+    transform: translateX(-150%) skewX(-20deg);
+    animation: btn-shine-sweep 3.2s ease-in-out infinite;
+  }
+
+  @keyframes btn-shine-sweep {
+    0%, 55% {
+      transform: translateX(-150%) skewX(-20deg);
+    }
+    100% {
+      transform: translateX(350%) skewX(-20deg);
+    }
   }
 }

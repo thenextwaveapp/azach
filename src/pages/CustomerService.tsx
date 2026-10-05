@@ -3,6 +3,8 @@ import { Footer } from "@/components/Footer";
 import { useState, useEffect } from "react";
 import { Mail, MapPin, Phone, ChevronDown, ChevronUp } from "lucide-react";
 import { Link } from "react-router-dom";
+import { invokeFunction } from "@/lib/functionError";
+import { useToast } from "@/hooks/use-toast";
 
 const CustomerService = () => {
   // Set page title
@@ -17,6 +19,8 @@ const CustomerService = () => {
     message: "",
   });
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const { toast } = useToast();
 
   const faqs = [
     {
@@ -41,13 +45,28 @@ const CustomerService = () => {
     setOpenFaq(openFaq === index ? null : index);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Here you would typically send the form data to your backend
-    console.log("Form submitted:", formData);
-    setSubmitted(true);
-    setFormData({ name: "", email: "", subject: "", message: "" });
-    setTimeout(() => setSubmitted(false), 5000);
+    setSubmitting(true);
+    try {
+      await invokeFunction("submit-form", {
+        formType: "contact",
+        fullName: formData.name,
+        email: formData.email,
+        details: { subject: formData.subject, message: formData.message },
+      });
+      setSubmitted(true);
+      setFormData({ name: "", email: "", subject: "", message: "" });
+      setTimeout(() => setSubmitted(false), 5000);
+    } catch (err) {
+      toast({
+        title: "Something went wrong",
+        description: err instanceof Error ? err.message : "Your message couldn't be sent. Please try again or email us directly.",
+        variant: "destructive",
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -98,7 +117,7 @@ const CustomerService = () => {
               </div>
               <h3 className="font-semibold mb-2">Email Us</h3>
               <p className="text-sm text-muted-foreground mb-2">info@azach.ng</p>
-              <p className="text-xs text-muted-foreground">We'll respond within 24 hours</p>
+              <p className="text-xs text-muted-foreground">We'll get back to you as soon as possible</p>
             </div>
 
             <div className="text-center p-6 bg-background rounded-lg shadow-sm">
@@ -138,7 +157,7 @@ const CustomerService = () => {
 
             {submitted && (
               <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg text-green-800">
-                Thank you for contacting us! We'll respond to your message within 24 hours.
+                Thank you for contacting us! We've received your message and will get back to you soon.
               </div>
             )}
 
@@ -205,9 +224,10 @@ const CustomerService = () => {
 
               <button
                 type="submit"
-                className="w-full bg-primary text-primary-foreground py-3 px-6 rounded-lg font-medium hover:bg-primary/90 transition-colors"
+                disabled={submitting}
+                className="w-full bg-primary text-primary-foreground py-3 px-6 rounded-lg font-medium hover:bg-primary/90 transition-colors disabled:opacity-60"
               >
-                Send Message
+                {submitting ? "Sending..." : "Send Message"}
               </button>
             </form>
           </div>

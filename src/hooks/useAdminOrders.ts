@@ -49,6 +49,9 @@ export function useUpdateShippingInfo() {
         dhl_tracking_number?: string;
         dhl_shipment_id?: string;
         dhl_label_url?: string;
+        topship_tracking_id?: string;
+        topship_tracking_url?: string;
+        topship_label_url?: string;
         estimated_delivery_date?: string;
       };
     }) => orderService.updateShippingInfo(orderId, shippingInfo),

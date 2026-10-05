@@ -11,6 +11,7 @@ import { useState } from "react";
 import { QuickViewModal } from "./QuickViewModal";
 import { OptimizedImage } from "./OptimizedImage";
 import { Product } from "@/types/product";
+import { trackAddToCart, trackAddToWishlist, trackSelectItem } from "@/lib/analytics";
 
 interface ProductCardProps {
   id: number | string;
@@ -19,17 +20,28 @@ interface ProductCardProps {
   image: string;
   category: string;
   product?: Product; // Full product object for quick view
+  listName?: string;
 }
 
-export const ProductCard = ({ id, name, price, image, category, product }: ProductCardProps) => {
+export const ProductCard = ({ id, name, price, image, category, product, listName }: ProductCardProps) => {
   const { addToCart } = useCart();
-  const { formatPrice } = useCurrency();
+  const { currency, formatNGN, formatDisplayPrice, getPrice } = useCurrency();
   const { toast } = useToast();
   const { user } = useAuth();
   const { data: isInWishlist } = useIsInWishlist(String(id));
   const addToWishlist = useAddToWishlist();
   const removeFromWishlist = useRemoveFromWishlist();
   const [quickViewOpen, setQuickViewOpen] = useState(false);
+
+  const analyticsItem = () => {
+    const display = product ? getPrice(product) : null;
+    return {
+      item_id: String(id),
+      item_name: name,
+      price: display?.amount ?? price,
+      item_category: category,
+    };
+  };
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -40,7 +52,9 @@ export const ProductCard = ({ id, name, price, image, category, product }: Produ
       price,
       image,
       category,
+      currency_prices: product?.currency_prices,
     });
+    trackAddToCart(analyticsItem(), currency);
     toast({
       title: "Added to cart",
       description: `${name} has been added to your cart.`,
@@ -71,6 +85,7 @@ export const ProductCard = ({ id, name, price, image, category, product }: Produ
         });
       } else {
         await addToWishlist.mutateAsync(product.id);
+        trackAddToWishlist(analyticsItem(), currency);
         toast({
           title: 'Added to wishlist',
           description: `${name} has been added to your wishlist.`,
@@ -95,7 +110,12 @@ export const ProductCard = ({ id, name, price, image, category, product }: Produ
 
   return (
     <>
-    <Link to={`/product/${id}`}>
+    <Link
+      to={`/product/${id}`}
+      onClick={() => {
+        if (listName) trackSelectItem(listName, analyticsItem(), currency);
+      }}
+    >
       <Card className="group overflow-hidden border-0 shadow-none cursor-pointer">
         <CardContent className="p-0">
           <div className="relative aspect-[3/4] overflow-hidden bg-muted">
@@ -115,7 +135,8 @@ export const ProductCard = ({ id, name, price, image, category, product }: Produ
                   variant="secondary"
                   className="h-9 w-9 bg-white/90 hover:bg-white"
                   onClick={handleToggleWishlist}
-                  title={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
+                  aria-label={isInWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
+                  title={isInWishlist ? "Remove from Wishlist" : "Add to Wishlist"}
                 >
                   <Heart className={`h-4 w-4 transition-colors ${isInWishlist ? 'fill-red-500 text-red-500' : 'text-black'}`} />
                 </Button>
@@ -125,6 +146,7 @@ export const ProductCard = ({ id, name, price, image, category, product }: Produ
                     variant="secondary"
                     className="h-9 w-9 bg-white/90 hover:bg-white"
                     onClick={handleQuickView}
+                    aria-label="Quick view"
                     title="Quick view"
                   >
                     <Eye className="h-4 w-4 text-black" />
@@ -136,6 +158,7 @@ export const ProductCard = ({ id, name, price, image, category, product }: Produ
               size="icon"
               className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity"
               onClick={handleAddToCart}
+              aria-label={`Add ${name} to cart`}
             >
               <ShoppingBag className="h-4 w-4" />
             </Button>
@@ -143,7 +166,7 @@ export const ProductCard = ({ id, name, price, image, category, product }: Produ
           <div className="pt-4 space-y-2">
             <p className="text-xs text-muted-foreground uppercase tracking-wider">{category}</p>
             <h3 className="font-medium">{name}</h3>
-            <p className="text-lg font-semibold">{formatPrice(price)}</p>
+            <p className="text-lg font-semibold">{product ? formatDisplayPrice(product) : formatNGN(price)}</p>
           </div>
         </CardContent>
       </Card>

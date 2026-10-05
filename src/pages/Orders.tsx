@@ -13,9 +13,17 @@ const Orders = () => {
   useEffect(() => {
     document.title = "My Orders - AZACH";
   }, []);
-  const { user } = useAuth();
-  const { formatPrice } = useCurrency();
-  const { data: orders = [], isLoading } = useOrders();
+  const { user, isAnonymous } = useAuth();
+  const { formatAsCurrency } = useCurrency();
+  const { data: orders = [], isLoading, refetch } = useOrders();
+
+  // Debug logging
+  console.log('Orders page:', {
+    userId: user?.id,
+    isAnonymous,
+    ordersCount: orders?.length,
+    orders
+  });
 
   return (
     <div className="min-h-screen">
@@ -67,7 +75,7 @@ const Orders = () => {
                     <div className="text-right">
                       <p className="font-semibold flex items-center gap-2">
                         <DollarSign className="h-4 w-4" />
-                        {formatPrice(order.total)}
+                        {formatAsCurrency(order.total, order.currency)}
                       </p>
                       <p className="text-sm text-muted-foreground capitalize">{order.status}</p>
                     </div>

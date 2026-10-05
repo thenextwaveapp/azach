@@ -6,6 +6,7 @@
 
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { sendEmail, shippingConfirmationEmail } from '../_shared/email.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -63,15 +64,28 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Fetch order details
+    // Fetch order details, joined to the products backing each line item so we can
+    // pull real weight/dimensions and the customs classification fields (no defaults).
     const { data: order, error: orderError } = await supabase
       .from('orders')
       .select(`
         *,
         order_items (
           product_name,
+          product_image,
           quantity,
-          price
+          price,
+          product_id,
+          product:products (
+            category,
+            gender,
+            material,
+            hs_code,
+            weight_kg,
+            length_cm,
+            width_cm,
+            height_cm
+          )
         )
       `)
       .eq('id', orderId)
@@ -96,47 +110,40 @@ serve(async (req) => {
       );
     }
 
-    // Calculate total weight and dimensions
-    // Using default values since order_items don't link to products table
-    const DEFAULT_WEIGHT_KG = 0.5; // 500g per item
-    const DEFAULT_LENGTH_CM = 30;
-    const DEFAULT_WIDTH_CM = 25;
-    const DEFAULT_HEIGHT_CM = 5;
+    // Every line item's product must have weight/dimensions before we can book a shipment at all.
+    const missingShippingInfo = order.order_items
+      .filter((item: any) => {
+        const p = item.product;
+        return !p || p.weight_kg == null || p.length_cm == null || p.width_cm == null || p.height_cm == null;
+      })
+      .map((item: any) => item.product_name);
+
+    if (missingShippingInfo.length > 0) {
+      return new Response(
+        JSON.stringify({
+          error: `Missing weight/dimensions for: ${missingShippingInfo.join(', ')}. Add these in Admin before creating a shipment.`,
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      );
+    }
+
+    const genderLabel: Record<string, string> = {
+      men: "Men's",
+      women: "Women's",
+      unisex: 'Unisex',
+    };
 
     let totalWeight = 0;
-    let maxLength = DEFAULT_LENGTH_CM;
-    let maxWidth = DEFAULT_WIDTH_CM;
-    let maxHeight = DEFAULT_HEIGHT_CM;
-    const itemsForCustoms: any[] = [];
+    let maxLength = 0;
+    let maxWidth = 0;
+    let maxHeight = 0;
 
     for (const orderItem of order.order_items) {
-      const quantity = orderItem.quantity;
-      const itemWeight = DEFAULT_WEIGHT_KG * quantity;
-
-      totalWeight += itemWeight;
-
-      // Add to customs declaration
-      itemsForCustoms.push({
-        number: itemsForCustoms.length + 1,
-        description: orderItem.product_name,
-        price: orderItem.price,
-        quantity: {
-          value: quantity,
-          unitOfMeasurement: 'PCS',
-        },
-        commodityCodes: [
-          {
-            typeCode: 'outbound',
-            value: '6203', // Generic clothing HS code - adjust as needed
-          },
-        ],
-        exportReasonType: 'permanent',
-        manufacturerCountry: 'NG',
-        weight: {
-          netValue: itemWeight,
-          grossValue: itemWeight,
-        },
-      });
+      const p = orderItem.product;
+      totalWeight += p.weight_kg * orderItem.quantity;
+      maxLength = Math.max(maxLength, p.length_cm);
+      maxWidth = Math.max(maxWidth, p.width_cm);
+      maxHeight = Math.max(maxHeight, p.height_cm);
     }
 
     // Ensure minimum weight
@@ -205,10 +212,84 @@ serve(async (req) => {
     const countryName = shippingAddress.country || '';
     const countryCode = countryCodeMap[countryName] || (countryName.length === 2 ? countryName.toUpperCase() : countryName.substring(0, 2).toUpperCase());
 
+    const isInternational = countryCode !== 'NG';
+
+    // International shipments need a customs declaration per line item. We refuse to
+    // guess a description or commodity code — every product must have these set.
+    const itemsForCustoms: any[] = [];
+    if (isInternational) {
+      const missingCustomsInfo: string[] = [];
+
+      for (const orderItem of order.order_items) {
+        const p = orderItem.product;
+        const missingFields = [
+          !p.category && 'category',
+          (!p.gender || p.gender.length === 0) && 'gender',
+          !p.material && 'material',
+          !p.hs_code && 'HS code',
+        ].filter(Boolean);
+
+        if (missingFields.length > 0) {
+          missingCustomsInfo.push(`${orderItem.product_name} (missing ${missingFields.join(', ')})`);
+          continue;
+        }
+
+        const categoryLabel = p.category.charAt(0).toUpperCase() + p.category.slice(1).toLowerCase();
+        const itemWeight = p.weight_kg * orderItem.quantity;
+        const genderDescription = p.gender.map((g: string) => genderLabel[g] || g).join('/');
+        itemsForCustoms.push({
+          number: itemsForCustoms.length + 1,
+          description: `${genderDescription} ${categoryLabel}, ${p.material}`,
+          price: orderItem.price,
+          quantity: {
+            value: orderItem.quantity,
+            unitOfMeasurement: 'PCS',
+          },
+          commodityCodes: [
+            { typeCode: 'outbound', value: p.hs_code },
+            { typeCode: 'inbound', value: p.hs_code },
+          ],
+          exportReasonType: 'permanent',
+          manufacturerCountry: 'NG',
+          weight: {
+            netValue: itemWeight,
+            grossValue: itemWeight,
+          },
+        });
+      }
+
+      if (missingCustomsInfo.length > 0) {
+        return new Response(
+          JSON.stringify({
+            error: `Missing customs info for international shipment: ${missingCustomsInfo.join('; ')}. Add these in Admin before creating a shipment.`,
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+        );
+      }
+
+      if (order.total == null || order.shipping_cost == null) {
+        return new Response(
+          JSON.stringify({
+            error: 'Order is missing total/shipping cost, required for the customs declaration.',
+          }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+        );
+      }
+    }
+
     // Handle both "name" and "fullName" fields
     const customerName = shippingAddress.fullName || shippingAddress.name || '';
-    const customerPhone = shippingAddress.phone || '+234 000 000 0000'; // Fallback if missing
     const customerEmail = shippingAddress.email || '';
+
+    if (!shippingAddress.phone) {
+      return new Response(
+        JSON.stringify({
+          error: 'Order is missing a shipping phone number, required by DHL to create a shipment.',
+        }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+      );
+    }
+    const customerPhone = shippingAddress.phone;
 
     // Prepare DHL shipment request
     const dhlShipmentRequest = {
@@ -217,7 +298,7 @@ serve(async (req) => {
         isRequested: false, // Can be changed to true to auto-schedule pickup
       },
       // Use domestic product for Nigeria, international for others
-      productCode: countryCode === 'NG' ? 'N' : 'P', // N = Domestic 12:00, P = Worldwide
+      productCode: isInternational ? 'P' : 'N', // N = Domestic 12:00, P = Worldwide
       accounts: [
         {
           typeCode: 'shipper',
@@ -229,6 +310,7 @@ serve(async (req) => {
           postalAddress: {
             postalCode: Deno.env.get('DHL_ORIGIN_POSTAL_CODE') || '100001',
             cityName: Deno.env.get('DHL_ORIGIN_CITY') || 'Lagos',
+            countyName: Deno.env.get('DHL_ORIGIN_STATE') || 'Lagos',
             countryCode: 'NG',
             addressLine1: Deno.env.get('DHL_ORIGIN_ADDRESS') || 'Business Address',
           },
@@ -238,11 +320,13 @@ serve(async (req) => {
             companyName: Deno.env.get('DHL_COMPANY_NAME') || 'AZACH',
             fullName: Deno.env.get('DHL_SHIPPER_NAME') || 'AZACH Shipping',
           },
+          typeCode: 'business', // AZACH is the shipping business
         },
         receiverDetails: {
           postalAddress: {
             postalCode: shippingAddress.postalCode || '',
             cityName: shippingAddress.city || '',
+            countyName: shippingAddress.state || shippingAddress.city || '',
             countryCode: countryCode,
             addressLine1: shippingAddress.address || '',
           },
@@ -252,6 +336,7 @@ serve(async (req) => {
             companyName: customerName,
             fullName: customerName,
           },
+          typeCode: 'private', // customers are individuals, not businesses
         },
       },
       content: {
@@ -265,9 +350,9 @@ serve(async (req) => {
             },
           },
         ],
-        isCustomsDeclarable: countryCode !== 'NG',
-        ...(countryCode !== 'NG' && {
-          declaredValue: order.total || 0,
+        isCustomsDeclarable: isInternational,
+        ...(isInternational && {
+          declaredValue: order.total,
           declaredValueCurrency: 'NGN',
           exportDeclaration: {
             lineItems: itemsForCustoms,
@@ -277,6 +362,14 @@ serve(async (req) => {
             },
             exportReason: 'Sale of goods',
             exportReasonType: 'permanent',
+            placeOfIncoterm: shippingAddress.city || '',
+            shipmentType: 'commercial',
+            additionalCharges: [
+              {
+                typeCode: 'freight',
+                value: order.shipping_cost,
+              },
+            ],
           },
           incoterm: 'DAP', // Delivered At Place
         }),
@@ -284,17 +377,31 @@ serve(async (req) => {
         unitOfMeasurement: 'metric',
       },
       outputImageProperties: {
+        allDocumentsInOneImage: true,
+        encodingFormat: 'pdf',
         imageOptions: [
           {
             typeCode: 'label',
-            templateName: 'ECOM26_84_001', // 4x6 label format
-            isRequested: true,
+            templateName: 'ECOM26_84_A4_001',
           },
           {
             typeCode: 'waybillDoc',
-            templateName: 'ARCH_8X4', // Waybill
+            templateName: 'ARCH_8X4_A4_002',
             isRequested: true,
+            hideAccountNumber: true,
           },
+          // Commercial invoice — required as the 3rd page for international (customs-declarable) shipments
+          ...(isInternational
+            ? [
+                {
+                  typeCode: 'invoice',
+                  templateName: 'COMMERCIAL_INVOICE_P_10',
+                  invoiceType: 'commercial',
+                  languageCode: 'eng',
+                  isRequested: true,
+                },
+              ]
+            : []),
         ],
       },
     };
@@ -334,6 +441,7 @@ serve(async (req) => {
     const documents = dhlData.documents || [];
     const labelDocument = documents.find((doc: any) => doc.typeCode === 'label');
     const waybillDocument = documents.find((doc: any) => doc.typeCode === 'waybillDoc');
+    const invoiceDocument = documents.find((doc: any) => doc.typeCode === 'invoice');
 
     // Store label PDF in Supabase Storage
     let labelUrl = null;
@@ -374,6 +482,34 @@ serve(async (req) => {
       throw new Error('Failed to update order with shipment details');
     }
 
+    if (customerEmail) {
+      const currency = order.currency || 'NGN';
+      const emailItems = order.order_items.map((i: any) => ({
+        name: i.product_name,
+        qty: i.quantity,
+        price: i.price,
+        image: i.product_image,
+      }));
+      await sendEmail({
+        to: customerEmail,
+        subject: `Your AZACH Order Has Shipped — ${dhlData.shipmentTrackingNumber}`,
+        html: shippingConfirmationEmail({
+          customerName: customerName || 'there',
+          orderNumber: `#AZ-${order.id.slice(0, 8).toUpperCase()}`,
+          trackingNumber: dhlData.shipmentTrackingNumber,
+          trackingUrl: `https://www.dhl.com/en/express/tracking.html?AWB=${dhlData.shipmentTrackingNumber}&brand=DHL`,
+          items: emailItems,
+          totals: {
+            subtotal: order.subtotal,
+            shipping: order.shipping_cost || 0,
+            tax: order.tax || 0,
+            total: order.total,
+            currency,
+          },
+        }),
+      });
+    }
+
     return new Response(
       JSON.stringify({
         success: true,
@@ -382,6 +518,7 @@ serve(async (req) => {
         labelUrl: labelUrl,
         labelBase64: labelDocument?.content,
         waybillBase64: waybillDocument?.content,
+        invoiceBase64: invoiceDocument?.content,
       }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },

@@ -1,6 +1,9 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import { useAuth } from "./AuthContext";
+import { useCurrency } from "./CurrencyContext";
 import { cartService } from "@/services/cartService";
+import { trackRemoveFromCart } from "@/lib/analytics";
+import type { CurrencyPrices } from "@/types/product";
 
 export interface CartItem {
   id: number | string;
@@ -9,6 +12,7 @@ export interface CartItem {
   image: string;
   category: string;
   quantity: number;
+  currency_prices?: CurrencyPrices;
 }
 
 interface CartContextType {
@@ -47,6 +51,7 @@ const saveCartToStorage = (items: CartItem[]) => {
 
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
+  const { currency, getPrice } = useCurrency();
   const [items, setItems] = useState<CartItem[]>(loadCartFromStorage);
   const [synced, setSynced] = useState(false);
 
@@ -79,6 +84,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
             image: item.product.image_url,
             category: item.product.category,
             quantity: item.quantity,
+            currency_prices: item.product.currency_prices,
           }));
 
           setItems(cartItems);
@@ -124,6 +130,21 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const removeFromCart = async (id: number | string) => {
+    const removed = items.find((item) => item.id === id);
+    if (removed) {
+      const display = getPrice(removed);
+      trackRemoveFromCart(
+        {
+          item_id: String(removed.id),
+          item_name: removed.name,
+          price: display?.amount ?? removed.price,
+          quantity: removed.quantity,
+          item_category: removed.category,
+        },
+        currency
+      );
+    }
+
     setItems((prevItems) => prevItems.filter((item) => item.id !== id));
 
     // Sync to database if user is logged in

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Fragment } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
@@ -28,12 +28,18 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct } from '@/hooks/useProducts';
-import { Trash2, Edit, Plus, LogOut, ChevronUp, ChevronDown, Upload, Search, ArrowUpDown, ArrowUp, ArrowDown, ShoppingCart } from 'lucide-react';
+import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct, useBundles } from '@/hooks/useProducts';
+import { Trash2, Edit, Plus, LogOut, ChevronUp, ChevronDown, Upload, Search, ArrowUpDown, ArrowUp, ArrowDown, ShoppingCart, Star } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import type { ProductInsert, ProductUpdate } from '@/types/product';
+import type { ProductInsert, ProductUpdate, ForeignCurrency } from '@/types/product';
 import { uploadImageToStorage, uploadMultipleImages } from '@/utils/imageUpload';
+
+// Paystack only charges NGN + USD on this account, so USD is the only foreign
+// currency we take a manually-set display/charge price for.
+const FOREIGN_CURRENCIES: { code: ForeignCurrency; label: string }[] = [
+  { code: 'USD', label: '$' },
+];
 
 const Admin = () => {
   // Set page title
@@ -41,6 +47,7 @@ const Admin = () => {
     document.title = "Admin Panel - AZACH";
   }, []);
   const { data: products, isLoading } = useProducts();
+  const { data: bundles } = useBundles();
   const createProduct = useCreateProduct();
   const updateProduct = useUpdateProduct();
   const deleteProduct = useDeleteProduct();
@@ -66,11 +73,29 @@ const Admin = () => {
     category: '',
     image_url: '',
     image_urls: [],
+    sku: '',
+    size: '',
+    material: '',
+    care_instructions: '',
+    style_code: '',
+    measurements: {},
+    model_info: {},
+    custom_size_available: false,
+    is_bundle: false,
+    bundle_id: undefined,
+    bundle_quantity: 1,
+    bundle_role: '',
     stock: 0,
     in_stock: true,
     featured: false,
     on_sale: false,
-    gender: undefined,
+    gender: [],
+    weight_kg: undefined,
+    length_cm: undefined,
+    width_cm: undefined,
+    height_cm: undefined,
+    hs_code: '',
+    currency_prices: {},
   });
   const [additionalImageInput, setAdditionalImageInput] = useState('');
   const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
@@ -82,6 +107,46 @@ const Admin = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!formData.image_url && !coverImageFile) {
+      toast({
+        title: 'Error',
+        description: 'Cover image is required',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!formData.gender || formData.gender.length === 0) {
+      toast({
+        title: 'Error',
+        description: 'At least one gender is required',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    if (!formData.sku?.trim()) {
+      toast({
+        title: 'Error',
+        description: 'SKU is required',
+        variant: 'destructive',
+      });
+      return;
+    }
+
+    const duplicateSku = products?.find(
+      (p) => p.sku?.trim().toLowerCase() === formData.sku!.trim().toLowerCase() && p.id !== editingProduct?.id
+    );
+    if (duplicateSku) {
+      toast({
+        title: 'Error',
+        description: `SKU "${formData.sku}" is already used by "${duplicateSku.name}"`,
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setIsUploading(true);
 
     try {
@@ -141,11 +206,29 @@ const Admin = () => {
       category: product.category,
       image_url: product.image_url,
       image_urls: product.image_urls || [],
+      sku: product.sku || '',
+      size: product.size || '',
+      material: product.material || '',
+      care_instructions: product.care_instructions || '',
+      style_code: product.style_code || '',
+      measurements: product.measurements || {},
+      model_info: product.model_info || {},
+      custom_size_available: product.custom_size_available || false,
+      is_bundle: product.is_bundle || false,
+      bundle_id: product.bundle_id || undefined,
+      bundle_quantity: product.bundle_quantity || 1,
+      bundle_role: product.bundle_role || '',
       stock: product.stock,
       in_stock: product.in_stock,
       featured: product.featured,
       on_sale: product.on_sale,
-      gender: product.gender,
+      gender: product.gender || [],
+      weight_kg: product.weight_kg,
+      length_cm: product.length_cm,
+      width_cm: product.width_cm,
+      height_cm: product.height_cm,
+      hs_code: product.hs_code || '',
+      currency_prices: product.currency_prices || {},
     });
     setIsDialogOpen(true);
   };
@@ -204,11 +287,29 @@ const Admin = () => {
       category: '',
       image_url: '',
       image_urls: [],
+      sku: '',
+      size: '',
+      material: '',
+      care_instructions: '',
+      style_code: '',
+      measurements: {},
+      model_info: {},
+      custom_size_available: false,
+      is_bundle: false,
+      bundle_id: undefined,
+      bundle_quantity: 1,
+      bundle_role: '',
       stock: 0,
       in_stock: true,
       featured: false,
       on_sale: false,
-      gender: undefined,
+      gender: [],
+      weight_kg: undefined,
+      length_cm: undefined,
+      width_cm: undefined,
+      height_cm: undefined,
+      hs_code: '',
+      currency_prices: {},
     });
     setAdditionalImageInput('');
     setCoverImageFile(null);
@@ -250,7 +351,7 @@ const Admin = () => {
         product.name.toLowerCase().includes(query) ||
         product.category.toLowerCase().includes(query) ||
         product.description?.toLowerCase().includes(query) ||
-        product.gender?.toLowerCase().includes(query) ||
+        product.gender?.some((g) => g.toLowerCase().includes(query)) ||
         product.id.toLowerCase().includes(query)
       );
     })
@@ -302,6 +403,10 @@ const Admin = () => {
               <ShoppingCart className="mr-2 h-4 w-4" />
               Orders
             </Button>
+            <Button variant="outline" onClick={() => navigate('/admin/reviews')}>
+              <Star className="mr-2 h-4 w-4" />
+              Reviews
+            </Button>
             <Button variant="outline" onClick={handleLogout}>
               <LogOut className="mr-2 h-4 w-4" />
               Logout
@@ -334,12 +439,21 @@ const Admin = () => {
                   </div>
                   <div>
                     <Label htmlFor="category">Category *</Label>
-                    <Input
-                      id="category"
+                    <Select
                       value={formData.category}
-                      onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                      required
-                    />
+                      onValueChange={(value) => setFormData({ ...formData, category: value })}
+                    >
+                      <SelectTrigger id="category">
+                        <SelectValue placeholder="Select category" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="TOPS">Tops</SelectItem>
+                        <SelectItem value="BOTTOM">Bottoms</SelectItem>
+                        <SelectItem value="SET">Sets</SelectItem>
+                        <SelectItem value="ACCESSORIES">Accessories</SelectItem>
+                        <SelectItem value="DRESS">Dress</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 </div>
                 <div>
@@ -377,11 +491,55 @@ const Admin = () => {
                     <Input
                       id="stock"
                       type="number"
-                      value={formData.stock}
+                      value={formData.is_bundle ? (editingProduct?.stock ?? 0) : formData.stock}
                       onChange={(e) => setFormData({ ...formData, stock: parseInt(e.target.value) || 0, in_stock: parseInt(e.target.value) > 0 })}
+                      disabled={formData.is_bundle}
                       required
                     />
+                    {formData.is_bundle && (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Computed automatically from component stock — save this set, then link components to it.
+                      </p>
+                    )}
                   </div>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                    {FOREIGN_CURRENCIES.map(({ code, label }) => (
+                      <Fragment key={code}>
+                        <div>
+                          <Label htmlFor={`price_${code}`}>Price ({label})</Label>
+                          <Input
+                            id={`price_${code}`}
+                            type="number"
+                            step="0.01"
+                            value={formData.currency_prices?.[code]?.price ?? ''}
+                            onChange={(e) => setFormData({
+                              ...formData,
+                              currency_prices: {
+                                ...formData.currency_prices,
+                                [code]: { ...formData.currency_prices?.[code], price: parseFloat(e.target.value) || undefined },
+                              },
+                            })}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor={`original_price_${code}`}>Original Price ({label})</Label>
+                          <Input
+                            id={`original_price_${code}`}
+                            type="number"
+                            step="0.01"
+                            value={formData.currency_prices?.[code]?.original_price ?? ''}
+                            onChange={(e) => setFormData({
+                              ...formData,
+                              currency_prices: {
+                                ...formData.currency_prices,
+                                [code]: { ...formData.currency_prices?.[code], original_price: parseFloat(e.target.value) || undefined },
+                              },
+                            })}
+                          />
+                        </div>
+                      </Fragment>
+                    ))}
                 </div>
                 <div>
                   <Label>Cover Image *</Label>
@@ -531,21 +689,352 @@ const Admin = () => {
                     </div>
                   )}
                 </div>
+                <div className="grid grid-cols-3 gap-4">
+                  <div>
+                    <Label htmlFor="sku">Garment ID (SKU) *</Label>
+                    <Input
+                      id="sku"
+                      value={formData.sku || ''}
+                      onChange={(e) => setFormData({ ...formData, sku: e.target.value })}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="size">Size</Label>
+                    <Input
+                      id="size"
+                      value={formData.size || ''}
+                      onChange={(e) => setFormData({ ...formData, size: e.target.value })}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="style_code">Style Code</Label>
+                    <Input
+                      id="style_code"
+                      value={formData.style_code || ''}
+                      onChange={(e) => setFormData({ ...formData, style_code: e.target.value })}
+                    />
+                  </div>
+                </div>
                 <div>
-                  <Label htmlFor="gender">Gender</Label>
-                  <Select
-                    value={formData.gender || ''}
-                    onValueChange={(value) => setFormData({ ...formData, gender: value as 'men' | 'women' | 'unisex' | undefined })}
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select gender" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="men">Men</SelectItem>
-                      <SelectItem value="women">Women</SelectItem>
-                      <SelectItem value="unisex">Unisex</SelectItem>
-                    </SelectContent>
-                  </Select>
+                  <Label htmlFor="material">Material *</Label>
+                  <Input
+                    id="material"
+                    value={formData.material || ''}
+                    onChange={(e) => setFormData({ ...formData, material: e.target.value })}
+                    required
+                  />
+                </div>
+                <div>
+                  <Label htmlFor="care_instructions">Care Instructions</Label>
+                  <Textarea
+                    id="care_instructions"
+                    value={formData.care_instructions || ''}
+                    onChange={(e) => setFormData({ ...formData, care_instructions: e.target.value })}
+                  />
+                </div>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="checkbox"
+                    id="custom_size_available"
+                    checked={formData.custom_size_available || false}
+                    onChange={(e) => setFormData({ ...formData, custom_size_available: e.target.checked })}
+                  />
+                  <Label htmlFor="custom_size_available">Custom Size Available</Label>
+                </div>
+                <div>
+                  <Label>Measurements (inches)</Label>
+                  <div className="grid grid-cols-3 gap-4 mt-2">
+                    <div>
+                      <Label htmlFor="chest_in" className="text-xs text-muted-foreground">Chest</Label>
+                      <Input
+                        id="chest_in"
+                        type="number"
+                        step="0.1"
+                        value={formData.measurements?.chest_in ?? ''}
+                        onChange={(e) => setFormData({
+                          ...formData,
+                          measurements: { ...formData.measurements, chest_in: parseFloat(e.target.value) || undefined },
+                        })}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="sleeve_in" className="text-xs text-muted-foreground">Sleeve</Label>
+                      <Input
+                        id="sleeve_in"
+                        type="number"
+                        step="0.1"
+                        value={formData.measurements?.sleeve_in ?? ''}
+                        onChange={(e) => setFormData({
+                          ...formData,
+                          measurements: { ...formData.measurements, sleeve_in: parseFloat(e.target.value) || undefined },
+                        })}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="waist_in" className="text-xs text-muted-foreground">Waist</Label>
+                      <Input
+                        id="waist_in"
+                        type="number"
+                        step="0.1"
+                        value={formData.measurements?.waist_in ?? ''}
+                        onChange={(e) => setFormData({
+                          ...formData,
+                          measurements: { ...formData.measurements, waist_in: parseFloat(e.target.value) || undefined },
+                        })}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="top_length_in" className="text-xs text-muted-foreground">Top Length</Label>
+                      <Input
+                        id="top_length_in"
+                        type="number"
+                        step="0.1"
+                        value={formData.measurements?.top_length_in ?? ''}
+                        onChange={(e) => setFormData({
+                          ...formData,
+                          measurements: { ...formData.measurements, top_length_in: parseFloat(e.target.value) || undefined },
+                        })}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="bottom_length_in" className="text-xs text-muted-foreground">Bottom Length</Label>
+                      <Input
+                        id="bottom_length_in"
+                        type="number"
+                        step="0.1"
+                        value={formData.measurements?.bottom_length_in ?? ''}
+                        onChange={(e) => setFormData({
+                          ...formData,
+                          measurements: { ...formData.measurements, bottom_length_in: parseFloat(e.target.value) || undefined },
+                        })}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <Label>Model Information</Label>
+                  <div className="grid grid-cols-3 gap-4 mt-2">
+                    <div>
+                      <Label htmlFor="model_height_in" className="text-xs text-muted-foreground">Height (in)</Label>
+                      <Input
+                        id="model_height_in"
+                        type="number"
+                        step="0.1"
+                        value={formData.model_info?.height_in ?? ''}
+                        onChange={(e) => setFormData({
+                          ...formData,
+                          model_info: { ...formData.model_info, height_in: parseFloat(e.target.value) || undefined },
+                        })}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="model_bust_in" className="text-xs text-muted-foreground">Bust (in)</Label>
+                      <Input
+                        id="model_bust_in"
+                        type="number"
+                        step="0.1"
+                        value={formData.model_info?.bust_in ?? ''}
+                        onChange={(e) => setFormData({
+                          ...formData,
+                          model_info: { ...formData.model_info, bust_in: parseFloat(e.target.value) || undefined },
+                        })}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="model_waist_in" className="text-xs text-muted-foreground">Waist (in)</Label>
+                      <Input
+                        id="model_waist_in"
+                        type="number"
+                        step="0.1"
+                        value={formData.model_info?.waist_in ?? ''}
+                        onChange={(e) => setFormData({
+                          ...formData,
+                          model_info: { ...formData.model_info, waist_in: parseFloat(e.target.value) || undefined },
+                        })}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="model_hips_in" className="text-xs text-muted-foreground">Hips (in)</Label>
+                      <Input
+                        id="model_hips_in"
+                        type="number"
+                        step="0.1"
+                        value={formData.model_info?.hips_in ?? ''}
+                        onChange={(e) => setFormData({
+                          ...formData,
+                          model_info: { ...formData.model_info, hips_in: parseFloat(e.target.value) || undefined },
+                        })}
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="model_wearing_size" className="text-xs text-muted-foreground">Wearing Size</Label>
+                      <Input
+                        id="model_wearing_size"
+                        value={formData.model_info?.wearing_size ?? ''}
+                        onChange={(e) => setFormData({
+                          ...formData,
+                          model_info: { ...formData.model_info, wearing_size: e.target.value || undefined },
+                        })}
+                      />
+                    </div>
+                  </div>
+                </div>
+                <div>
+                  <Label>Shipping Dimensions *</Label>
+                  <div className="grid grid-cols-4 gap-4 mt-2">
+                    <div>
+                      <Label htmlFor="weight_kg" className="text-xs text-muted-foreground">Weight (kg) *</Label>
+                      <Input
+                        id="weight_kg"
+                        type="number"
+                        step="0.01"
+                        value={formData.weight_kg ?? ''}
+                        onChange={(e) => setFormData({ ...formData, weight_kg: parseFloat(e.target.value) || undefined })}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="length_cm" className="text-xs text-muted-foreground">Length (cm) *</Label>
+                      <Input
+                        id="length_cm"
+                        type="number"
+                        step="0.1"
+                        value={formData.length_cm ?? ''}
+                        onChange={(e) => setFormData({ ...formData, length_cm: parseFloat(e.target.value) || undefined })}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="width_cm" className="text-xs text-muted-foreground">Width (cm) *</Label>
+                      <Input
+                        id="width_cm"
+                        type="number"
+                        step="0.1"
+                        value={formData.width_cm ?? ''}
+                        onChange={(e) => setFormData({ ...formData, width_cm: parseFloat(e.target.value) || undefined })}
+                        required
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="height_cm" className="text-xs text-muted-foreground">Height (cm) *</Label>
+                      <Input
+                        id="height_cm"
+                        type="number"
+                        step="0.1"
+                        value={formData.height_cm ?? ''}
+                        onChange={(e) => setFormData({ ...formData, height_cm: parseFloat(e.target.value) || undefined })}
+                        required
+                      />
+                    </div>
+                  </div>
+                  <div className="mt-4">
+                    <Label htmlFor="hs_code" className="text-xs text-muted-foreground">HS / Commodity Code (required for international shipments) *</Label>
+                    <Input
+                      id="hs_code"
+                      placeholder="e.g. 6203.3200.00"
+                      value={formData.hs_code || ''}
+                      onChange={(e) => setFormData({ ...formData, hs_code: e.target.value })}
+                      className="w-48"
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="border rounded-lg p-4 space-y-4">
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="checkbox"
+                      id="is_bundle"
+                      checked={formData.is_bundle || false}
+                      onChange={(e) => setFormData({
+                        ...formData,
+                        is_bundle: e.target.checked,
+                        // A bundle can't also be someone else's component
+                        bundle_id: e.target.checked ? undefined : formData.bundle_id,
+                      })}
+                    />
+                    <Label htmlFor="is_bundle">This product is a Set (e.g. a tuxedo made of separate pieces)</Label>
+                  </div>
+
+                  {formData.is_bundle ? (
+                    <p className="text-xs text-muted-foreground">
+                      Save this set, then edit each piece (jacket, trousers, etc.) and set its "Belongs to Set" field to this set.
+                      Its stock is the number of complete sets currently buildable from those pieces' stock.
+                    </p>
+                  ) : (
+                    <div>
+                      <Label>Belongs to Set (optional)</Label>
+                      <div className="grid grid-cols-2 gap-4 mt-2">
+                        <div>
+                          <Label htmlFor="bundle_id" className="text-xs text-muted-foreground">Set</Label>
+                          <Select
+                            value={formData.bundle_id || 'none'}
+                            onValueChange={(value) => setFormData({ ...formData, bundle_id: value === 'none' ? undefined : value })}
+                          >
+                            <SelectTrigger>
+                              <SelectValue placeholder="Not part of a set" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="none">Not part of a set</SelectItem>
+                              {bundles
+                                ?.filter((b) => b.id !== editingProduct?.id)
+                                .map((b) => (
+                                  <SelectItem key={b.id} value={b.id}>
+                                    {b.name} ({b.sku || 'no SKU'})
+                                  </SelectItem>
+                                ))}
+                            </SelectContent>
+                          </Select>
+                        </div>
+                        <div>
+                          <Label htmlFor="bundle_role" className="text-xs text-muted-foreground">Role in Set</Label>
+                          <Input
+                            id="bundle_role"
+                            placeholder="e.g. Jacket, Trousers"
+                            value={formData.bundle_role || ''}
+                            onChange={(e) => setFormData({ ...formData, bundle_role: e.target.value })}
+                          />
+                        </div>
+                      </div>
+                      {formData.bundle_id && (
+                        <div className="mt-2">
+                          <Label htmlFor="bundle_quantity" className="text-xs text-muted-foreground">Quantity required per set</Label>
+                          <Input
+                            id="bundle_quantity"
+                            type="number"
+                            min={1}
+                            className="w-32"
+                            value={formData.bundle_quantity ?? 1}
+                            onChange={(e) => setFormData({ ...formData, bundle_quantity: parseInt(e.target.value) || 1 })}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+                <div>
+                  <Label>Gender * (select one or more)</Label>
+                  <div className="flex gap-4 mt-2">
+                    {(['men', 'women', 'unisex'] as const).map((option) => (
+                      <div key={option} className="flex items-center space-x-2">
+                        <input
+                          type="checkbox"
+                          id={`gender-${option}`}
+                          checked={formData.gender?.includes(option) || false}
+                          onChange={(e) => {
+                            const current = formData.gender || [];
+                            setFormData({
+                              ...formData,
+                              gender: e.target.checked
+                                ? [...current, option]
+                                : current.filter((g) => g !== option),
+                            });
+                          }}
+                        />
+                        <Label htmlFor={`gender-${option}`} className="capitalize font-normal">{option}</Label>
+                      </div>
+                    ))}
+                  </div>
                 </div>
                 <div className="flex gap-4">
                   <div className="flex items-center space-x-2">
@@ -642,6 +1131,8 @@ const Admin = () => {
                     <SortIcon column="name" />
                   </div>
                 </TableHead>
+                <TableHead>SKU</TableHead>
+                <TableHead>Size</TableHead>
                 <TableHead
                   className="cursor-pointer hover:bg-muted/50 select-none"
                   onClick={() => handleSort('category')}
@@ -684,7 +1175,19 @@ const Admin = () => {
                         className="w-16 h-20 object-cover rounded-md"
                       />
                     </TableCell>
-                    <TableCell className="font-medium">{product.name}</TableCell>
+                    <TableCell className="font-medium">
+                      {product.name}
+                      {product.is_bundle && (
+                        <span className="ml-2 px-1.5 py-0.5 rounded text-[10px] bg-primary/10 text-primary align-middle">SET</span>
+                      )}
+                      {product.bundle_id && (
+                        <span className="ml-2 px-1.5 py-0.5 rounded text-[10px] bg-muted text-muted-foreground align-middle">
+                          {product.bundle_role || 'piece'}
+                        </span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-muted-foreground">{product.sku || '—'}</TableCell>
+                    <TableCell className="text-muted-foreground">{product.size || '—'}</TableCell>
                     <TableCell>{product.category}</TableCell>
                     <TableCell>${product.price}</TableCell>
                     <TableCell>{product.stock}</TableCell>
@@ -718,7 +1221,7 @@ const Admin = () => {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">
+                  <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">
                     {searchQuery ? (
                       <div className="space-y-2">
                         <p>No products match your search "{searchQuery}"</p>

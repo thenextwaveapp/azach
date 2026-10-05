@@ -1,4 +1,5 @@
 import { supabase } from '@/lib/supabase';
+import type { CurrencyPrices } from '@/types/product';
 
 export interface CartItemDB {
   id: string;
@@ -21,6 +22,7 @@ export interface CartItemWithProduct {
     category: string;
     stock: number;
     in_stock: boolean;
+    currency_prices?: CurrencyPrices;
   };
 }
 
@@ -40,7 +42,8 @@ class CartService {
           image_url,
           category,
           stock,
-          in_stock
+          in_stock,
+          currency_prices
         )
       `)
       .eq('user_id', userId);

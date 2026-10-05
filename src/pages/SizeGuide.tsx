@@ -146,15 +146,26 @@ const SizeGuide = () => {
 
               {/* How to Measure - Men */}
               <div className="bg-muted p-8 rounded-lg mb-8">
-                <h3 className="text-2xl font-semibold mb-4">How to Measure</h3>
-                <div className="space-y-4 text-muted-foreground">
-                  <div>
-                    <h4 className="font-semibold text-foreground mb-2">Chest:</h4>
-                    <p>Measure around the fullest part of your chest, keeping the tape measure horizontal.</p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-foreground mb-2">Waist:</h4>
-                    <p>Measure around your natural waistline, keeping the tape measure comfortably loose.</p>
+                <h3 className="text-2xl font-semibold mb-6">How to Measure</h3>
+                <div className="grid md:grid-cols-2 gap-8 items-center">
+                  <img
+                    src="/male-measurement-guide.png"
+                    alt="How to measure: chest, waist, and trouser length guide"
+                    className="w-full max-w-sm mx-auto rounded-lg"
+                  />
+                  <div className="space-y-4 text-muted-foreground">
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2">Chest:</h4>
+                      <p>Measure around the fullest part of your chest, keeping the tape measure horizontal.</p>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2">Waist:</h4>
+                      <p>Measure around your natural waistline, keeping the tape measure comfortably loose.</p>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2">Trouser Length:</h4>
+                      <p>Measure from your waist down to your ankle (or desired length).</p>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -207,19 +218,30 @@ const SizeGuide = () => {
 
               {/* How to Measure - Women */}
               <div className="bg-muted p-8 rounded-lg mb-8">
-                <h3 className="text-2xl font-semibold mb-4">How to Measure</h3>
-                <div className="space-y-4 text-muted-foreground">
-                  <div>
-                    <h4 className="font-semibold text-foreground mb-2">Bust:</h4>
-                    <p>Measure around the fullest part of your bust, keeping the tape measure horizontal and comfortably loose.</p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-foreground mb-2">Waist:</h4>
-                    <p>Measure around your natural waistline at the smallest part of your waist.</p>
-                  </div>
-                  <div>
-                    <h4 className="font-semibold text-foreground mb-2">Hips:</h4>
-                    <p>Measure around the fullest part of your hips, approximately 8 inches below your waist.</p>
+                <h3 className="text-2xl font-semibold mb-6">How to Measure</h3>
+                <div className="grid md:grid-cols-2 gap-8 items-center">
+                  <img
+                    src="/female-measurement-guide.png"
+                    alt="How to measure: chest, waist, hips, and length guide"
+                    className="w-full max-w-sm mx-auto rounded-lg"
+                  />
+                  <div className="space-y-4 text-muted-foreground">
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2">Chest:</h4>
+                      <p>Measure around the fullest part of your chest, keeping the tape measure horizontal and comfortably loose.</p>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2">Waist:</h4>
+                      <p>Measure around your natural waistline, the slimmest part of your waist.</p>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2">Hips:</h4>
+                      <p>Measure around the fullest part of your hips.</p>
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-foreground mb-2">Length:</h4>
+                      <p>Measure from your waist down to your ankle.</p>
+                    </div>
                   </div>
                 </div>
               </div>

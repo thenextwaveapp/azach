@@ -45,7 +45,7 @@ serve(async (req) => {
 
     // Call DHL Tracking API
     const dhlResponse = await fetch(
-      `${dhlApiUrl}/shipments/${trackingNumber}/tracking`,
+      `${dhlApiUrl}/shipments/${trackingNumber}/tracking?trackingView=all-checkpoints&levelOfDetail=all`,
       {
         method: 'GET',
         headers: {

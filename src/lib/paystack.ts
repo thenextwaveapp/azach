@@ -3,7 +3,7 @@
  * Handles payment initialization and verification for Nigerian market
  */
 
-import { supabase } from './supabase';
+import { invokeFunction } from './functionError';
 
 export interface PaystackCheckoutRequest {
   items: Array<{
@@ -13,6 +13,7 @@ export interface PaystackCheckoutRequest {
     quantity: number;
     image: string;
   }>;
+  userId: string;
   userEmail: string;
   currency: string;
   shippingAddress: {
@@ -26,6 +27,9 @@ export interface PaystackCheckoutRequest {
     country: string;
   };
   shippingCost: number;
+  shippingProvider?: 'dhl' | 'topship';
+  shippingService?: string;
+  discountCode?: string;
 }
 
 export interface PaystackCheckoutResponse {
@@ -49,32 +53,28 @@ export interface PaystackVerificationResponse {
  */
 export const initializePaystackTransaction = async (
   items: PaystackCheckoutRequest['items'],
+  userId: string,
   userEmail: string,
   currency: string,
   shippingAddress: PaystackCheckoutRequest['shippingAddress'],
-  shippingCost: number
+  shippingCost: number,
+  discountCode?: string,
+  shippingProvider?: 'dhl' | 'topship',
+  shippingService?: string
 ): Promise<PaystackCheckoutResponse> => {
   try {
-    const { data, error } = await supabase.functions.invoke('paystack-initialize', {
-      body: {
-        items,
-        userEmail,
-        currency: currency.toUpperCase(),
-        shippingAddress,
-        shippingCost,
-        callback_url: `${window.location.origin}/checkout/success`,
-      },
+    const data = await invokeFunction<any>('paystack-initialize', {
+      items,
+      userId,
+      userEmail,
+      currency: currency.toUpperCase(),
+      shippingAddress,
+      shippingCost,
+      shippingProvider,
+      shippingService,
+      discountCode,
+      callback_url: `${window.location.origin}/checkout/success`,
     });
-
-    // Always check data.error first (this is where edge function errors go)
-    if (data?.error) {
-      throw new Error(data.error);
-    }
-
-    // Check for HTTP errors
-    if (error) {
-      throw new Error(data?.error || data?.message || error.message || 'Failed to initialize payment');
-    }
 
     if (!data?.reference) {
       throw new Error('Invalid response from payment server');
@@ -99,14 +99,7 @@ export const verifyPaystackTransaction = async (
   reference: string
 ): Promise<PaystackVerificationResponse> => {
   try {
-    const { data, error } = await supabase.functions.invoke('paystack-verify', {
-      body: { reference },
-    });
-
-    if (error) {
-      console.error('Paystack verification error:', error);
-      throw new Error(error.message || 'Failed to verify payment');
-    }
+    const data = await invokeFunction<any>('paystack-verify', { reference });
 
     if (!data || data.status !== 'success') {
       throw new Error('Payment verification failed');

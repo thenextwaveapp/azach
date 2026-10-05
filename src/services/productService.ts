@@ -63,14 +63,64 @@ export const productService = {
     return data || [];
   },
 
-  // Get products by gender
+  // Get products by gender (matches products tagged with this gender, e.g. also unisex-tagged)
   async getByGender(gender: 'men' | 'women'): Promise<Product[]> {
     const { data, error } = await supabase
       .from('products')
       .select('*')
-      .eq('gender', gender)
+      .contains('gender', [gender])
       .eq('in_stock', true)
       .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  // Get other in-stock/out-of-stock pieces sharing the same style code
+  async getByStyleCode(styleCode: string, excludeId: string): Promise<Product[]> {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .eq('style_code', styleCode)
+      .neq('id', excludeId)
+      .order('created_at', { ascending: false });
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  // Get all bundle/set products, for admin "belongs to set" selection
+  async getBundles(): Promise<Product[]> {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .eq('is_bundle', true)
+      .order('name', { ascending: true });
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  // Get the components that make up a bundle (e.g. jacket/trousers/vest of a tuxedo set)
+  async getBundleComponents(bundleId: string): Promise<Product[]> {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .eq('bundle_id', bundleId)
+      .order('created_at', { ascending: true });
+
+    if (error) throw error;
+    return data || [];
+  },
+
+  // Get sibling components in the same bundle (excluding the current piece)
+  async getBundleSiblings(bundleId: string, excludeId: string): Promise<Product[]> {
+    const { data, error } = await supabase
+      .from('products')
+      .select('*')
+      .eq('bundle_id', bundleId)
+      .neq('id', excludeId)
+      .order('created_at', { ascending: true });
 
     if (error) throw error;
     return data || [];
@@ -144,8 +194,6 @@ export const productService = {
   // Get filtered products with server-side filtering and sorting
   async getFiltered(filters: {
     categories?: string[];
-    minPrice?: number;
-    maxPrice?: number;
     inStock?: boolean | null;
     onSale?: boolean | null;
     gender?: 'men' | 'women' | 'unisex' | null;
@@ -159,13 +207,10 @@ export const productService = {
       query = query.in('category', filters.categories);
     }
 
-    // Price range filter
-    if (filters.minPrice !== undefined) {
-      query = query.gte('price', filters.minPrice);
-    }
-    if (filters.maxPrice !== undefined) {
-      query = query.lte('price', filters.maxPrice);
-    }
+    // Price range is intentionally NOT filtered here — it's applied client-side against
+    // each product's actual displayed price (see ShopAll/Men/Women/Sale), since non-NGN
+    // currencies show a manually-set price anchor rather than a straight NGN conversion,
+    // and filtering against the raw NGN column would disagree with what's on screen.
 
     // Stock filter
     if (filters.inStock !== null && filters.inStock !== undefined) {
@@ -177,11 +222,11 @@ export const productService = {
       query = query.eq('on_sale', filters.onSale);
     }
 
-    // Gender filter - support both single gender and multiple genders
+    // Gender filter - matches products tagged with any of the requested genders
     if (filters.genders && filters.genders.length > 0) {
-      query = query.in('gender', filters.genders);
+      query = query.overlaps('gender', filters.genders);
     } else if (filters.gender) {
-      query = query.eq('gender', filters.gender);
+      query = query.overlaps('gender', [filters.gender]);
     }
 
     // Sorting

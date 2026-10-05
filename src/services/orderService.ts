@@ -8,6 +8,9 @@ export interface Order {
   subtotal: number;
   tax: number;
   shipping_cost: number;
+  discount_code: string | null;
+  discount_amount: number;
+  currency: 'NGN' | 'USD';
   shipping_address: any;
   billing_address: any;
   payment_method: string | null;
@@ -15,9 +18,15 @@ export interface Order {
   payment_provider: 'stripe' | 'paystack';
   paystack_reference: string | null;
   stripe_session_id: string | null;
+  shipping_provider: 'dhl' | 'topship';
+  shipping_service: string | null;
   dhl_tracking_number: string | null;
   dhl_shipment_id: string | null;
   dhl_label_url: string | null;
+  topship_shipment_id: string | null;
+  topship_tracking_id: string | null;
+  topship_tracking_url: string | null;
+  topship_label_url: string | null;
   estimated_delivery_date: string | null;
   notes: string | null;
   created_at: string;
@@ -148,6 +157,9 @@ export const orderService = {
       dhl_tracking_number?: string;
       dhl_shipment_id?: string;
       dhl_label_url?: string;
+      topship_tracking_id?: string;
+      topship_tracking_url?: string;
+      topship_label_url?: string;
       estimated_delivery_date?: string;
     }
   ): Promise<Order> {

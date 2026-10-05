@@ -18,7 +18,7 @@ const Wishlist = () => {
   const { data: wishlistData = [], isLoading } = useWishlist();
 
   const wishlistItems = wishlistData.map((item: any) =>
-    item.products ? productToDisplay(item.products) : null
+    item.products ? { ...productToDisplay(item.products), product: item.products } : null
   ).filter(Boolean);
 
   return (

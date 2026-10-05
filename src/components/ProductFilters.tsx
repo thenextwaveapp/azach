@@ -37,10 +37,12 @@ export const ProductFilters = ({
   maxPrice,
   hideGenderFilter = false,
 }: ProductFiltersProps) => {
-  const { formatPrice } = useCurrency();
+  const { currency, formatAsCurrency } = useCurrency();
   const [sortBy, setSortBy] = useState<SortOption>("newest");
   const [categories, setCategories] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, maxPrice]);
+  // NGN-scale prices need a coarser step than dollar-scale ones to keep ~50+ slider positions.
+  const priceStep = maxPrice > 1000 ? 10 : 1;
   const [inStock, setInStock] = useState<boolean | null>(null);
   const [onSale, setOnSale] = useState<boolean | null>(null);
   const [gender, setGender] = useState<'men' | 'women' | 'unisex' | null>(null);
@@ -187,14 +189,14 @@ export const ProductFilters = ({
         </Label>
         <div className="space-y-3">
           <div className="text-sm text-muted-foreground">
-            {formatPrice(priceRange[0])} - {formatPrice(priceRange[1])}
+            {formatAsCurrency(priceRange[0], currency)} - {formatAsCurrency(priceRange[1], currency)}
           </div>
           <Slider
             value={priceRange}
             onValueChange={handlePriceRangeChange}
             max={maxPrice}
             min={0}
-            step={10}
+            step={priceStep}
             className="w-full"
           />
         </div>
@@ -356,16 +358,16 @@ export const ProductFilters = ({
             <div className="flex items-center gap-2">
               <span className="text-xs text-muted-foreground whitespace-nowrap">Price:</span>
               <div className="flex items-center gap-1">
-                <span className="text-xs">{formatPrice(priceRange[0])}</span>
+                <span className="text-xs">{formatAsCurrency(priceRange[0], currency)}</span>
                 <span className="text-xs text-muted-foreground">-</span>
-                <span className="text-xs">{formatPrice(priceRange[1])}</span>
+                <span className="text-xs">{formatAsCurrency(priceRange[1], currency)}</span>
               </div>
               <Slider
                 value={priceRange}
                 onValueChange={handlePriceRangeChange}
                 max={maxPrice}
                 min={0}
-                step={10}
+                step={priceStep}
                 className="w-24"
               />
             </div>

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,7 @@ import { ProductCard } from "@/components/ProductCard";
 import { Link } from "react-router-dom";
 import { useSearchProducts } from "@/hooks/useProducts";
 import { productToDisplay } from "@/utils/productHelpers";
+import { trackSearch } from "@/lib/analytics";
 
 interface SearchDialogProps {
   open: boolean;
@@ -16,6 +17,27 @@ interface SearchDialogProps {
 export const SearchDialog = ({ open, onOpenChange }: SearchDialogProps) => {
   const [searchQuery, setSearchQuery] = useState("");
   const { data: filteredProducts = [], isLoading } = useSearchProducts(searchQuery);
+  const lastTrackedTerm = useRef("");
+
+  useEffect(() => {
+    if (!open) {
+      lastTrackedTerm.current = "";
+      setSearchQuery("");
+    }
+  }, [open]);
+
+  useEffect(() => {
+    const term = searchQuery.trim();
+    if (term.length < 2 || isLoading) return;
+
+    const timer = setTimeout(() => {
+      if (term === lastTrackedTerm.current) return;
+      lastTrackedTerm.current = term;
+      trackSearch(term, filteredProducts.length);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery, isLoading, filteredProducts.length]);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -38,6 +60,7 @@ export const SearchDialog = ({ open, onOpenChange }: SearchDialogProps) => {
               <Button
                 variant="ghost"
                 size="icon"
+                aria-label="Clear search"
                 className="absolute right-1 top-1/2 -translate-y-1/2 h-8 w-8"
                 onClick={() => setSearchQuery("")}
               >
@@ -61,11 +84,15 @@ export const SearchDialog = ({ open, onOpenChange }: SearchDialogProps) => {
                     {filteredProducts.map((product) => (
                       <Link
                         key={product.id}
-                        to="/"
+                        to={`/product/${product.id}`}
                         onClick={() => onOpenChange(false)}
                         className="block"
                       >
-                        <ProductCard {...productToDisplay(product)} />
+                        <ProductCard
+                          {...productToDisplay(product)}
+                          product={product}
+                          listName="Search Results"
+                        />
                       </Link>
                     ))}
                   </div>
@@ -90,4 +117,3 @@ export const SearchDialog = ({ open, onOpenChange }: SearchDialogProps) => {
     </Dialog>
   );
 };
-

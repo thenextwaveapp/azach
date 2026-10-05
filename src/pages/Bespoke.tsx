@@ -13,10 +13,16 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { invokeFunction } from "@/lib/functionError";
+import { trackGenerateLead } from "@/lib/analytics";
+import { uploadFormAttachments } from "@/utils/imageUpload";
 
 const Bespoke = () => {
   const { toast } = useToast();
+  const location = useLocation();
+  const referenceImageUrl = (location.state as { referenceImageUrl?: string } | null)?.referenceImageUrl;
 
   useEffect(() => {
     document.title = "Custom (Bespoke) - AZACH";
@@ -32,6 +38,7 @@ const Bespoke = () => {
     silhouetteType: "",
     location: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({
@@ -47,7 +54,7 @@ const Bespoke = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!formData.fullName || !formData.emailWhatsApp || !formData.whatToCreate || !formData.ideaDescription) {
@@ -59,22 +66,55 @@ const Bespoke = () => {
       return;
     }
 
-    console.log("Custom Request:", formData);
-    toast({
-      title: "Request Submitted!",
-      description: "We'll get back to you soon to discuss your custom piece.",
-    });
+    const isEmail = formData.emailWhatsApp.includes("@");
 
-    // Reset form
-    setFormData({
-      fullName: "",
-      emailWhatsApp: "",
-      whatToCreate: "",
-      ideaDescription: "",
-      files: null,
-      silhouetteType: "",
-      location: "",
-    });
+    setIsSubmitting(true);
+    try {
+      const uploadedUrls = formData.files && formData.files.length > 0
+        ? await uploadFormAttachments(Array.from(formData.files), "bespoke")
+        : [];
+      const attachmentUrls = referenceImageUrl ? [referenceImageUrl, ...uploadedUrls] : uploadedUrls;
+
+      await invokeFunction("submit-form", {
+        formType: "bespoke",
+        fullName: formData.fullName,
+        email: isEmail ? formData.emailWhatsApp : "no-email-provided@azach.ng",
+        phone: isEmail ? undefined : formData.emailWhatsApp,
+        details: {
+          emailOrWhatsApp: formData.emailWhatsApp,
+          whatToCreate: formData.whatToCreate,
+          ideaDescription: formData.ideaDescription,
+          silhouetteType: formData.silhouetteType,
+          location: formData.location,
+          attachmentUrls,
+        },
+      });
+
+      trackGenerateLead("bespoke");
+
+      toast({
+        title: "Request Submitted!",
+        description: "We'll get back to you soon to discuss your custom piece.",
+      });
+
+      setFormData({
+        fullName: "",
+        emailWhatsApp: "",
+        whatToCreate: "",
+        ideaDescription: "",
+        files: null,
+        silhouetteType: "",
+        location: "",
+      });
+    } catch (err) {
+      toast({
+        title: "Something went wrong",
+        description: err instanceof Error ? err.message : "Your request couldn't be submitted. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -224,6 +264,20 @@ const Bespoke = () => {
               </p>
             </div>
 
+            {referenceImageUrl && (
+              <div className="mb-8 flex items-center gap-4 rounded-lg border border-[#a97c50]/30 bg-[#a97c50]/5 p-4">
+                <img
+                  src={referenceImageUrl}
+                  alt="Reference from Lookbook"
+                  className="h-20 w-20 rounded object-cover flex-shrink-0"
+                />
+                <div>
+                  <p className="text-sm font-medium">Referencing this look from the Lookbook</p>
+                  <p className="text-xs text-muted-foreground">This image will be included with your request.</p>
+                </div>
+              </div>
+            )}
+
             <form onSubmit={handleSubmit} className="space-y-6">
               <Card>
                 <CardContent className="pt-6 space-y-6">
@@ -329,10 +383,11 @@ const Bespoke = () => {
 
                   <Button
                     type="submit"
-                    className="w-full bg-[#a97c50] hover:bg-[#8b6440] text-white uppercase font-semibold"
+                    disabled={isSubmitting}
+                    className="w-full bg-[#a97c50] hover:bg-[#8b6440] text-white uppercase font-semibold disabled:opacity-60"
                     size="lg"
                   >
-                    Start Your Request
+                    {isSubmitting ? "Submitting..." : "Start Your Request"}
                   </Button>
                 </CardContent>
               </Card>

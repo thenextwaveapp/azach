@@ -1,222 +1,35 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Header } from '@/components/Header';
+import { Footer } from '@/components/Footer';
 import { Button } from '@/components/ui/button';
-import { ShoppingBag } from 'lucide-react';
+import { ShoppingBag, MessageSquarePlus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-
-const lookbookImages = [
-
-  {
-    id: 2,
-    url: 'https://imagizer.imageshack.com/img922/4573/t32bY4.png',
-    title: 'Urban Style',
-    subtitle: 'Street Ready',
-  },
-  {
-    id: 3,
-    url: 'https://imagizer.imageshack.com/img924/7503/WWQd4o.png',
-    title: 'Bold Statements',
-    subtitle: 'Stand Out',
-  },
-  {
-    id: 4,
-    url: 'https://imagizer.imageshack.com/img922/8977/njo2Cy.png',
-    title: 'Everyday Essentials',
-    subtitle: 'Effortless Style',
-    productId: '1', // Link to product ID in your database
-  },
-  {
-    id: 12,
-    url: 'https://imagizer.imageshack.com/img922/3118/oLZTGy.png',
-    title: 'Clean Lines',
-    subtitle: 'Minimalist Appeal',
-  },
-  {
-    id: 8,
-    url: 'https://imagizer.imageshack.com/img923/6444/rVXa7Q.jpg',
-    title: 'Statement Pieces',
-    subtitle: 'Make an Impact',
-  },
-  {
-    id: 11,
-    url: 'https://imagizer.imageshack.com/img922/910/6btd6p.jpg',
-    title: 'Refined Comfort',
-    subtitle: 'Casual Luxury',
-  },
- 
-  {
-    id: 14,
-    url: 'https://imagizer.imageshack.com/img922/9915/XoteCo.jpg',
-    title: 'Denim Reimagined',
-    subtitle: 'Circular Fashion',
-  },
-  {
-    id: 16,
-    url: 'https://imagizer.imageshack.com/img924/6849/LNz3AB.jpg',
-    title: 'Street Culture',
-    subtitle: 'Urban Expression',
-  },
-  {
-    id: 13,
-    url: 'https://imagizer.imageshack.com/img922/1637/rCT53r.jpg',
-    title: 'Layered Looks',
-    subtitle: 'Versatile Style',
-  },
-  {
-    id: 20,
-    url: 'https://imagizer.imageshack.com/img924/5903/Q3ouqG.jpg',
-    title: 'Authentic Style',
-    subtitle: 'True Character',
-  },
-  {
-    id: 21,
-    url: 'https://imagizer.imageshack.com/img922/1922/XC1h1T.jpg',
-    title: 'Urban Uniform',
-    subtitle: 'City Ready',
-  },
-  {
-    id: 25,
-    url: 'https://imagizer.imageshack.com/img923/658/8Spq9s.jpg',
-    title: 'Timeless Appeal',
-    subtitle: 'Enduring Style',
-  },
-  {
-    id: 22,
-    url: 'https://imagizer.imageshack.com/img922/2168/Vmedyk.jpg',
-    title: 'Elevated Basics',
-    subtitle: 'Premium Essentials',
-  },
- 
-
-  {
-    id: 26,
-    url: 'https://imagizer.imageshack.com/img924/4527/sNTuHP.jpg',
-    title: 'Refined Rebellion',
-    subtitle: 'Sophisticated Edge',
-  },
-  {
-    id: 23,
-    url: 'https://imagizer.imageshack.com/img924/319/n7QIYV.jpg',
-    title: 'Distinctive Details',
-    subtitle: 'Crafted Quality',
-  },
-  {
-    id: 24,
-    url: 'https://imagizer.imageshack.com/img924/8522/6hDXOq.jpg',
-    title: 'Contemporary Craft',
-    subtitle: 'Modern Artisan',
-  },
-  {
-    id: 27,
-    url: 'https://imagizer.imageshack.com/img922/7715/ZQPBQo.jpg',
-    title: 'Street Luxury',
-    subtitle: 'Premium Casual',
-  },
-  {
-    id: 29,
-    url: 'https://imagizer.imageshack.com/img923/5811/wZiu50.jpg',
-    title: 'Urban Aesthetic',
-    subtitle: 'City Style',
-  },
-
-  {
-    id: 5,
-    url: 'https://imagizer.imageshack.com/img922/6203/Vs2iEj.jpg',
-    title: 'Reimagined Classics',
-    subtitle: 'Timeless Pieces',
-  },
-  {
-    id: 6,
-    url: 'https://imagizer.imageshack.com/img922/6506/jf1DmN.jpg',
-    title: 'Crafted Details',
-    subtitle: 'Artisan Quality',
-  },
-  {
-    id: 7,
-    url: 'https://imagizer.imageshack.com/img923/3149/EbT0og.jpg',
-    title: 'Contemporary Edge',
-    subtitle: 'Modern Design',
-  },
-  {
-    id: 31,
-    url: 'https://imagizer.imageshack.com/img922/5598/bz06Z2.jpg',
-    title: 'Bold Expression',
-    subtitle: 'Individual Style',
-  },
-  {
-    id: 32,
-    url: 'https://imagizer.imageshack.com/img924/8458/EM9pci.jpg',
-    title: 'Modern Heritage',
-    subtitle: 'Contemporary Roots',
-  },
-  {
-    id: 35,
-    url: 'https://imagizer.imageshack.com/img924/4269/cODp4B.jpg',
-    title: 'Street Essential',
-    subtitle: 'Urban Core',
-  },
-  {
-    id: 37,
-    url: 'https://imagizer.imageshack.com/img923/866/DEPaZH.jpg',
-    title: 'Crafted Character',
-    subtitle: 'Artisan Touch',
-  },
-  {
-    id: 19,
-    url: 'https://imagizer.imageshack.com/img922/6065/mIaSch.jpg',
-    title: 'Bold Textures',
-    subtitle: 'Tactile Design',
-  },
-  {
-    id: 33,
-    url: 'https://imagizer.imageshack.com/img924/2177/k7nEHz.jpg',
-    title: 'Casual Sophistication',
-    subtitle: 'Refined Ease',
-  },
-
-  {
-    id: 36,
-    url: 'https://imagizer.imageshack.com/img924/4707/ZEPFku.jpg',
-    title: 'Elevated Everyday',
-    subtitle: 'Premium Daily',
-  },
-
-  {
-    id: 30,
-    url: 'https://imagizer.imageshack.com/img924/1871/4AgN7k.jpg',
-    title: 'Crafted Comfort',
-    subtitle: 'Artisan Made',
-  },
-  
-  {
-    id: 28,
-    url: 'https://imagizer.imageshack.com/img923/7982/SWpFtu.jpg',
-    title: 'Heritage Renewed',
-    subtitle: 'Classic Reimagined',
-  },
-  {
-    id: 38,
-    url: 'https://imagizer.imageshack.com/img923/4334/1sXp7a.jpg',
-    title: 'Urban Elegance',
-    subtitle: 'City Refined',
-  },
-  {
-    id: 39,
-    url: 'https://imagizer.imageshack.com/img923/782/j3G9Vf.jpg',
-    title: 'Signature Craft',
-    subtitle: 'Made to Last',
-  },
-  {
-    id: 40,
-    url: 'https://imagizer.imageshack.com/img922/8419/3yHXLe.jpg',
-    title: 'Timeless Upcycle',
-    subtitle: 'Sustainable Legacy',
-  },
-];
+import { useLookbookImages } from '@/hooks/useLookbook';
 
 const Lookbook = () => {
   const navigate = useNavigate();
   const containerRef = useRef<HTMLDivElement>(null);
+  const { data: lookbookImages = [] } = useLookbookImages();
+  const [openCaptions, setOpenCaptions] = useState<Set<string>>(new Set());
+
+  const toggleCaption = (id: string) => {
+    setOpenCaptions((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  useEffect(() => {
+    // Fallback so any edge-case horizontal overscroll reveals black, not the site's
+    // usual light body background, behind this page specifically.
+    const previousBodyBg = document.body.style.backgroundColor;
+    document.body.style.backgroundColor = '#000';
+    return () => {
+      document.body.style.backgroundColor = previousBodyBg;
+    };
+  }, []);
 
   useEffect(() => {
     // Set page title
@@ -261,10 +74,10 @@ const Lookbook = () => {
     handleScroll(); // Initial call
 
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [lookbookImages.length]);
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-black overflow-x-clip">
       <Header />
 
       {/* Hero Section */}
@@ -297,56 +110,86 @@ const Lookbook = () => {
 
       {/* Lookbook Cards */}
       <div ref={containerRef} className="relative bg-black">
-        {lookbookImages.map((image, index) => (
-          <div
-            key={image.id}
-            className="lookbook-card h-screen flex items-center justify-center px-4"
-            style={{
-              marginBottom: index === lookbookImages.length - 1 ? '0' : '100vh',
-            }}
-          >
-            <div className="relative w-full max-w-7xl" style={{ height: 'calc((100vh - 80px) * 0.85)' }}>
-              <div className="group relative w-full h-full overflow-hidden rounded-3xl bg-muted border border-border/50">
+        {lookbookImages.map((image, index) => {
+          const showCaption = openCaptions.has(image.id);
+
+          return (
+            <div
+              key={image.id}
+              className="lookbook-card h-screen flex items-center justify-center px-2 md:px-6"
+              style={{
+                marginBottom: index === lookbookImages.length - 1 ? '0' : '100vh',
+              }}
+            >
+              <div
+                className="group relative w-full max-w-7xl overflow-hidden rounded-3xl bg-gradient-to-br from-zinc-800 to-zinc-950"
+                style={{ height: 'calc(100vh - 20px)' }}
+              >
                 <img
-                  src={image.url}
-                  alt={image.title}
+                  src={image.image_url}
+                  alt={image.headline || 'AZACH Lookbook'}
                   className="w-full h-full object-contain"
                   loading="lazy"
                 />
 
-                {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-black/5 to-transparent" />
-
-                {/* Shop This Look Button - Only if productId exists */}
-                {image.productId && (
-                  <div className="absolute bottom-12 right-12 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                {/* Shop This Look / Request This Look - bottom right, stacked if both exist */}
+                <div className="absolute bottom-6 right-6 z-10 flex flex-col items-end gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  {image.product_id && (
                     <Button
-                      onClick={() => navigate(`/product/${image.productId}`)}
+                      onClick={() => navigate(`/product/${image.product_id}`)}
                       className="bg-white/95 text-black hover:bg-white backdrop-blur-sm gap-2 shadow-lg"
                       size="sm"
                     >
                       <ShoppingBag className="h-4 w-4" />
                       Shop This Look
                     </Button>
-                  </div>
-                )}
+                  )}
 
-                {/* Content Overlay */}
-                <div className="absolute bottom-0 left-0 right-0 p-12 text-foreground">
-                  <div className="space-y-2">
-                    <p className="text-sm uppercase tracking-[0.3em] font-light text-muted-foreground">
-                      {String(index + 1).padStart(2, '0')} / {String(lookbookImages.length).padStart(2, '0')}
-                    </p>
-                  </div>
+                  {image.headline && (
+                    <Button
+                      onClick={() =>
+                        navigate('/bespoke', {
+                          state: { referenceImageUrl: image.image_url, referenceHeadline: image.headline },
+                        })
+                      }
+                      className="bg-white/15 text-white border border-white/40 hover:bg-white hover:text-black backdrop-blur-sm gap-2"
+                      size="sm"
+                    >
+                      <MessageSquarePlus className="h-4 w-4" />
+                      Request This Look
+                    </Button>
+                  )}
                 </div>
 
-                {/* Decorative Corner Elements */}
-                <div className="absolute top-8 right-8 w-16 h-16 border-t-2 border-r-2 border-foreground/20" />
-                <div className="absolute bottom-8 left-8 w-16 h-16 border-b-2 border-l-2 border-foreground/20" />
+                {/* Headline + optional caption - only rendered when data exists */}
+                {image.headline && (
+                  <div className="absolute inset-0 rounded-3xl bg-gradient-to-t from-black/70 via-black/10 to-transparent flex flex-col justify-end p-6 md:p-10 pointer-events-none">
+                    <div className="pointer-events-auto max-w-xl">
+                      <h3 className="text-white text-2xl md:text-4xl font-semibold tracking-tight mb-3">
+                        {image.headline}
+                      </h3>
+                      {image.caption && (
+                        <>
+                          {showCaption && (
+                            <p className="text-white/90 text-sm md:text-base leading-relaxed mb-2 max-w-md">
+                              {image.caption}
+                            </p>
+                          )}
+                          <button
+                            onClick={() => toggleCaption(image.id)}
+                            className="text-[11px] uppercase tracking-[0.15em] text-white/70 hover:text-white underline underline-offset-4 decoration-white/40 hover:decoration-white transition-colors"
+                          >
+                            {showCaption ? 'Show Less' : 'Read More'}
+                          </button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Footer CTA */}
@@ -370,16 +213,17 @@ const Lookbook = () => {
               size="lg"
               variant="outline"
               onClick={() => {
-                navigate('/');
+                navigate('/shop-all');
                 window.scrollTo(0, 0);
               }}
               className="text-lg px-8 py-6 border-zinc-700 text-zinc-900 hover:bg-zinc-800 hover:text-white hover:border-zinc-600 transition-colors duration-300"
             >
-              Back to Home
+              Shop All
             </Button>
           </div>
         </div>
       </div>
+      <Footer dark />
     </div>
   );
 };

@@ -17,7 +17,7 @@ export const RelatedProducts = ({ currentProduct, limit = 4 }: RelatedProductsPr
       (product) =>
         product.id !== currentProduct.id &&
         (product.category === currentProduct.category ||
-          product.gender === currentProduct.gender)
+          product.gender?.some((g) => currentProduct.gender?.includes(g)))
     )
     .slice(0, limit);
 
@@ -39,6 +39,7 @@ export const RelatedProducts = ({ currentProduct, limit = 4 }: RelatedProductsPr
             key={product.id}
             {...productToDisplay(product)}
             product={product}
+            listName="Related Products"
           />
         ))}
       </div>

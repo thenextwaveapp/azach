@@ -8,10 +8,25 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCurrency } from '@/contexts/CurrencyContext';
+import { useLiveExchangeRates } from '@/hooks/useLiveExchangeRate';
 import { initializePaystackTransaction, loadPaystackScript, openPaystackPopup } from '@/lib/paystack';
-import { getDHLRates, calculateCartHash, formatDeliveryEstimate, type DHLShippingRate } from '@/lib/dhl';
-import { Loader2, Package, Truck } from 'lucide-react';
+import { getDHLRates, formatDeliveryEstimate } from '@/lib/dhl';
+import { getTopshipRates } from '@/lib/topship';
+import { Loader2, Package, Truck, Tag } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { supabase } from '@/lib/supabase';
+import { getFunctionErrorMessage } from '@/lib/functionError';
+import { trackBeginCheckout } from '@/lib/analytics';
+
+// One shipping option in the combined DHL + Topship list shown at checkout.
+interface CheckoutShippingRate {
+  provider: 'dhl' | 'topship';
+  code: string; // DHL product code or Topship pricing tier — unique within a provider
+  name: string;
+  totalPrice: number; // NGN
+  durationLabel: string;
+  secondaryLabel: string;
+}
 
 interface ShippingAddress {
   email: string;
@@ -47,17 +62,22 @@ const COUNTRIES = [
 
 const Checkout = () => {
   const navigate = useNavigate();
-  const { items, getTotalPrice, getTotalItems } = useCart();
-  const { user } = useAuth();
-  const { formatPrice } = useCurrency();
+  const { items, getTotalItems } = useCart();
+  const { user, isAnonymous, loading: authLoading } = useAuth();
+  const { currency, getPrice, formatAsCurrency } = useCurrency();
+  const { data: rates, isLoading: ratesLoading } = useLiveExchangeRates();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [loadingShipping, setLoadingShipping] = useState(false);
-  const [shippingRates, setShippingRates] = useState<DHLShippingRate[]>([]);
-  const [selectedShippingRate, setSelectedShippingRate] = useState<DHLShippingRate | null>(null);
+  const [shippingRates, setShippingRates] = useState<CheckoutShippingRate[]>([]);
+  const [selectedShippingRate, setSelectedShippingRate] = useState<CheckoutShippingRate | null>(null);
   const [billingSameAsShipping, setBillingSameAsShipping] = useState(true);
+  const [discountCodeInput, setDiscountCodeInput] = useState('');
+  const [appliedDiscount, setAppliedDiscount] = useState<{ code: string; percentOff: number } | null>(null);
+  const [discountError, setDiscountError] = useState('');
+  const [applyingDiscount, setApplyingDiscount] = useState(false);
   const [shippingAddress, setShippingAddress] = useState<ShippingAddress>({
-    email: user?.email || '',
+    email: (!isAnonymous && user?.email) ? user.email : '',
     fullName: '',
     phone: '',
     address: '',
@@ -72,12 +92,12 @@ const Checkout = () => {
     document.title = "Checkout - AZACH";
   }, []);
 
-  // Update email when user changes
+  // Update email when user changes (but not for anonymous users)
   useEffect(() => {
-    if (user?.email) {
+    if (user?.email && !isAnonymous) {
       setShippingAddress(prev => ({ ...prev, email: user.email || '' }));
     }
-  }, [user]);
+  }, [user, isAnonymous]);
 
   // Load Paystack script on mount
   useEffect(() => {
@@ -101,42 +121,81 @@ const Checkout = () => {
   // Fetch shipping rates when destination changes
   useEffect(() => {
     const fetchShippingRates = async () => {
+      // Topship quotes on city + country; DHL additionally needs a postal code.
       if (!shippingAddress.country || !shippingAddress.city || !shippingAddress.postalCode || items.length === 0) return;
 
       setLoadingShipping(true);
       setShippingRates([]);
       setSelectedShippingRate(null);
 
-      try {
-        const cartItems = items.map(item => ({
-          id: item.id,
-          quantity: item.quantity,
-        }));
+      const cartItems = items.map(item => ({
+        id: item.id,
+        quantity: item.quantity,
+      }));
 
-        const result = await getDHLRates({
+      // Quote both providers in parallel — one failing shouldn't hide the other's rates.
+      const [dhlResult, topshipResult] = await Promise.allSettled([
+        getDHLRates({
           destinationCountry: shippingAddress.country,
           destinationPostalCode: shippingAddress.postalCode || undefined,
           destinationCity: shippingAddress.city || undefined,
+          destinationAddressLine1: shippingAddress.address || undefined,
           items: cartItems,
-        });
+        }),
+        getTopshipRates({
+          destinationCountry: shippingAddress.country,
+          destinationCity: shippingAddress.city,
+          items: cartItems,
+        }),
+      ]);
 
-        setShippingRates(result.rates);
+      const combined: CheckoutShippingRate[] = [];
 
-        // Auto-select cheapest rate
-        if (result.rates.length > 0) {
-          const cheapest = result.rates.sort((a, b) => a.totalPrice - b.totalPrice)[0];
-          setSelectedShippingRate(cheapest);
+      if (dhlResult.status === 'fulfilled') {
+        for (const rate of dhlResult.value.rates) {
+          combined.push({
+            provider: 'dhl',
+            code: rate.productCode,
+            name: rate.productName,
+            totalPrice: rate.totalPrice,
+            durationLabel: `Estimated: ${formatDeliveryEstimate(rate.estimatedDeliveryDays)}`,
+            secondaryLabel: `${rate.estimatedDeliveryDays} ${rate.estimatedDeliveryDays === 1 ? 'day' : 'days'}`,
+          });
         }
-      } catch (error: any) {
-        console.error('Error fetching shipping rates:', error);
+      } else {
+        console.error('Error fetching DHL rates:', dhlResult.reason);
+      }
+
+      if (topshipResult.status === 'fulfilled') {
+        for (const rate of topshipResult.value.rates) {
+          combined.push({
+            provider: 'topship',
+            code: rate.pricingTier,
+            name: rate.mode,
+            totalPrice: rate.totalPrice,
+            durationLabel: rate.duration,
+            secondaryLabel: rate.pricingTier.replace(/([a-z])([A-Z])/g, '$1 $2'),
+          });
+        }
+      } else {
+        console.error('Error fetching Topship rates:', topshipResult.reason);
+      }
+
+      combined.sort((a, b) => a.totalPrice - b.totalPrice);
+      setShippingRates(combined);
+
+      if (combined.length > 0) {
+        setSelectedShippingRate(combined[0]); // cheapest overall
+      } else {
+        const reason = dhlResult.status === 'rejected' ? dhlResult.reason : topshipResult.status === 'rejected' ? topshipResult.reason : null;
         toast({
           title: 'Shipping rates unavailable',
-          description: error.message || 'Could not calculate shipping. Please try again.',
+          description: (reason as any)?.message || 'Could not calculate shipping. Please try again.',
           variant: 'destructive',
         });
-      } finally {
-        setLoadingShipping(false);
       }
+
+      setLoadingShipping(false);
     };
 
     // Debounce shipping rate fetch
@@ -145,9 +204,88 @@ const Checkout = () => {
   }, [shippingAddress.country, shippingAddress.postalCode, shippingAddress.city, items]);
 
   const totalItems = getTotalItems();
-  const subtotal = getTotalPrice();
-  const shippingCost = selectedShippingRate?.totalPrice || 0;
-  const total = subtotal + shippingCost;
+
+  // Paystack only settles NGN on this account, so the actual charge is always NGN. We
+  // still display — and base that NGN charge on — whatever currency the visitor is
+  // browsing in, converting through the live rate rather than falling back to the
+  // separately-stored NGN price.
+  const getItemDisplayAmount = (item: (typeof items)[number]): number =>
+    currency === 'NGN' ? item.price : (getPrice(item)?.amount ?? item.price);
+
+  // Converts an amount already shown in the current display currency into NGN.
+  const convertToNGN = (displayAmount: number): number => {
+    if (currency === 'NGN' || !rates?.[currency]) return displayAmount;
+    return (displayAmount / rates[currency]) * rates.NGN;
+  };
+
+  // Converts a raw NGN amount (e.g. the DHL shipping quote) into the current display currency.
+  const convertFromNGN = (ngnAmount: number): number => {
+    if (currency === 'NGN' || !rates?.[currency]) return ngnAmount;
+    return (ngnAmount / rates.NGN) * rates[currency];
+  };
+
+  // The NGN amount actually charged for this item.
+  const getItemChargeAmountNGN = (item: (typeof items)[number]): number =>
+    currency === 'NGN' ? item.price : convertToNGN(getItemDisplayAmount(item));
+
+  const subtotalDisplay = items.reduce((sum, item) => sum + getItemDisplayAmount(item) * item.quantity, 0);
+  const shippingCostNGN = selectedShippingRate?.totalPrice || 0;
+  const shippingCostDisplay = convertFromNGN(shippingCostNGN);
+
+  const discountPercent = appliedDiscount?.percentOff ?? 0;
+  const discountAmountDisplay = subtotalDisplay * (discountPercent / 100);
+  const totalDisplay = subtotalDisplay - discountAmountDisplay + shippingCostDisplay;
+
+  const subtotalChargeNGN = items.reduce((sum, item) => sum + getItemChargeAmountNGN(item) * item.quantity, 0);
+  const discountAmountChargeNGN = subtotalChargeNGN * (discountPercent / 100);
+  const totalChargeNGN = subtotalChargeNGN - discountAmountChargeNGN + shippingCostNGN;
+
+  const handleApplyDiscount = async () => {
+    const code = discountCodeInput.trim();
+    if (!code) return;
+
+    if (!shippingAddress.email) {
+      setDiscountError('Enter your email above first.');
+      return;
+    }
+
+    setApplyingDiscount(true);
+    setDiscountError('');
+    try {
+      const { data, error } = await supabase.functions.invoke('validate-discount-code', {
+        body: { code, email: shippingAddress.email },
+      });
+      if (error) {
+        setDiscountError(await getFunctionErrorMessage(error, 'Could not validate that code. Please try again.'));
+        setAppliedDiscount(null);
+        return;
+      }
+
+      if (!data?.valid) {
+        setDiscountError(data?.error || 'Invalid discount code');
+        setAppliedDiscount(null);
+        return;
+      }
+
+      setAppliedDiscount({ code: data.code, percentOff: data.percentOff });
+      toast({ title: 'Discount applied', description: `${data.percentOff}% off your order.` });
+    } catch (error) {
+      console.error('Discount validation error:', error);
+      setDiscountError('Could not validate that code. Please try again.');
+      setAppliedDiscount(null);
+    } finally {
+      setApplyingDiscount(false);
+    }
+  };
+
+  const handleRemoveDiscount = () => {
+    setAppliedDiscount(null);
+    setDiscountCodeInput('');
+    setDiscountError('');
+  };
+
+  // Waiting on the live rate before we can safely show/charge a non-NGN order.
+  const ratePending = currency !== 'NGN' && ratesLoading;
 
   useEffect(() => {
     // Redirect to cart if empty
@@ -156,8 +294,35 @@ const Checkout = () => {
     }
   }, [items, navigate]);
 
+  useEffect(() => {
+    if (items.length === 0) return;
+    trackBeginCheckout(
+      items.map((item) => ({
+        item_id: String(item.id),
+        item_name: item.name,
+        price: getItemDisplayAmount(item),
+        quantity: item.quantity,
+        item_category: item.category,
+      })),
+      subtotalDisplay,
+      currency
+    );
+    // Fires once per checkout visit — item identity, not price/qty churn, should trigger this.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const handleCheckout = async () => {
     try {
+      // Ensure user is loaded
+      if (!user?.id) {
+        toast({
+          title: 'Authentication required',
+          description: 'Please wait while we set up your session...',
+          variant: 'destructive',
+        });
+        return;
+      }
+
       // Validate shipping address
       if (!shippingAddress.email || !shippingAddress.fullName || !shippingAddress.phone ||
           !shippingAddress.address || !shippingAddress.city || !shippingAddress.state ||
@@ -183,11 +348,12 @@ const Checkout = () => {
 
       setLoading(true);
 
-      // Prepare cart items (prices are already in NGN from database)
+      // Cart items priced in NGN for the actual Paystack charge — converted from the
+      // real USD price at the live rate when the order was shown/priced in USD.
       const cartItems = items.map(item => ({
         id: item.id,
         name: item.name,
-        price: item.price, // Already in NGN
+        price: getItemChargeAmountNGN(item),
         quantity: item.quantity,
         image: item.image,
       }));
@@ -198,17 +364,21 @@ const Checkout = () => {
       // Initialize Paystack transaction
       const checkoutData = await initializePaystackTransaction(
         cartItems,
+        user.id, // Pass user_id (anonymous or authenticated)
         shippingAddress.email,
-        'NGN', // Always use NGN for Paystack (Nigerian gateway)
+        'NGN', // Always NGN — no USD settlement account set up yet
         shippingAddress,
-        shippingCost
+        shippingCostNGN,
+        appliedDiscount?.code,
+        selectedShippingRate?.provider,
+        selectedShippingRate?.code
       );
 
       // Open Paystack popup
       openPaystackPopup(
         checkoutData,
         shippingAddress.email,
-        total,
+        totalChargeNGN,
         (reference: string) => {
           // Payment successful - redirect to success page
           navigate(`/checkout/success?reference=${reference}`);
@@ -224,9 +394,13 @@ const Checkout = () => {
       );
     } catch (error: any) {
       console.error('Checkout error:', error);
+
+      // Show the actual error message from the API
+      const errorMessage = error.response?.data?.message || error.message || 'Something went wrong. Please try again.';
+
       toast({
         title: 'Checkout failed',
-        description: error.message || 'Something went wrong. Please try again.',
+        description: errorMessage,
         variant: 'destructive',
       });
       setLoading(false);
@@ -255,10 +429,13 @@ const Checkout = () => {
                     id="email"
                     type="email"
                     value={shippingAddress.email}
-                    onChange={(e) => setShippingAddress({ ...shippingAddress, email: e.target.value })}
+                    onChange={(e) => {
+                      setShippingAddress({ ...shippingAddress, email: e.target.value });
+                      if (appliedDiscount) handleRemoveDiscount();
+                    }}
                     placeholder="your.email@example.com"
                     required
-                    disabled={!!user}
+                    disabled={!!user && !isAnonymous}
                   />
                 </div>
                 <div>
@@ -358,11 +535,11 @@ const Checkout = () => {
                     </div>
                   ) : shippingRates.length > 0 ? (
                     <div className="space-y-2">
-                      {shippingRates.map((rate, index) => (
+                      {shippingRates.map((rate) => (
                         <div
-                          key={index}
+                          key={`${rate.provider}-${rate.code}`}
                           className={`p-4 border rounded-lg cursor-pointer transition-colors ${
-                            selectedShippingRate?.productCode === rate.productCode
+                            selectedShippingRate?.provider === rate.provider && selectedShippingRate?.code === rate.code
                               ? 'border-primary bg-primary/5'
                               : 'border-muted hover:border-primary/50'
                           }`}
@@ -370,16 +547,19 @@ const Checkout = () => {
                         >
                           <div className="flex justify-between items-center">
                             <div>
-                              <p className="font-medium">{rate.productName}</p>
-                              <p className="text-sm text-muted-foreground">
-                                Estimated: {formatDeliveryEstimate(rate.estimatedDeliveryDays)}
-                              </p>
+                              <div className="flex items-center gap-2">
+                                <p className="font-medium">{rate.name}</p>
+                                <span className="text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+                                  {rate.provider === 'dhl' ? 'DHL' : 'Topship'}
+                                </span>
+                              </div>
+                              <p className="text-sm text-muted-foreground">{rate.durationLabel}</p>
                             </div>
                             <div className="text-right">
-                              <p className="font-semibold">{formatPrice(rate.totalPrice)}</p>
-                              <p className="text-xs text-muted-foreground">
-                                {rate.estimatedDeliveryDays} {rate.estimatedDeliveryDays === 1 ? 'day' : 'days'}
+                              <p className="font-semibold">
+                                {formatAsCurrency(convertFromNGN(rate.totalPrice), currency)}
                               </p>
+                              <p className="text-xs text-muted-foreground">{rate.secondaryLabel}</p>
                             </div>
                           </div>
                         </div>
@@ -416,23 +596,69 @@ const Checkout = () => {
                         </div>
                       </div>
                       <p className="font-semibold">
-                        {formatPrice(item.price * item.quantity)}
+                        {formatAsCurrency(getItemDisplayAmount(item) * item.quantity, currency)}
                       </p>
                     </div>
                   ))}
                 </div>
 
+                <div className="border-t pt-4 pb-2">
+                  {appliedDiscount ? (
+                    <div className="flex items-center justify-between p-3 bg-primary/5 border border-primary/20 rounded-lg text-sm">
+                      <div className="flex items-center gap-2">
+                        <Tag className="w-4 h-4 text-primary" />
+                        <span>
+                          Code <span className="font-semibold">{appliedDiscount.code}</span> applied — {appliedDiscount.percentOff}% off
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleRemoveDiscount}
+                        className="text-muted-foreground hover:text-foreground underline text-xs"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="space-y-1">
+                      <div className="flex gap-2">
+                        <Input
+                          value={discountCodeInput}
+                          onChange={(e) => setDiscountCodeInput(e.target.value)}
+                          placeholder="Discount code"
+                          className="flex-1"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={handleApplyDiscount}
+                          disabled={applyingDiscount || !discountCodeInput.trim()}
+                        >
+                          {applyingDiscount ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Apply'}
+                        </Button>
+                      </div>
+                      {discountError && <p className="text-xs text-destructive">{discountError}</p>}
+                    </div>
+                  )}
+                </div>
+
                 <div className="border-t pt-4 space-y-2">
                   <div className="flex justify-between text-sm">
                     <span>Subtotal ({totalItems} {totalItems === 1 ? 'item' : 'items'})</span>
-                    <span>{formatPrice(subtotal)}</span>
+                    <span>{formatAsCurrency(subtotalDisplay, currency)}</span>
                   </div>
+                  {appliedDiscount && (
+                    <div className="flex justify-between text-sm text-primary">
+                      <span>Discount ({appliedDiscount.percentOff}%)</span>
+                      <span>-{formatAsCurrency(discountAmountDisplay, currency)}</span>
+                    </div>
+                  )}
                   <div className="flex justify-between text-sm">
                     <span>Shipping</span>
-                    {loadingShipping ? (
+                    {loadingShipping || ratePending ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
                     ) : selectedShippingRate ? (
-                      <span>{formatPrice(shippingCost)}</span>
+                      <span>{formatAsCurrency(shippingCostDisplay, currency)}</span>
                     ) : (
                       <span className="text-muted-foreground">Calculate</span>
                     )}
@@ -445,8 +671,13 @@ const Checkout = () => {
                   )}
                   <div className="flex justify-between text-lg font-semibold pt-2 border-t">
                     <span>Total</span>
-                    <span>{formatPrice(total)}</span>
+                    <span>{formatAsCurrency(totalDisplay, currency)}</span>
                   </div>
+                  {currency !== 'NGN' && (
+                    <p className="text-xs text-muted-foreground text-center pt-1">
+                      Charged to your card in Naira at the current exchange rate.
+                    </p>
+                  )}
                 </div>
 
                 {/* Checkout Button */}
@@ -454,12 +685,17 @@ const Checkout = () => {
                   size="lg"
                   className="w-full mt-6"
                   onClick={handleCheckout}
-                  disabled={loading || loadingShipping}
+                  disabled={loading || loadingShipping || authLoading || ratePending || !user?.id}
                 >
                   {loading ? (
                     <>
                       <Loader2 className="mr-2 h-5 w-5 animate-spin" />
                       Processing...
+                    </>
+                  ) : authLoading ? (
+                    <>
+                      <Loader2 className="mr-2 h-5 w-5 animate-spin" />
+                      Loading...
                     </>
                   ) : (
                     'Pay with Paystack'

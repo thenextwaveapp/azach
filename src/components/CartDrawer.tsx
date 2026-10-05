@@ -6,6 +6,8 @@ import { useCurrency } from "@/contexts/CurrencyContext";
 import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
+import { useEffect } from "react";
+import { trackViewCart } from "@/lib/analytics";
 
 interface CartDrawerProps {
   open: boolean;
@@ -13,10 +15,28 @@ interface CartDrawerProps {
 }
 
 export const CartDrawer = ({ open, onOpenChange }: CartDrawerProps) => {
-  const { items, removeFromCart, updateQuantity, getTotalPrice, clearCart } = useCart();
-  const { formatPrice } = useCurrency();
+  const { items, removeFromCart, updateQuantity, clearCart } = useCart();
+  const { formatCartTotal, currency, getPrice } = useCurrency();
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!open || items.length === 0) return;
+    trackViewCart(
+      items.map((item) => {
+        const display = getPrice(item);
+        return {
+          item_id: String(item.id),
+          item_name: item.name,
+          price: display?.amount ?? item.price,
+          quantity: item.quantity,
+          item_category: item.category,
+        };
+      }),
+      currency
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open]);
 
   const handleCheckout = () => {
     if (items.length === 0) {
@@ -78,6 +98,7 @@ export const CartDrawer = ({ open, onOpenChange }: CartDrawerProps) => {
                       <Button
                         variant="ghost"
                         size="icon"
+                        aria-label={`Remove ${item.name} from cart`}
                         className="h-8 w-8"
                         onClick={() => removeFromCart(item.id)}
                       >
@@ -90,6 +111,7 @@ export const CartDrawer = ({ open, onOpenChange }: CartDrawerProps) => {
                         <Button
                           variant="outline"
                           size="icon"
+                          aria-label={`Decrease quantity of ${item.name}`}
                           className="h-7 w-7"
                           onClick={() => updateQuantity(item.id, item.quantity - 1)}
                         >
@@ -99,13 +121,14 @@ export const CartDrawer = ({ open, onOpenChange }: CartDrawerProps) => {
                         <Button
                           variant="outline"
                           size="icon"
+                          aria-label={`Increase quantity of ${item.name}`}
                           className="h-7 w-7"
                           onClick={() => updateQuantity(item.id, item.quantity + 1)}
                         >
                           <Plus className="h-3 w-3" />
                         </Button>
                       </div>
-                      <p className="font-semibold text-sm">{formatPrice(item.price * item.quantity)}</p>
+                      <p className="font-semibold text-sm">{formatCartTotal([item])}</p>
                     </div>
                   </div>
                 </div>
@@ -128,11 +151,11 @@ export const CartDrawer = ({ open, onOpenChange }: CartDrawerProps) => {
                   <span className="text-sm text-muted-foreground">
                     Subtotal ({items.reduce((sum, item) => sum + item.quantity, 0)} items)
                   </span>
-                  <span className="font-semibold">{formatPrice(getTotalPrice())}</span>
+                  <span className="font-semibold">{formatCartTotal(items)}</span>
                 </div>
                 <div className="flex justify-between text-lg font-semibold">
                   <span>Total</span>
-                  <span>{formatPrice(getTotalPrice())}</span>
+                  <span>{formatCartTotal(items)}</span>
                 </div>
               </div>
 

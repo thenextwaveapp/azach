@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { createDHLShipment } from '@/lib/dhl';
+import { createTopshipShipment } from '@/lib/topship';
 import {
   Table,
   TableBody,
@@ -45,6 +46,7 @@ import {
   LogOut,
   Package,
   ExternalLink,
+  Star,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -63,7 +65,7 @@ const OrdersAdmin = () => {
   const updateOrderNotes = useUpdateOrderNotes();
   const { toast } = useToast();
   const { user, signOut } = useAuth();
-  const { formatPrice } = useCurrency();
+  const { formatAsCurrency } = useCurrency();
   const navigate = useNavigate();
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -75,18 +77,28 @@ const OrdersAdmin = () => {
     dhl_tracking_number: '',
     dhl_shipment_id: '',
     dhl_label_url: '',
+    topship_tracking_id: '',
+    topship_tracking_url: '',
+    topship_label_url: '',
     estimated_delivery_date: '',
   });
   const [orderNotes, setOrderNotes] = useState('');
   const [isCreatingShipment, setIsCreatingShipment] = useState(false);
 
+  // The provider the customer selected at checkout drives which carrier we book with.
+  const orderProvider = selectedOrder?.shipping_provider === 'topship' ? 'topship' : 'dhl';
+  const providerLabel = orderProvider === 'topship' ? 'Topship' : 'DHL';
+  const orderTrackingNumber = (order: OrderWithItems) =>
+    order.dhl_tracking_number || order.topship_tracking_id || '';
+
   const handleCreateShipment = async () => {
     if (!selectedOrder) return;
 
-    if (selectedOrder.dhl_tracking_number) {
+    const existingTracking = orderTrackingNumber(selectedOrder);
+    if (existingTracking) {
       toast({
         title: 'Shipment Already Created',
-        description: `Tracking number: ${selectedOrder.dhl_tracking_number}`,
+        description: `Tracking number: ${existingTracking}`,
         variant: 'destructive',
       });
       return;
@@ -94,18 +106,28 @@ const OrdersAdmin = () => {
 
     try {
       setIsCreatingShipment(true);
-      const result = await createDHLShipment(selectedOrder.id);
 
-      setShippingFormData({
-        dhl_tracking_number: result.trackingNumber,
-        dhl_shipment_id: result.shipmentId,
-        dhl_label_url: result.labelUrl || '',
-        estimated_delivery_date: shippingFormData.estimated_delivery_date,
-      });
+      if (orderProvider === 'topship') {
+        const result = await createTopshipShipment(selectedOrder.id);
+        setShippingFormData({
+          ...shippingFormData,
+          topship_tracking_id: result.trackingNumber,
+          topship_tracking_url: result.trackingUrl || '',
+          topship_label_url: result.labelUrl || '',
+        });
+      } else {
+        const result = await createDHLShipment(selectedOrder.id);
+        setShippingFormData({
+          ...shippingFormData,
+          dhl_tracking_number: result.trackingNumber,
+          dhl_shipment_id: result.shipmentId,
+          dhl_label_url: result.labelUrl || '',
+        });
+      }
 
       toast({
         title: 'Success',
-        description: 'DHL shipment created successfully!',
+        description: `${providerLabel} shipment created successfully!`,
       });
 
       // Refresh order data
@@ -114,7 +136,7 @@ const OrdersAdmin = () => {
     } catch (error: any) {
       toast({
         title: 'Error',
-        description: error.message || 'Failed to create DHL shipment',
+        description: error.message || `Failed to create ${providerLabel} shipment`,
         variant: 'destructive',
       });
     } finally {
@@ -157,6 +179,9 @@ const OrdersAdmin = () => {
       dhl_tracking_number: order.dhl_tracking_number || '',
       dhl_shipment_id: order.dhl_shipment_id || '',
       dhl_label_url: order.dhl_label_url || '',
+      topship_tracking_id: order.topship_tracking_id || '',
+      topship_tracking_url: order.topship_tracking_url || '',
+      topship_label_url: order.topship_label_url || '',
       estimated_delivery_date: order.estimated_delivery_date
         ? new Date(order.estimated_delivery_date).toISOString().split('T')[0]
         : '',
@@ -207,6 +232,9 @@ const OrdersAdmin = () => {
           dhl_tracking_number: shippingFormData.dhl_tracking_number || undefined,
           dhl_shipment_id: shippingFormData.dhl_shipment_id || undefined,
           dhl_label_url: shippingFormData.dhl_label_url || undefined,
+          topship_tracking_id: shippingFormData.topship_tracking_id || undefined,
+          topship_tracking_url: shippingFormData.topship_tracking_url || undefined,
+          topship_label_url: shippingFormData.topship_label_url || undefined,
           estimated_delivery_date: shippingFormData.estimated_delivery_date || undefined,
         },
       });
@@ -262,6 +290,7 @@ const OrdersAdmin = () => {
         shippingAddress?.email?.toLowerCase().includes(query) ||
         billingAddress?.name?.toLowerCase().includes(query) ||
         order.dhl_tracking_number?.toLowerCase().includes(query) ||
+        order.topship_tracking_id?.toLowerCase().includes(query) ||
         order.order_items.some((item) => item.product_name.toLowerCase().includes(query))
       );
     })
@@ -337,6 +366,10 @@ const OrdersAdmin = () => {
               <Button variant="outline" onClick={() => navigate('/admin')}>
                 <Package className="mr-2 h-4 w-4" />
                 Products
+              </Button>
+              <Button variant="outline" onClick={() => navigate('/admin/reviews')}>
+                <Star className="mr-2 h-4 w-4" />
+                Reviews
               </Button>
             </div>
           </div>
@@ -459,7 +492,7 @@ const OrdersAdmin = () => {
                       <TableCell className="text-sm">
                         {new Date(order.created_at).toLocaleDateString()}
                       </TableCell>
-                      <TableCell className="font-semibold">{formatPrice(order.total)}</TableCell>
+                      <TableCell className="font-semibold">{formatAsCurrency(order.total, order.currency)}</TableCell>
                       <TableCell>
                         <Select
                           value={order.status}
@@ -500,8 +533,8 @@ const OrdersAdmin = () => {
                         </Select>
                       </TableCell>
                       <TableCell>
-                        {order.dhl_tracking_number ? (
-                          <span className="text-xs font-mono">{order.dhl_tracking_number}</span>
+                        {order.dhl_tracking_number || order.topship_tracking_id ? (
+                          <span className="text-xs font-mono">{order.dhl_tracking_number || order.topship_tracking_id}</span>
                         ) : (
                           <span className="text-xs text-muted-foreground">No tracking</span>
                         )}
@@ -564,10 +597,10 @@ const OrdersAdmin = () => {
                         <div className="flex-1">
                           <p className="font-medium text-sm">{item.product_name}</p>
                           <p className="text-xs text-muted-foreground">
-                            Qty: {item.quantity} × {formatPrice(item.price)}
+                            Qty: {item.quantity} × {formatAsCurrency(item.price, selectedOrder.currency)}
                           </p>
                         </div>
-                        <p className="font-semibold">{formatPrice(item.price * item.quantity)}</p>
+                        <p className="font-semibold">{formatAsCurrency(item.price * item.quantity, selectedOrder.currency)}</p>
                       </div>
                     ))}
                   </div>
@@ -618,13 +651,13 @@ const OrdersAdmin = () => {
 
                 {/* Shipping Info Form */}
                 <div>
-                  <h3 className="font-semibold mb-3">DHL Shipping Information</h3>
+                  <h3 className="font-semibold mb-3">{providerLabel} Shipping Information</h3>
 
                   {/* Create Shipment Button */}
-                  {!selectedOrder?.dhl_tracking_number && (
+                  {selectedOrder && !orderTrackingNumber(selectedOrder) && (
                     <div className="mb-4 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                       <p className="text-sm text-blue-700 mb-3">
-                        No shipment created yet. Create a DHL shipment to automatically generate a label and tracking number.
+                        No shipment created yet. Create a {providerLabel} shipment to automatically generate a label and tracking number.
                       </p>
                       <Button
                         onClick={handleCreateShipment}
@@ -632,84 +665,175 @@ const OrdersAdmin = () => {
                         className="w-full"
                       >
                         <Package className="mr-2 h-4 w-4" />
-                        {isCreatingShipment ? 'Creating Shipment...' : 'Create DHL Shipment'}
+                        {isCreatingShipment ? 'Creating Shipment...' : `Create ${providerLabel} Shipment`}
                       </Button>
                     </div>
                   )}
 
-                  {selectedOrder?.dhl_tracking_number && (
+                  {selectedOrder && orderTrackingNumber(selectedOrder) && (
                     <div className="mb-4 p-4 bg-green-50 border border-green-200 rounded-lg">
                       <p className="text-sm text-green-700 font-semibold">
                         ✓ Shipment Created
                       </p>
                       <p className="text-xs text-green-600 mt-1">
-                        Tracking: {selectedOrder.dhl_tracking_number}
+                        Tracking: {orderTrackingNumber(selectedOrder)}
                       </p>
+                      {selectedOrder.topship_tracking_url && (
+                        <a
+                          href={selectedOrder.topship_tracking_url}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="text-xs text-green-600 underline"
+                        >
+                          Track on Topship
+                        </a>
+                      )}
                     </div>
                   )}
 
                   <div className="space-y-3">
-                    <div>
-                      <Label htmlFor="tracking">Tracking Number</Label>
-                      <Input
-                        id="tracking"
-                        value={shippingFormData.dhl_tracking_number}
-                        onChange={(e) =>
-                          setShippingFormData({
-                            ...shippingFormData,
-                            dhl_tracking_number: e.target.value,
-                          })
-                        }
-                        placeholder="Enter DHL tracking number"
-                        readOnly={!!selectedOrder?.dhl_tracking_number}
-                        className={selectedOrder?.dhl_tracking_number ? 'bg-gray-100' : ''}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="shipment">Shipment ID</Label>
-                      <Input
-                        id="shipment"
-                        value={shippingFormData.dhl_shipment_id}
-                        onChange={(e) =>
-                          setShippingFormData({
-                            ...shippingFormData,
-                            dhl_shipment_id: e.target.value,
-                          })
-                        }
-                        placeholder="Enter DHL shipment ID"
-                        readOnly={!!selectedOrder?.dhl_tracking_number}
-                        className={selectedOrder?.dhl_tracking_number ? 'bg-gray-100' : ''}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="label">Label URL</Label>
-                      <div className="flex gap-2">
-                        <Input
-                          id="label"
-                          value={shippingFormData.dhl_label_url}
-                          onChange={(e) =>
-                            setShippingFormData({
-                              ...shippingFormData,
-                              dhl_label_url: e.target.value,
-                            })
-                          }
-                          placeholder="Enter DHL label URL or create shipment"
-                          readOnly={!!selectedOrder?.dhl_tracking_number}
-                          className={selectedOrder?.dhl_tracking_number ? 'bg-gray-100' : ''}
-                        />
-                        {shippingFormData.dhl_label_url && (
-                          <Button
-                            variant="outline"
-                            size="icon"
-                            onClick={() =>
-                              window.open(shippingFormData.dhl_label_url, '_blank')
+                    {orderProvider === 'dhl' ? (
+                      <>
+                        <div>
+                          <Label htmlFor="tracking">Tracking Number</Label>
+                          <Input
+                            id="tracking"
+                            value={shippingFormData.dhl_tracking_number}
+                            onChange={(e) =>
+                              setShippingFormData({
+                                ...shippingFormData,
+                                dhl_tracking_number: e.target.value,
+                              })
                             }
-                          >
-                            <ExternalLink className="h-4 w-4" />
-                          </Button>
-                        )}
-                      </div>
-                    </div>
+                            placeholder="Enter DHL tracking number"
+                            readOnly={!!selectedOrder?.dhl_tracking_number}
+                            className={selectedOrder?.dhl_tracking_number ? 'bg-gray-100' : ''}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="shipment">Shipment ID</Label>
+                          <Input
+                            id="shipment"
+                            value={shippingFormData.dhl_shipment_id}
+                            onChange={(e) =>
+                              setShippingFormData({
+                                ...shippingFormData,
+                                dhl_shipment_id: e.target.value,
+                              })
+                            }
+                            placeholder="Enter DHL shipment ID"
+                            readOnly={!!selectedOrder?.dhl_tracking_number}
+                            className={selectedOrder?.dhl_tracking_number ? 'bg-gray-100' : ''}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="label">Label URL</Label>
+                          <div className="flex gap-2">
+                            <Input
+                              id="label"
+                              value={shippingFormData.dhl_label_url}
+                              onChange={(e) =>
+                                setShippingFormData({
+                                  ...shippingFormData,
+                                  dhl_label_url: e.target.value,
+                                })
+                              }
+                              placeholder="Enter DHL label URL or create shipment"
+                              readOnly={!!selectedOrder?.dhl_tracking_number}
+                              className={selectedOrder?.dhl_tracking_number ? 'bg-gray-100' : ''}
+                            />
+                            {shippingFormData.dhl_label_url && (
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() =>
+                                  window.open(shippingFormData.dhl_label_url, '_blank')
+                                }
+                              >
+                                <ExternalLink className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div>
+                          <Label htmlFor="ts-tracking">Tracking ID</Label>
+                          <Input
+                            id="ts-tracking"
+                            value={shippingFormData.topship_tracking_id}
+                            onChange={(e) =>
+                              setShippingFormData({
+                                ...shippingFormData,
+                                topship_tracking_id: e.target.value,
+                              })
+                            }
+                            placeholder="Enter Topship tracking ID"
+                            readOnly={!!selectedOrder?.topship_tracking_id}
+                            className={selectedOrder?.topship_tracking_id ? 'bg-gray-100' : ''}
+                          />
+                        </div>
+                        <div>
+                          <Label htmlFor="ts-tracking-url">Tracking URL</Label>
+                          <div className="flex gap-2">
+                            <Input
+                              id="ts-tracking-url"
+                              value={shippingFormData.topship_tracking_url}
+                              onChange={(e) =>
+                                setShippingFormData({
+                                  ...shippingFormData,
+                                  topship_tracking_url: e.target.value,
+                                })
+                              }
+                              placeholder="Enter Topship tracking URL"
+                              readOnly={!!selectedOrder?.topship_tracking_id}
+                              className={selectedOrder?.topship_tracking_id ? 'bg-gray-100' : ''}
+                            />
+                            {shippingFormData.topship_tracking_url && (
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() =>
+                                  window.open(shippingFormData.topship_tracking_url, '_blank')
+                                }
+                              >
+                                <ExternalLink className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                        <div>
+                          <Label htmlFor="ts-label">Label URL</Label>
+                          <div className="flex gap-2">
+                            <Input
+                              id="ts-label"
+                              value={shippingFormData.topship_label_url}
+                              onChange={(e) =>
+                                setShippingFormData({
+                                  ...shippingFormData,
+                                  topship_label_url: e.target.value,
+                                })
+                              }
+                              placeholder="Enter Topship label URL or create shipment"
+                              readOnly={!!selectedOrder?.topship_tracking_id}
+                              className={selectedOrder?.topship_tracking_id ? 'bg-gray-100' : ''}
+                            />
+                            {shippingFormData.topship_label_url && (
+                              <Button
+                                variant="outline"
+                                size="icon"
+                                onClick={() =>
+                                  window.open(shippingFormData.topship_label_url, '_blank')
+                                }
+                              >
+                                <ExternalLink className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
+                        </div>
+                      </>
+                    )}
                     <div>
                       <Label htmlFor="delivery">Estimated Delivery Date</Label>
                       <Input
@@ -763,19 +887,25 @@ const OrdersAdmin = () => {
                   <div className="space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span>Subtotal:</span>
-                      <span>{formatPrice(selectedOrder.subtotal)}</span>
+                      <span>{formatAsCurrency(selectedOrder.subtotal, selectedOrder.currency)}</span>
                     </div>
+                    {selectedOrder.discount_amount > 0 && (
+                      <div className="flex justify-between text-primary">
+                        <span>Discount{selectedOrder.discount_code ? ` (${selectedOrder.discount_code})` : ''}:</span>
+                        <span>-{formatAsCurrency(selectedOrder.discount_amount, selectedOrder.currency)}</span>
+                      </div>
+                    )}
                     <div className="flex justify-between">
                       <span>Tax:</span>
-                      <span>{formatPrice(selectedOrder.tax)}</span>
+                      <span>{formatAsCurrency(selectedOrder.tax, selectedOrder.currency)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span>Shipping:</span>
-                      <span>{formatPrice(selectedOrder.shipping_cost)}</span>
+                      <span>{formatAsCurrency(selectedOrder.shipping_cost, selectedOrder.currency)}</span>
                     </div>
                     <div className="flex justify-between font-bold text-base border-t pt-2">
                       <span>Total:</span>
-                      <span>{formatPrice(selectedOrder.total)}</span>
+                      <span>{formatAsCurrency(selectedOrder.total, selectedOrder.currency)}</span>
                     </div>
                   </div>
                 </div>

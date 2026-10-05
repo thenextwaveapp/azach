@@ -16,11 +16,30 @@ interface RateRequest {
   destinationCountry: string;
   destinationPostalCode?: string;
   destinationCity?: string;
+  destinationAddressLine1?: string;
   items: Array<{
     id: string;
     quantity: number;
   }>;
 }
+
+// DHL requires this exact format: '2010-02-11T17:10:09 GMT+01:00'
+const formatDHLDate = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  const hours = String(date.getHours()).padStart(2, '0');
+  const minutes = String(date.getMinutes()).padStart(2, '0');
+  const seconds = String(date.getSeconds()).padStart(2, '0');
+
+  const offsetMinutes = -date.getTimezoneOffset();
+  const offsetHours = Math.floor(Math.abs(offsetMinutes) / 60);
+  const offsetMins = Math.abs(offsetMinutes) % 60;
+  const offsetSign = offsetMinutes >= 0 ? '+' : '-';
+  const gmtOffset = `GMT${offsetSign}${String(offsetHours).padStart(2, '0')}:${String(offsetMins).padStart(2, '0')}`;
+
+  return `${year}-${month}-${day}T${hours}:${minutes}:${seconds} ${gmtOffset}`;
+};
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -30,7 +49,7 @@ serve(async (req) => {
 
   try {
     const requestBody: RateRequest = await req.json();
-    const { destinationCountry, destinationPostalCode, destinationCity, items } = requestBody;
+    const { destinationCountry, destinationPostalCode, destinationCity, destinationAddressLine1, items } = requestBody;
 
     // Validate request
     if (!destinationCountry || !items || items.length === 0) {
@@ -125,11 +144,14 @@ serve(async (req) => {
     const dhlRequestBody = {
       customerDetails: {
         shipperDetails: {
+          addressLine1: Deno.env.get('DHL_ORIGIN_ADDRESS') || 'Business Address',
           postalCode: Deno.env.get('DHL_ORIGIN_POSTAL_CODE') || '100001',
           cityName: Deno.env.get('DHL_ORIGIN_CITY') || 'Lagos',
+          countyName: Deno.env.get('DHL_ORIGIN_STATE') || 'Lagos',
           countryCode: 'NG',
         },
         receiverDetails: {
+          addressLine1: destinationAddressLine1 || destinationCity || '',
           postalCode: destinationPostalCode || '',
           cityName: destinationCity || '',
           countryCode: destinationCountry,
@@ -141,9 +163,10 @@ serve(async (req) => {
           number: Deno.env.get('DHL_ACCOUNT_NUMBER'),
         },
       ],
-      plannedShippingDateAndTime: plannedShippingDate.toISOString(),
+      plannedShippingDateAndTime: formatDHLDate(plannedShippingDate),
       unitOfMeasurement: 'metric',
       isCustomsDeclarable: destinationCountry !== 'NG',
+      nextBusinessDay: true,
       packages: [
         {
           weight: totalWeight,

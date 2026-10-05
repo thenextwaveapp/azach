@@ -42,27 +42,19 @@ serve(async (req) => {
       throw new Error('No items provided')
     }
 
-    // Generate a temporary session ID for stock reservation
-    const tempSessionId = crypto.randomUUID()
-
-    // Reserve stock for all items
+    // Point-in-time stock check — no hold/reservation, just confirms enough stock exists
+    // right now.
     for (const item of items) {
       // Skip shipping line items
       if (item.id === 'shipping') continue
 
-      const { data, error } = await supabaseAdmin.rpc('reserve_stock', {
-        p_product_id: item.id,
-        p_quantity: item.quantity,
-        p_session_id: tempSessionId,
-        p_duration_minutes: 15 // 15 minute reservation
-      })
+      const { data: product, error } = await supabaseAdmin
+        .from('products')
+        .select('stock')
+        .eq('id', item.id)
+        .maybeSingle()
 
-      if (error || !data) {
-        // Reservation failed, release any successful reservations
-        await supabaseAdmin.rpc('release_reservation', {
-          p_session_id: tempSessionId
-        })
-
+      if (error || !product || product.stock < item.quantity) {
         throw new Error(`Insufficient stock for ${item.name}`)
       }
     }
@@ -144,8 +136,6 @@ serve(async (req) => {
         }))),
         // Store shipping address if provided
         shippingAddress: shippingAddress ? JSON.stringify(shippingAddress) : undefined,
-        // Store reservation session ID for cleanup
-        reservationSessionId: tempSessionId,
       },
     })
 

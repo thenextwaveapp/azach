@@ -1,6 +1,6 @@
 /**
  * Paystack Initialize Transaction Edge Function
- * Creates a Paystack payment transaction and reserves stock
+ * Creates a Paystack payment transaction after checking stock availability
  * Similar to create-checkout-session but for Paystack
  */
 
@@ -20,6 +20,7 @@ interface InitializeRequest {
     quantity: number;
     image: string;
   }>;
+  userId: string;
   userEmail: string;
   currency: string;
   shippingAddress: {
@@ -33,7 +34,10 @@ interface InitializeRequest {
     country: string;
   };
   shippingCost: number;
+  shippingProvider?: string;
+  shippingService?: string;
   callback_url: string;
+  discountCode?: string;
 }
 
 serve(async (req) => {
@@ -44,11 +48,11 @@ serve(async (req) => {
 
   try {
     const requestBody: InitializeRequest = await req.json();
-    const { items, userEmail, currency, shippingAddress, shippingCost, callback_url } =
+    const { items, userId, userEmail, currency, shippingAddress, shippingCost, shippingProvider, shippingService, callback_url, discountCode } =
       requestBody;
 
-    // Validate request
-    if (!items || items.length === 0 || !userEmail || !shippingAddress) {
+    // Validate request - userId must be a non-empty string
+    if (!items || items.length === 0 || !userId || userId === '' || !userEmail || !shippingAddress) {
       return new Response(
         JSON.stringify({ error: 'Missing required fields' }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
@@ -61,26 +65,21 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    // Generate unique session ID for stock reservation
-    const tempSessionId = crypto.randomUUID();
-
-    // Reserve stock for each item (15 minute timeout)
+    // Point-in-time stock check — no hold/reservation, just confirms enough stock exists
+    // right now. A concurrent checkout could still race this between check and payment;
+    // that's accepted (see decrement_stock_for_purchase, which floors at 0 either way).
     for (const item of items) {
       if (item.id === 'shipping') continue; // Skip shipping line item
 
-      const { data, error } = await supabase.rpc('reserve_stock', {
-        p_product_id: item.id,
-        p_quantity: item.quantity,
-        p_session_id: tempSessionId,
-        p_duration_minutes: 15,
-      });
+      const { data: product, error } = await supabase
+        .from('products')
+        .select('stock')
+        .eq('id', item.id)
+        .maybeSingle();
 
-      if (error || !data) {
-        // If stock reservation fails, release all reservations and return error
-        await supabase.rpc('release_reservation', { p_session_id: tempSessionId });
-
+      if (error || !product || product.stock < item.quantity) {
         return new Response(
-          JSON.stringify({ error: `Insufficient stock for ${item.name}` }),
+          JSON.stringify({ error: `${item.name} is out of stock.` }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
         );
       }
@@ -90,10 +89,60 @@ serve(async (req) => {
     const subtotal = items.reduce((sum, item) => {
       return item.id !== 'shipping' ? sum + item.price * item.quantity : sum;
     }, 0);
-    const total = subtotal + shippingCost;
+
+    // Discounts must be validated and applied here, server-side — this is the amount that
+    // actually gets charged. The frontend's "Apply" preview is UX only and cannot be trusted.
+    let discountCodeId: string | null = null;
+    let discountPercent = 0;
+    let discountAmount = 0;
+    let appliedDiscountCode: string | null = null;
+
+    if (discountCode && discountCode.trim() !== '') {
+      const normalizedCode = discountCode.trim().toUpperCase();
+
+      const { data: discount, error: discountError } = await supabase
+        .from('discount_codes')
+        .select('id, code, percent_off')
+        .eq('code', normalizedCode)
+        .eq('active', true)
+        .maybeSingle();
+
+      if (discountError) throw discountError;
+
+      if (!discount) {
+        return new Response(
+          JSON.stringify({ error: 'Invalid discount code' }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+        );
+      }
+
+      // Redeemable only once, period — not once per email. Codes are single-use.
+      const { data: redemption, error: redemptionError } = await supabase
+        .from('discount_redemptions')
+        .select('id')
+        .eq('discount_code_id', discount.id)
+        .maybeSingle();
+
+      if (redemptionError) throw redemptionError;
+
+      if (redemption) {
+        return new Response(
+          JSON.stringify({ error: 'This discount code has already been used' }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+        );
+      }
+
+      discountCodeId = discount.id;
+      appliedDiscountCode = discount.code;
+      discountPercent = discount.percent_off;
+      discountAmount = subtotal * (discountPercent / 100);
+    }
+
+    const total = subtotal - discountAmount + shippingCost;
 
     console.log('Payment calculation:', {
       subtotal,
+      discountAmount,
       shippingCost,
       total,
     });
@@ -117,11 +166,16 @@ serve(async (req) => {
       currency: currency.toUpperCase(),
       callback_url,
       metadata: {
+        userId,
         cartItems: JSON.stringify(items),
         shippingAddress: JSON.stringify(shippingAddress),
-        reservationSessionId: tempSessionId,
         shippingCost,
+        shippingProvider: shippingProvider || 'dhl',
+        shippingService: shippingService || null,
         subtotal,
+        discountCodeId,
+        discountCode: appliedDiscountCode,
+        discountAmount,
         custom_fields: [
           {
             display_name: 'Customer Name',
@@ -164,9 +218,6 @@ serve(async (req) => {
     if (!paystackResponse.ok) {
       const errorData = await paystackResponse.json();
       console.error('Paystack API error:', JSON.stringify(errorData));
-
-      // Release stock reservations on failure
-      await supabase.rpc('release_reservation', { p_session_id: tempSessionId });
 
       return new Response(
         JSON.stringify({

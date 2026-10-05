@@ -1,12 +1,20 @@
 import { Link } from "react-router-dom";
 
-export const Footer = () => {
+interface FooterProps {
+  dark?: boolean;
+}
+
+export const Footer = ({ dark = false }: FooterProps) => {
   return (
     <>
-      <footer className="py-16 bg-[#a97c50] text-white">
+      <footer
+        className={`relative py-16 text-white shadow-[0_-12px_32px_-8px_rgba(0,0,0,0.25)] ${
+          dark ? 'bg-black' : 'bg-gradient-to-b from-[#8b6440] to-[#a97c50]'
+        }`}
+      >
         <div className="container mx-auto px-4">
           {/* Top Section - Logo */}
-          <div className="flex flex-col md:flex-row justify-start items-center mb-12 pb-12 border-b border-white">
+          <div className="flex flex-col md:flex-row justify-start items-center mb-12 pb-12 border-b border-white/20">
             <div className="mb-6 md:mb-0">
               <Link
                 to="/"
@@ -62,8 +70,12 @@ export const Footer = () => {
           </div>
 
           {/* Copyright */}
-          <div className="pt-8 border-t border-white text-center text-sm text-white">
+          <div className="pt-8 border-t border-white/20 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-white/80">
             <p>&copy; 2026 AZACH. All rights reserved.</p>
+            <div className="flex gap-6">
+              <Link to="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
+              <Link to="/terms-of-service" className="hover:text-white transition-colors">Terms of Service</Link>
+            </div>
           </div>
         </div>
       </footer>

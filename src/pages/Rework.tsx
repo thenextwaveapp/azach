@@ -14,6 +14,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { invokeFunction } from "@/lib/functionError";
+import { trackGenerateLead } from "@/lib/analytics";
+import { uploadFormAttachments } from "@/utils/imageUpload";
 
 const Rework = () => {
   const { toast } = useToast();
@@ -33,6 +36,7 @@ const Rework = () => {
     files: null as FileList | null,
     location: "",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({
@@ -48,7 +52,7 @@ const Rework = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!formData.fullName || !formData.email || !formData.serviceType || !formData.workDescription) {
@@ -60,23 +64,52 @@ const Rework = () => {
       return;
     }
 
-    console.log("RRS Request:", formData);
-    toast({
-      title: "Request Submitted!",
-      description: "We'll contact you soon to discuss your rework/repair needs.",
-    });
+    setIsSubmitting(true);
+    try {
+      const attachmentUrls = formData.files && formData.files.length > 0
+        ? await uploadFormAttachments(Array.from(formData.files), "rework")
+        : [];
 
-    // Reset form
-    setFormData({
-      fullName: "",
-      email: "",
-      whatsapp: "",
-      serviceType: "",
-      pieceType: "",
-      workDescription: "",
-      files: null,
-      location: "",
-    });
+      await invokeFunction("submit-form", {
+        formType: "rework",
+        fullName: formData.fullName,
+        email: formData.email,
+        phone: formData.whatsapp,
+        details: {
+          serviceType: formData.serviceType,
+          pieceType: formData.pieceType,
+          workDescription: formData.workDescription,
+          location: formData.location,
+          attachmentUrls,
+        },
+      });
+
+      trackGenerateLead("rework");
+
+      toast({
+        title: "Request Submitted!",
+        description: "We'll contact you soon to discuss your rework/repair needs.",
+      });
+
+      setFormData({
+        fullName: "",
+        email: "",
+        whatsapp: "",
+        serviceType: "",
+        pieceType: "",
+        workDescription: "",
+        files: null,
+        location: "",
+      });
+    } catch (err) {
+      toast({
+        title: "Something went wrong",
+        description: err instanceof Error ? err.message : "Your request couldn't be submitted. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -360,10 +393,11 @@ const Rework = () => {
 
                   <Button
                     type="submit"
-                    className="w-full bg-[#a97c50] hover:bg-[#8b6440] text-white uppercase font-semibold"
+                    disabled={isSubmitting}
+                    className="w-full bg-[#a97c50] hover:bg-[#8b6440] text-white uppercase font-semibold disabled:opacity-60"
                     size="lg"
                   >
-                    Start RRS Request
+                    {isSubmitting ? "Submitting..." : "Start RRS Request"}
                   </Button>
                 </CardContent>
               </Card>

@@ -1,11 +1,14 @@
 import { Header } from "@/components/Header";
+import { Footer } from "@/components/Footer";
 import { ProductCard } from "@/components/ProductCard";
 import { Newsletter } from "@/components/Newsletter";
 import { ProductFilters, SortOption } from "@/components/ProductFilters";
 import { Badge } from "@/components/ui/badge";
 import { useFilteredProducts, useProducts } from "@/hooks/useProducts";
-import { productToDisplay } from "@/utils/productHelpers";
-import { useState, useEffect } from "react";
+import { productToDisplay, getDisplayPriceAmount } from "@/utils/productHelpers";
+import { useCurrency } from "@/contexts/CurrencyContext";
+import { useTrackItemList } from "@/hooks/useTrackItemList";
+import { useState, useEffect, useMemo } from "react";
 
 const Sale = () => {
   const [filters, setFilters] = useState<{
@@ -26,10 +29,38 @@ const Sale = () => {
     sortBy: 'newest',
   });
 
-  const { data: products = [], isLoading } = useFilteredProducts(filters);
+  const { getPrice, currency } = useCurrency();
+
+  // Excludes minPrice/maxPrice — the server-side query no longer filters on price (see
+  // productService.getFiltered), and including them here would change the react-query key
+  // on every currency-rate tick, triggering a needless refetch of the whole product list.
+  const serverFilters = useMemo(
+    () => ({
+      categories: filters.categories,
+      inStock: filters.inStock,
+      onSale: filters.onSale,
+      gender: filters.gender,
+      sortBy: filters.sortBy,
+    }),
+    [filters.categories, filters.inStock, filters.onSale, filters.gender, filters.sortBy]
+  );
+  const { data: unfilteredByPrice = [], isLoading } = useFilteredProducts(serverFilters);
+
+  // Price filtering happens client-side against each product's actual displayed price —
+  // see getDisplayPriceAmount for why that can't be a straight NGN column comparison.
+  const products = useMemo(
+    () =>
+      unfilteredByPrice.filter((p) => {
+        const amount = getDisplayPriceAmount(p, getPrice);
+        return amount >= filters.minPrice && amount <= filters.maxPrice;
+      }),
+    [unfilteredByPrice, filters.minPrice, filters.maxPrice, getPrice]
+  );
 
   // Get all products for categories (we still need this for filter options)
   const { data: allProducts = [] } = useProducts();
+
+  useTrackItemList("Sale", products, getPrice, currency, isLoading);
 
   // Set page title
   useEffect(() => {
@@ -62,7 +93,7 @@ const Sale = () => {
           <ProductFilters
             onFiltersChange={setFilters}
             availableCategories={Array.from(new Set(allProducts.map(p => p.category)))}
-            maxPrice={allProducts.length > 0 ? Math.max(...allProducts.map(p => p.price)) : 1000}
+            maxPrice={allProducts.length > 0 ? Math.max(...allProducts.map(p => getDisplayPriceAmount(p, getPrice))) : 1000}
           />
 
           {isLoading ? (
@@ -80,7 +111,7 @@ const Sale = () => {
                     <Badge className="absolute top-4 right-4 z-10 bg-secondary text-secondary-foreground">
                       {discount}% OFF
                     </Badge>
-                    <ProductCard {...productDisplay} product={product} />
+                    <ProductCard {...productDisplay} product={product} listName="Sale" />
                     <div className="mt-2 flex items-center gap-2">
                       <span className="text-lg font-semibold">${product.price}</span>
                       <span className="text-sm text-muted-foreground line-through">
@@ -100,6 +131,7 @@ const Sale = () => {
       </section>
 
       <Newsletter />
+      <Footer />
     </div>
   );
 };

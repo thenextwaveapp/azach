@@ -17,6 +17,37 @@ export const useProduct = (id: string) => {
   });
 };
 
+export const useProductsByStyle = (styleCode: string | undefined, excludeId: string) => {
+  return useQuery({
+    queryKey: ['products', 'style', styleCode, excludeId],
+    queryFn: () => productService.getByStyleCode(styleCode!, excludeId),
+    enabled: !!styleCode,
+  });
+};
+
+export const useBundles = () => {
+  return useQuery({
+    queryKey: ['products', 'bundles'],
+    queryFn: () => productService.getBundles(),
+  });
+};
+
+export const useBundleComponents = (bundleId: string | undefined) => {
+  return useQuery({
+    queryKey: ['products', 'bundle-components', bundleId],
+    queryFn: () => productService.getBundleComponents(bundleId!),
+    enabled: !!bundleId,
+  });
+};
+
+export const useBundleSiblings = (bundleId: string | undefined, excludeId: string) => {
+  return useQuery({
+    queryKey: ['products', 'bundle-siblings', bundleId, excludeId],
+    queryFn: () => productService.getBundleSiblings(bundleId!, excludeId),
+    enabled: !!bundleId,
+  });
+};
+
 export const useFeaturedProducts = () => {
   return useQuery({
     queryKey: ['products', 'featured'],

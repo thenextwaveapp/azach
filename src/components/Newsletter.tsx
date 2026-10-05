@@ -2,18 +2,34 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
 import { useToast } from "@/hooks/use-toast";
+import { invokeFunction } from "@/lib/functionError";
+import { trackGenerateLead } from "@/lib/analytics";
 
 export const Newsletter = () => {
   const [email, setEmail] = useState("");
+  const [submitting, setSubmitting] = useState(false);
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    toast({
-      title: "Thank you for subscribing!",
-      description: "You'll receive our latest updates and exclusive offers.",
-    });
-    setEmail("");
+    setSubmitting(true);
+    try {
+      await invokeFunction("subscribe-newsletter", { email });
+      trackGenerateLead("newsletter");
+      toast({
+        title: "Thank you for subscribing!",
+        description: "You'll receive our latest updates and exclusive offers.",
+      });
+      setEmail("");
+    } catch (err) {
+      toast({
+        title: "Something went wrong",
+        description: err instanceof Error ? err.message : "We couldn't subscribe that email. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -33,26 +49,26 @@ export const Newsletter = () => {
                 required
                 className="flex-1 focus:outline-none focus-visible:outline-none focus-visible:ring-0 focus-visible:ring-offset-0"
               />
-              <Button type="submit" className="bg-[#a97c50] hover:bg-[#8b6440] transition-colors">
-                Subscribe
+              <Button type="submit" disabled={submitting} className="bg-[#a97c50] hover:bg-[#8b6440] transition-colors disabled:opacity-60">
+                {submitting ? "Subscribing..." : "Subscribe"}
               </Button>
             </form>
 
             {/* Right: Social Media Icons */}
             <div className="flex gap-6 items-center">
-              <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
+              <a href="https://www.instagram.com/azachng" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
                 <img src="/instagram.png" alt="Instagram" className="h-6 w-6" />
                 <span className="sr-only">Instagram</span>
               </a>
-              <a href="https://tiktok.com" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
+              <a href="https://www.tiktok.com/@azachng" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
                 <img src="/tiktok.png" alt="TikTok" className="h-6 w-6" />
                 <span className="sr-only">TikTok</span>
               </a>
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
+              <a href="https://x.com/azachng?s=11" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
                 <img src="/x.png" alt="X" className="h-6 w-6" />
                 <span className="sr-only">X</span>
               </a>
-              <a href="https://facebook.com" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
+              <a href="https://www.facebook.com/share/18yazwSQ52/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
                 <img src="/facebook.png" alt="Facebook" className="h-6 w-6" />
                 <span className="sr-only">Facebook</span>
               </a>

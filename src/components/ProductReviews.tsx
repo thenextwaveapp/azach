@@ -1,74 +1,56 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Star, CheckCircle } from "lucide-react";
+import { Star, CheckCircle, Clock } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { useProductReviews, useCreateReview } from "@/hooks/useReviews";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-
-interface Review {
-  id: string;
-  user_name: string;
-  rating: number;
-  comment: string;
-  created_at: string;
-  verified_purchase?: boolean;
-}
 
 interface ProductReviewsProps {
   productId: string;
-  reviews?: Review[];
-  averageRating?: number;
-  totalReviews?: number;
 }
 
-export const ProductReviews = ({ 
-  productId, 
-  reviews = [], 
-  averageRating = 0,
-  totalReviews = 0 
-}: ProductReviewsProps) => {
-  const { user } = useAuth();
-  const { toast } = useToast();
-  const [rating, setRating] = useState(5);
-  const [comment, setComment] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+const renderStars = (rating: number, size: "sm" | "md" = "md") => {
+  const sizeClass = size === "sm" ? "h-3 w-3" : "h-4 w-4";
+  return (
+    <div className="flex gap-0.5">
+      {[1, 2, 3, 4, 5].map((star) => (
+        <Star
+          key={star}
+          className={`${sizeClass} ${
+            star <= rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
+          }`}
+        />
+      ))}
+    </div>
+  );
+};
 
-  // Mock reviews data - in production, this would come from an API
-  const mockReviews: Review[] = reviews.length > 0 ? reviews : [
-    {
-      id: "1",
-      user_name: "Sarah M.",
-      rating: 5,
-      comment: "Absolutely love this piece! The quality is exceptional and it fits perfectly. Highly recommend!",
-      created_at: "2024-01-15",
-      verified_purchase: true,
-    },
-    {
-      id: "2",
-      user_name: "James T.",
-      rating: 4,
-      comment: "Great quality denim, very comfortable. The fit is true to size. Only minor issue is the color is slightly lighter than shown.",
-      created_at: "2024-01-10",
-      verified_purchase: true,
-    },
-    {
-      id: "3",
-      user_name: "Emma L.",
-      rating: 5,
-      comment: "Perfect! Exactly as described. The craftsmanship is outstanding. Will definitely order again.",
-      created_at: "2024-01-05",
-      verified_purchase: true,
-    },
-  ];
+export const ProductReviews = ({ productId }: ProductReviewsProps) => {
+  const { user, isAnonymous } = useAuth();
+  const { toast } = useToast();
+  const { data: reviews = [], isLoading } = useProductReviews(productId, user?.id);
+  const createReview = useCreateReview();
+
+  const [rating, setRating] = useState(5);
+  const [userName, setUserName] = useState("");
+  const [comment, setComment] = useState("");
+
+  const approvedReviews = useMemo(() => reviews.filter((r) => r.status === "approved"), [reviews]);
+  const ownReview = useMemo(
+    () => (user && !isAnonymous ? reviews.find((r) => r.user_id === user.id) : undefined),
+    [reviews, user, isAnonymous]
+  );
 
   const handleSubmitReview = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!user) {
+
+    if (!user || isAnonymous) {
       toast({
         title: "Login required",
         description: "Please login to submit a review",
@@ -77,48 +59,48 @@ export const ProductReviews = ({
       return;
     }
 
-    setIsSubmitting(true);
-    
-    // In production, this would make an API call
-    setTimeout(() => {
+    if (!userName.trim()) {
+      toast({
+        title: "Name required",
+        description: "Please enter the name you'd like shown on your review",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      await createReview.mutateAsync({
+        product_id: productId,
+        user_id: user.id,
+        user_name: userName.trim(),
+        rating,
+        comment,
+      });
       toast({
         title: "Review submitted",
-        description: "Thank you for your feedback!",
+        description: "Thanks for your feedback! It'll appear once our team approves it.",
       });
       setComment("");
       setRating(5);
-      setIsSubmitting(false);
-    }, 1000);
-  };
-
-  const renderStars = (rating: number, size: "sm" | "md" = "md") => {
-    const sizeClass = size === "sm" ? "h-3 w-3" : "h-4 w-4";
-    return (
-      <div className="flex gap-0.5">
-        {[1, 2, 3, 4, 5].map((star) => (
-          <Star
-            key={star}
-            className={`${sizeClass} ${
-              star <= rating ? "fill-yellow-400 text-yellow-400" : "text-gray-300"
-            }`}
-          />
-        ))}
-      </div>
-    );
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: error.message || "Failed to submit review",
+        variant: "destructive",
+      });
+    }
   };
 
   const ratingDistribution = [5, 4, 3, 2, 1].map((star) => {
-    const count = mockReviews.filter((r) => r.rating === star).length;
-    const percentage = mockReviews.length > 0 ? (count / mockReviews.length) * 100 : 0;
+    const count = approvedReviews.filter((r) => r.rating === star).length;
+    const percentage = approvedReviews.length > 0 ? (count / approvedReviews.length) * 100 : 0;
     return { star, count, percentage };
   });
 
-  const avgRating = averageRating || 
-    (mockReviews.length > 0
-      ? mockReviews.reduce((sum, r) => sum + r.rating, 0) / mockReviews.length
-      : 0);
-
-  const total = totalReviews || mockReviews.length;
+  const avgRating =
+    approvedReviews.length > 0
+      ? approvedReviews.reduce((sum, r) => sum + r.rating, 0) / approvedReviews.length
+      : 0;
 
   return (
     <div className="space-y-8">
@@ -136,7 +118,7 @@ export const ProductReviews = ({
                 <div>
                   {renderStars(Math.round(avgRating))}
                   <p className="text-sm text-muted-foreground mt-1">
-                    Based on {total} review{total !== 1 ? "s" : ""}
+                    Based on {approvedReviews.length} review{approvedReviews.length !== 1 ? "s" : ""}
                   </p>
                 </div>
               </div>
@@ -163,37 +145,62 @@ export const ProductReviews = ({
             {/* Write Review Form */}
             <div>
               <h3 className="font-semibold mb-4">Write a Review</h3>
-              <form onSubmit={handleSubmitReview} className="space-y-4">
-                <div>
-                  <Label>Rating</Label>
-                  <Select value={String(rating)} onValueChange={(v) => setRating(Number(v))}>
-                    <SelectTrigger>
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {[5, 4, 3, 2, 1].map((star) => (
-                        <SelectItem key={star} value={String(star)}>
-                          {star} Star{star !== 1 ? "s" : ""}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+              {ownReview ? (
+                <div className="flex items-start gap-2 text-sm text-muted-foreground">
+                  <Clock className="h-4 w-4 mt-0.5 shrink-0" />
+                  <p>
+                    You've already submitted a review for this product.
+                    {ownReview.status === "pending" && " It's awaiting approval."}
+                    {ownReview.status === "rejected" && " It was not approved for publishing."}
+                  </p>
                 </div>
-                <div>
-                  <Label htmlFor="comment">Your Review</Label>
-                  <Textarea
-                    id="comment"
-                    placeholder="Share your thoughts about this product..."
-                    value={comment}
-                    onChange={(e) => setComment(e.target.value)}
-                    rows={4}
-                    required
-                  />
-                </div>
-                <Button type="submit" disabled={isSubmitting}>
-                  {isSubmitting ? "Submitting..." : "Submit Review"}
-                </Button>
-              </form>
+              ) : !user || isAnonymous ? (
+                <p className="text-sm text-muted-foreground">
+                  Please login to write a review.
+                </p>
+              ) : (
+                <form onSubmit={handleSubmitReview} className="space-y-4">
+                  <div>
+                    <Label htmlFor="userName">Your Name</Label>
+                    <Input
+                      id="userName"
+                      placeholder="e.g. Sarah M."
+                      value={userName}
+                      onChange={(e) => setUserName(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label>Rating</Label>
+                    <Select value={String(rating)} onValueChange={(v) => setRating(Number(v))}>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {[5, 4, 3, 2, 1].map((star) => (
+                          <SelectItem key={star} value={String(star)}>
+                            {star} Star{star !== 1 ? "s" : ""}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  <div>
+                    <Label htmlFor="comment">Your Review</Label>
+                    <Textarea
+                      id="comment"
+                      placeholder="Share your thoughts about this product..."
+                      value={comment}
+                      onChange={(e) => setComment(e.target.value)}
+                      rows={4}
+                      required
+                    />
+                  </div>
+                  <Button type="submit" disabled={createReview.isPending}>
+                    {createReview.isPending ? "Submitting..." : "Submit Review"}
+                  </Button>
+                </form>
+              )}
             </div>
           </div>
         </CardContent>
@@ -202,8 +209,12 @@ export const ProductReviews = ({
       {/* Reviews List */}
       <div className="space-y-4">
         <h3 className="text-xl font-semibold">All Reviews</h3>
-        {mockReviews.length > 0 ? (
-          mockReviews.map((review) => (
+        {isLoading ? (
+          <Card>
+            <CardContent className="pt-6 text-center text-muted-foreground">Loading reviews...</CardContent>
+          </Card>
+        ) : approvedReviews.length > 0 ? (
+          approvedReviews.map((review) => (
             <Card key={review.id}>
               <CardContent className="pt-6">
                 <div className="flex items-start gap-4">
@@ -249,4 +260,3 @@ export const ProductReviews = ({
     </div>
   );
 };
-

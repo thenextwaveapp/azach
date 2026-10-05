@@ -7,6 +7,7 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.38.4';
 import { crypto } from 'https://deno.land/std@0.168.0/crypto/mod.ts';
+import { createOrderFromPaystackTransaction } from '../_shared/createOrderFromPaystack.ts';
 
 /**
  * Verify Paystack webhook signature using HMAC SHA512
@@ -79,7 +80,6 @@ serve(async (req) => {
     // Handle the charge.success event
     if (event.event === 'charge.success') {
       const data = event.data;
-      const metadata = data.metadata || {};
 
       // Initialize Supabase client with service role key for admin access
       const supabaseAdmin = createClient(
@@ -93,130 +93,15 @@ serve(async (req) => {
         }
       );
 
-      // Check if order already exists (prevent duplicate processing)
-      const { data: existingOrder } = await supabaseAdmin
-        .from('orders')
-        .select('id')
-        .eq('paystack_reference', data.reference)
-        .single();
+      const result = await createOrderFromPaystackTransaction(supabaseAdmin, data);
 
-      if (existingOrder) {
-        console.log('Order already exists for reference:', data.reference);
-        return new Response(JSON.stringify({ received: true, duplicate: true }), {
+      if (!result.ok) {
+        console.error('Order creation failed:', result.error);
+        return new Response(JSON.stringify({ error: result.error }), {
           headers: { 'Content-Type': 'application/json' },
-          status: 200,
+          status: 400,
         });
       }
-
-      // Parse cart items from metadata
-      const cartItems = metadata.cartItems ? JSON.parse(metadata.cartItems) : [];
-
-      if (!cartItems || cartItems.length === 0) {
-        console.error('No cart items in metadata');
-        return new Response('No cart items', { status: 400 });
-      }
-
-      // Parse shipping address from metadata
-      const shippingAddress = metadata.shippingAddress
-        ? JSON.parse(metadata.shippingAddress)
-        : null;
-
-      // Calculate totals (amount from Paystack is in kobo/cents)
-      const total = data.amount / 100;
-      const shippingCost = metadata.shippingCost || 0;
-      const subtotal = total - shippingCost;
-
-      // Get user ID from customer email if available
-      let userId = null;
-      if (data.customer?.email) {
-        const { data: userData } = await supabaseAdmin
-          .from('auth.users')
-          .select('id')
-          .eq('email', data.customer.email)
-          .single();
-        userId = userData?.id;
-      }
-
-      // Create order (use shipping address as billing address by default)
-      const { data: order, error: orderError } = await supabaseAdmin
-        .from('orders')
-        .insert({
-          user_id: userId,
-          status: 'processing',
-          payment_status: 'paid',
-          payment_provider: 'paystack',
-          total: total,
-          subtotal: subtotal,
-          shipping_cost: shippingCost,
-          paystack_reference: data.reference,
-          paystack_access_code: data.access_code,
-          shipping_address: shippingAddress,
-          billing_address: shippingAddress, // Same as shipping for now
-        })
-        .select()
-        .single();
-
-      if (orderError) {
-        console.error('Error creating order:', orderError);
-        throw orderError;
-      }
-
-      // Create order items
-      const orderItems = cartItems
-        .filter((item: any) => item.id !== 'shipping')
-        .map((item: any) => ({
-          order_id: order.id,
-          product_id: item.id,
-          product_name: item.name,
-          product_image: item.image,
-          price: item.price,
-          quantity: item.quantity,
-        }));
-
-      const { error: itemsError } = await supabaseAdmin
-        .from('order_items')
-        .insert(orderItems);
-
-      if (itemsError) {
-        console.error('Error creating order items:', itemsError);
-        throw itemsError;
-      }
-
-      // Update product stock
-      for (const item of cartItems) {
-        if (item.id === 'shipping') continue;
-
-        const { data: product } = await supabaseAdmin
-          .from('products')
-          .select('stock')
-          .eq('id', item.id)
-          .single();
-
-        if (product) {
-          const newStock = Math.max(0, product.stock - item.quantity);
-          await supabaseAdmin
-            .from('products')
-            .update({
-              stock: newStock,
-              in_stock: newStock > 0,
-            })
-            .eq('id', item.id);
-        }
-      }
-
-      // Release stock reservation
-      const reservationSessionId = metadata.reservationSessionId;
-      if (reservationSessionId) {
-        await supabaseAdmin.rpc('release_reservation', {
-          p_session_id: reservationSessionId,
-        });
-      }
-
-      console.log('Order created successfully:', order.id);
-
-      // TODO: Create DHL shipment (implement in Phase 4)
-      // This would call DHL API to create shipment and get tracking number
-      // await createDHLShipment(order.id, shippingAddress, orderItems);
     }
 
     return new Response(JSON.stringify({ received: true }), {

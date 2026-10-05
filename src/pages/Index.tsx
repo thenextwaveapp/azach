@@ -8,10 +8,35 @@ import { useFeaturedProducts } from "@/hooks/useProducts";
 import { productToDisplay } from "@/utils/productHelpers";
 import { OptimizedImage } from "@/components/OptimizedImage";
 import { Link } from "react-router-dom";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+
+// Matches the grid's lg:grid-cols-5 breakpoint — below it (2-3 cols) a full page
+// of 6 fills whole rows; at lg+ (5 cols) a page of 5 fills exactly one row.
+const FEATURED_PAGE_SIZE_MOBILE = 6;
+const FEATURED_PAGE_SIZE_DESKTOP = 5;
 
 const Index = () => {
   const { data: featuredProducts = [], isLoading } = useFeaturedProducts();
+  const [featuredPage, setFeaturedPage] = useState(0);
+  const [isDesktop, setIsDesktop] = useState(false);
+
+  useEffect(() => {
+    const mql = window.matchMedia("(min-width: 1024px)");
+    setIsDesktop(mql.matches);
+    const handleChange = (e: MediaQueryListEvent) => {
+      setIsDesktop(e.matches);
+      setFeaturedPage(0);
+    };
+    mql.addEventListener("change", handleChange);
+    return () => mql.removeEventListener("change", handleChange);
+  }, []);
+
+  const featuredPageSize = isDesktop ? FEATURED_PAGE_SIZE_DESKTOP : FEATURED_PAGE_SIZE_MOBILE;
+  const featuredPageCount = Math.ceil(featuredProducts.length / featuredPageSize);
+  const visibleFeaturedProducts = featuredProducts.slice(
+    featuredPage * featuredPageSize,
+    featuredPage * featuredPageSize + featuredPageSize
+  );
 
   useEffect(() => {
     document.title = "AZACH - Sustainable Upcycled Fashion";
@@ -40,29 +65,112 @@ const Index = () => {
           ) : featuredProducts.length > 0 ? (
             <div className="relative">
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-6">
-                {featuredProducts.slice(0, 5).map((product) => (
-                  <ProductCard key={product.id} {...productToDisplay(product)} product={product} />
+                {visibleFeaturedProducts.map((product) => (
+                  <ProductCard key={product.id} {...productToDisplay(product)} product={product} listName="New Pieces" />
                 ))}
               </div>
               {/* Pagination Arrows */}
-              <div className="flex gap-3 justify-end mt-6">
-                <button className="w-10 h-10 rounded-full border-2 border-foreground flex items-center justify-center hover:bg-foreground hover:text-background transition-colors">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                  </svg>
-                </button>
-                <button className="w-10 h-10 rounded-full border-2 border-foreground flex items-center justify-center hover:bg-foreground hover:text-background transition-colors">
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                  </svg>
-                </button>
-              </div>
+              {featuredPageCount > 1 && (
+                <div className="flex gap-3 justify-end mt-6">
+                  <button
+                    onClick={() => setFeaturedPage((p) => Math.max(0, p - 1))}
+                    disabled={featuredPage === 0}
+                    className="w-10 h-10 rounded-full border-2 border-foreground flex items-center justify-center hover:bg-foreground hover:text-background transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-foreground"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={() => setFeaturedPage((p) => Math.min(featuredPageCount - 1, p + 1))}
+                    disabled={featuredPage >= featuredPageCount - 1}
+                    className="w-10 h-10 rounded-full border-2 border-foreground flex items-center justify-center hover:bg-foreground hover:text-background transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-foreground"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                    </svg>
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
             <div className="text-center py-12">
               <p className="text-muted-foreground">No featured products available.</p>
             </div>
           )}
+        </div>
+      </section>
+
+      {/* LOOKBOOK STRIP */}
+      <section className="py-16 bg-[#141414] text-white">
+        <div className="container mx-auto px-4 text-center">
+          <p className="text-xs uppercase tracking-[0.2em] text-white/50 mb-3">The Collection</p>
+          <h2 className="text-2xl md:text-3xl font-semibold uppercase tracking-wide mb-8">See The Full Lookbook</h2>
+          <Link to="/lookbook">
+            <button className="border-2 border-white px-10 py-3 text-sm uppercase tracking-wide hover:bg-white hover:text-black transition-colors">
+              View Lookbook
+            </button>
+          </Link>
+        </div>
+      </section>
+
+      {/* SHOP BY TYPE */}
+      <section className="py-8 bg-muted">
+        <div className="container mx-auto px-4">
+          <h2 className="text-2xl md:text-3xl font-semibold uppercase tracking-wide mb-6">Shop by Type</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
+            <Link to="/shop-all?category=tops" className="group text-center">
+              <div className="relative aspect-square mb-3 overflow-hidden">
+                <OptimizedImage
+                  src="/category-tops.png"
+                  alt="Tops"
+                  aspectRatio="square"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
+              </div>
+              <span className="text-sm font-medium uppercase tracking-wide">Tops</span>
+            </Link>
+
+            <Link to="/shop-all?category=bottoms" className="group text-center">
+              <div className="relative aspect-square mb-3 overflow-hidden">
+                <OptimizedImage
+                  src="/category-bottoms.png"
+                  alt="Bottoms"
+                  aspectRatio="square"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
+              </div>
+              <span className="text-sm font-medium uppercase tracking-wide">Bottoms</span>
+            </Link>
+
+            <Link to="/shop-all?category=sets" className="group text-center">
+              <div className="relative aspect-square mb-3 overflow-hidden">
+                <OptimizedImage
+                  src="/category-sets.png"
+                  alt="Sets"
+                  aspectRatio="square"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
+              </div>
+              <span className="text-sm font-medium uppercase tracking-wide">Sets</span>
+            </Link>
+
+            <Link to="/shop-all?category=accessories" className="group text-center">
+              <div className="relative aspect-square mb-3 overflow-hidden">
+                <OptimizedImage
+                  src="/category-accessories.png"
+                  alt="Accessories"
+                  aspectRatio="square"
+                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  loading="lazy"
+                />
+              </div>
+              <span className="text-sm font-medium uppercase tracking-wide">Accessories</span>
+            </Link>
+          </div>
         </div>
       </section>
 
@@ -131,66 +239,6 @@ const Index = () => {
                   </svg>
                 </button>
               </div>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      {/* SHOP BY TYPE */}
-      <section className="py-8 bg-muted">
-        <div className="container mx-auto px-4">
-          <h2 className="text-2xl md:text-3xl font-semibold uppercase tracking-wide mb-6">Shop by Type</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-6 max-w-5xl mx-auto">
-            <Link to="/shop-all?category=tops" className="group text-center">
-              <div className="relative aspect-square mb-3 overflow-hidden">
-                <OptimizedImage
-                  src="/category-tops.png"
-                  alt="Tops"
-                  aspectRatio="square"
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  loading="lazy"
-                />
-              </div>
-              <span className="text-sm font-medium uppercase tracking-wide">Tops</span>
-            </Link>
-
-            <Link to="/shop-all?category=bottoms" className="group text-center">
-              <div className="relative aspect-square mb-3 overflow-hidden">
-                <OptimizedImage
-                  src="/category-bottoms.png"
-                  alt="Bottoms"
-                  aspectRatio="square"
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  loading="lazy"
-                />
-              </div>
-              <span className="text-sm font-medium uppercase tracking-wide">Bottoms</span>
-            </Link>
-
-            <Link to="/shop-all?category=sets" className="group text-center">
-              <div className="relative aspect-square mb-3 overflow-hidden">
-                <OptimizedImage
-                  src="/category-sets.png"
-                  alt="Sets"
-                  aspectRatio="square"
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  loading="lazy"
-                />
-              </div>
-              <span className="text-sm font-medium uppercase tracking-wide">Sets</span>
-            </Link>
-
-            <Link to="/shop-all?category=accessories" className="group text-center">
-              <div className="relative aspect-square mb-3 overflow-hidden">
-                <OptimizedImage
-                  src="/category-accessories.png"
-                  alt="Accessories"
-                  aspectRatio="square"
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  loading="lazy"
-                />
-              </div>
-              <span className="text-sm font-medium uppercase tracking-wide">Accessories</span>
             </Link>
           </div>
         </div>

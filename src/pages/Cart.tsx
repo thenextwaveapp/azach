@@ -7,16 +7,35 @@ import { Trash2, Plus, Minus, ShoppingBag } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import { useToast } from "@/hooks/use-toast";
 import { useEffect } from "react";
+import { trackViewCart } from "@/lib/analytics";
 
 const Cart = () => {
   // Set page title
   useEffect(() => {
     document.title = "Shopping Cart - AZACH";
   }, []);
-  const { items, removeFromCart, updateQuantity, getTotalPrice, clearCart } = useCart();
-  const { formatPrice } = useCurrency();
+  const { items, removeFromCart, updateQuantity, clearCart } = useCart();
+  const { formatCartTotal, currency, getPrice } = useCurrency();
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (items.length === 0) return;
+    trackViewCart(
+      items.map((item) => {
+        const display = getPrice(item);
+        return {
+          item_id: String(item.id),
+          item_name: item.name,
+          price: display?.amount ?? item.price,
+          quantity: item.quantity,
+          item_category: item.category,
+        };
+      }),
+      currency
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleCheckout = () => {
     if (items.length === 0) {
@@ -77,18 +96,20 @@ const Cart = () => {
                     <Button
                       variant="ghost"
                       size="icon"
+                      aria-label={`Remove ${item.name} from cart`}
                       onClick={() => removeFromCart(item.id)}
                       className="text-destructive hover:text-destructive"
                     >
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       <Button
                         variant="outline"
                         size="icon"
+                        aria-label={`Decrease quantity of ${item.name}`}
                         className="h-8 w-8"
                         onClick={() => updateQuantity(item.id, item.quantity - 1)}
                       >
@@ -98,13 +119,14 @@ const Cart = () => {
                       <Button
                         variant="outline"
                         size="icon"
+                        aria-label={`Increase quantity of ${item.name}`}
                         className="h-8 w-8"
                         onClick={() => updateQuantity(item.id, item.quantity + 1)}
                       >
                         <Plus className="h-3 w-3" />
                       </Button>
                     </div>
-                    <p className="font-semibold">{formatPrice(item.price * item.quantity)}</p>
+                    <p className="font-semibold">{formatCartTotal([item])}</p>
                   </div>
                 </div>
               </div>
@@ -128,7 +150,7 @@ const Cart = () => {
               <div className="space-y-2">
                 <div className="flex justify-between text-lg font-semibold">
                   <span>Subtotal ({items.reduce((sum, item) => sum + item.quantity, 0)} items)</span>
-                  <span>{formatPrice(getTotalPrice())}</span>
+                  <span>{formatCartTotal(items)}</span>
                 </div>
               </div>
 

@@ -13,10 +13,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
 export const AccountDropdown = () => {
-  const { user, signOut } = useAuth();
+  const { user, isAnonymous, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
-  const isAuthenticated = !!user;
+  const isAuthenticated = !!user && !isAnonymous;
 
   const handleLogout = async () => {
     await signOut();
@@ -30,7 +30,7 @@ export const AccountDropdown = () => {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="hover:bg-muted hover:text-foreground">
+        <Button variant="ghost" size="icon" aria-label="Account menu" className="hover:bg-muted hover:text-foreground">
           <User className="h-5 w-5" />
         </Button>
       </DropdownMenuTrigger>

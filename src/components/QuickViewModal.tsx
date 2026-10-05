@@ -10,6 +10,7 @@ import { OptimizedImage } from "@/components/OptimizedImage";
 import { Product } from "@/types/product";
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import { trackAddToCart, trackAddToWishlist } from "@/lib/analytics";
 
 interface QuickViewModalProps {
   product: Product | null;
@@ -19,7 +20,7 @@ interface QuickViewModalProps {
 
 export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalProps) => {
   const { addToCart } = useCart();
-  const { formatPrice } = useCurrency();
+  const { currency, formatDisplayPrice, getPrice } = useCurrency();
   const { toast } = useToast();
   const { user } = useAuth();
   const { data: isInWishlist } = useIsInWishlist(product?.id || '');
@@ -31,6 +32,16 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
 
   if (!product) return null;
 
+  const analyticsItem = () => {
+    const display = getPrice(product);
+    return {
+      item_id: String(product.id),
+      item_name: product.name,
+      price: display?.amount ?? product.price,
+      item_category: product.category,
+    };
+  };
+
   const handleAddToCart = () => {
     addToCart({
       id: product.id,
@@ -38,7 +49,9 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
       price: product.price,
       image: product.image_url,
       category: product.category,
+      currency_prices: product.currency_prices,
     });
+    trackAddToCart(analyticsItem(), currency);
     toast({
       title: "Added to cart",
       description: `${product.name} has been added to your cart.`,
@@ -71,6 +84,7 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
         });
       } else {
         await addToWishlist.mutateAsync(product.id);
+        trackAddToWishlist(analyticsItem(), currency);
         toast({
           title: 'Added to wishlist',
           description: `${product.name} has been added to your wishlist.`,
@@ -148,11 +162,11 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
               <h2 className="text-3xl font-semibold mb-4">{product.name}</h2>
               <div className="flex items-baseline gap-3 mb-6">
                 <span className="text-2xl font-semibold">
-                  {formatPrice(product.price)}
+                  {formatDisplayPrice(product)}
                 </span>
                 {product.original_price && product.original_price > product.price && (
                   <span className="text-lg text-muted-foreground line-through">
-                    {formatPrice(product.original_price)}
+                    {formatDisplayPrice(product, 'original_price')}
                   </span>
                 )}
               </div>
@@ -196,7 +210,7 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
                   onClick={handleToggleWishlist}
                 >
                   <Heart className={`mr-2 h-5 w-5 transition-colors ${isInWishlist ? 'fill-red-500 text-red-500' : ''}`} />
-                  {isInWishlist ? 'Saved' : 'Save'}
+                  {isInWishlist ? 'In Wishlist' : 'Add to Wishlist'}
                 </Button>
                 <Link to={`/product/${product.id}`} className="flex-1">
                   <Button size="lg" variant="outline" className="w-full">

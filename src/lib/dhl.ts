@@ -3,12 +3,13 @@
  * Handles shipping rate calculation and tracking for global shipments from Nigeria
  */
 
-import { supabase } from './supabase';
+import { invokeFunction } from './functionError';
 
 export interface DHLRateRequest {
   destinationCountry: string;
   destinationPostalCode?: string;
   destinationCity?: string;
+  destinationAddressLine1?: string;
   items: Array<{
     id: string;
     quantity: number;
@@ -97,24 +98,13 @@ export const getDHLRates = async (
   request: DHLRateRequest
 ): Promise<DHLRateResponse> => {
   try {
-    const { data, error } = await supabase.functions.invoke('dhl-get-rates', {
-      body: {
-        destinationCountry: request.destinationCountry,
-        destinationPostalCode: request.destinationPostalCode,
-        destinationCity: request.destinationCity,
-        items: request.items,
-      },
+    const data = await invokeFunction<any>('dhl-get-rates', {
+      destinationCountry: request.destinationCountry,
+      destinationPostalCode: request.destinationPostalCode,
+      destinationCity: request.destinationCity,
+      destinationAddressLine1: request.destinationAddressLine1,
+      items: request.items,
     });
-
-    if (data && data.error) {
-      throw new Error(data.error);
-    }
-
-    if (error) {
-      console.error('DHL rates error:', error);
-      const errorMessage = data?.error || error.message || 'Failed to get shipping rates';
-      throw new Error(errorMessage);
-    }
 
     if (!data || !data.rates || data.rates.length === 0) {
       throw new Error('No shipping rates available for this destination');
@@ -210,19 +200,7 @@ export const trackDHLShipment = async (
   trackingNumber: string
 ): Promise<DHLTrackingInfo> => {
   try {
-    const { data, error } = await supabase.functions.invoke('dhl-track-shipment', {
-      body: { trackingNumber },
-    });
-
-    if (data && data.error) {
-      throw new Error(data.error);
-    }
-
-    if (error) {
-      console.error('DHL tracking error:', error);
-      const errorMessage = data?.error || error.message || 'Failed to track shipment';
-      throw new Error(errorMessage);
-    }
+    const data = await invokeFunction<any>('dhl-track-shipment', { trackingNumber });
 
     if (!data) {
       throw new Error('No tracking information available');
@@ -287,22 +265,10 @@ export const createDHLShipment = async (
   orderId: string
 ): Promise<DHLCreateShipmentResponse> => {
   try {
-    const { data, error } = await supabase.functions.invoke('dhl-create-shipment', {
-      body: { orderId },
-    });
-
-    if (data && data.error) {
-      throw new Error(data.error);
-    }
-
-    if (error) {
-      console.error('DHL shipment creation error:', error);
-      const errorMessage = data?.error || error.message || 'Failed to create shipment';
-      throw new Error(errorMessage);
-    }
+    const data = await invokeFunction<any>('dhl-create-shipment', { orderId });
 
     if (!data || !data.success) {
-      throw new Error(data?.error || 'Failed to create shipment');
+      throw new Error('Failed to create shipment');
     }
 
     return data;
@@ -320,25 +286,13 @@ export const validateDHLAddress = async (
   request: DHLValidateAddressRequest
 ): Promise<DHLValidateAddressResponse> => {
   try {
-    const { data, error } = await supabase.functions.invoke('dhl-validate-address', {
-      body: {
-        type: request.type || 'delivery',
-        countryCode: request.countryCode,
-        postalCode: request.postalCode,
-        cityName: request.cityName,
-        addressLine1: request.addressLine1,
-      },
+    const data = await invokeFunction<any>('dhl-validate-address', {
+      type: request.type || 'delivery',
+      countryCode: request.countryCode,
+      postalCode: request.postalCode,
+      cityName: request.cityName,
+      addressLine1: request.addressLine1,
     });
-
-    if (data && data.error) {
-      throw new Error(data.error);
-    }
-
-    if (error) {
-      console.error('DHL address validation error:', error);
-      const errorMessage = data?.error || error.message || 'Failed to validate address';
-      throw new Error(errorMessage);
-    }
 
     if (!data) {
       throw new Error('No validation response received');
