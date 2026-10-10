@@ -43,7 +43,7 @@ export const SearchDialog = ({ open, onOpenChange }: SearchDialogProps) => {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-3xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="font-display font-semibold tracking-normal normal-case">Search Products</DialogTitle>
+          <DialogTitle className="font-heading font-semibold tracking-normal normal-case">Search Products</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <div className="relative">

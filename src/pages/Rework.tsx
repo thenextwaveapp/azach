@@ -23,7 +23,6 @@ const Rework = () => {
 
   useEffect(() => {
     document.title = "Rework & Repair (RRS) - AZACH";
-    window.scrollTo(0, 0);
   }, []);
 
   const [formData, setFormData] = useState({
@@ -121,20 +120,20 @@ const Rework = () => {
         {/* Background Image */}
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: 'url(/header-rrs.png)' }}
+          style={{ backgroundImage: 'url(/campaign/banner-custom.jpg)', backgroundPosition: 'center 25%' }}
         />
         {/* Overlay */}
         <div className="absolute inset-0 bg-slate-900/35" />
 
         <div className="container mx-auto px-4 relative z-10 py-20">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-5xl md:text-6xl font-semibold uppercase tracking-tight text-white"
+            <h1 className="font-display text-5xl md:text-6xl font-bold uppercase text-white"
               style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}
             >
-              Rework & Repair (RRS)
+              Rework & Repair
             </h1>
-            <h2 className="text-2xl md:text-3xl font-light mt-4 text-white">
-              Transform What You Already Own
+            <h2 className="text-xl md:text-2xl font-light uppercase tracking-wide mt-4 text-white">
+              Transform what you already own
             </h2>
           </div>
         </div>

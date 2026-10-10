@@ -7,7 +7,6 @@ import { useEffect } from 'react';
 const About = () => {
   useEffect(() => {
     document.title = "About - AZACH";
-    window.scrollTo(0, 0);
   }, []);
 
   return (
@@ -20,22 +19,22 @@ const About = () => {
         <div
           className="absolute inset-0 bg-cover bg-no-repeat"
           style={{
-            backgroundImage: 'url(/header-about.png)',
-            backgroundPosition: 'center 30%'
+            backgroundImage: 'url(/campaign/hero-about.jpg)',
+            backgroundPosition: 'center 25%'
           }}
         />
         {/* Overlay */}
         <div className="absolute inset-0 bg-slate-900/35" />
 
         <div className="container mx-auto px-4 relative z-10 py-20">
-          <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-5xl md:text-6xl font-semibold uppercase tracking-tight text-white"
+          <div className="max-w-5xl mx-auto text-center">
+            <h1 className="font-display text-4xl sm:text-5xl md:text-6xl font-bold uppercase text-white"
               style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}
             >
-              About
+              It Started With What We Had
             </h1>
-            <h2 className="text-2xl md:text-3xl font-light mt-4 text-white">
-              Reconstructing What Already Exists
+            <h2 className="text-xl md:text-2xl font-light uppercase tracking-wide mt-4 text-white">
+              Before AZACH was a brand, it was a way of looking at things differently
             </h2>
           </div>
         </div>

@@ -101,14 +101,31 @@ const Index = () => {
         </div>
       </section>
 
-      {/* LOOKBOOK STRIP */}
-      <section className="py-16 bg-[#141414] text-white">
-        <div className="container mx-auto px-4 text-center">
-          <p className="text-xs uppercase tracking-[0.2em] text-white/50 mb-3">The Collection</p>
-          <h2 className="text-2xl md:text-3xl font-semibold uppercase tracking-wide mb-8">See The Full Lookbook</h2>
-          <Link to="/lookbook">
-            <button className="border-2 border-white px-10 py-3 text-sm uppercase tracking-wide hover:bg-white hover:text-black transition-colors">
-              View Lookbook
+      {/* CAMPAIGN STRIP */}
+      <section className="relative overflow-hidden text-white">
+        {/* Collage of campaign images as the backdrop */}
+        <div className="absolute inset-0 grid grid-cols-3 md:grid-cols-6">
+          {[1, 2, 3, 4, 5, 6].map((n) => (
+            <img
+              key={n}
+              src={`/campaign/strip-${n}.jpg`}
+              alt=""
+              className={`h-full w-full object-cover object-top ${n > 3 ? "hidden md:block" : ""}`}
+              loading="lazy"
+            />
+          ))}
+        </div>
+        <div className="absolute inset-0 bg-black/45" />
+        <div className="relative z-10 container mx-auto px-4 py-20 md:py-24 text-center">
+          <h2 className="font-display text-2xl sm:text-3xl md:text-4xl font-bold tracking-[0.25em] uppercase">
+            Reconstruction Into Refinement
+          </h2>
+          <p className="mt-4 text-sm md:text-base text-white/90">
+            Different Pasts, A More Considered Future
+          </p>
+          <Link to="/lookbook" className="inline-block mt-8">
+            <button className="bg-[#a97c50] hover:bg-[#8b6440] text-white px-8 py-3 text-sm uppercase tracking-wide font-semibold transition-colors">
+              View the Collection
             </button>
           </Link>
         </div>
@@ -122,7 +139,7 @@ const Index = () => {
             <Link to="/shop-all?category=tops" className="group text-center">
               <div className="relative aspect-square mb-3 overflow-hidden">
                 <OptimizedImage
-                  src="/category-tops.png"
+                  src="/campaign/cat-tops.jpg"
                   alt="Tops"
                   aspectRatio="square"
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -135,10 +152,11 @@ const Index = () => {
             <Link to="/shop-all?category=bottoms" className="group text-center">
               <div className="relative aspect-square mb-3 overflow-hidden">
                 <OptimizedImage
-                  src="/category-bottoms.png"
+                  src="/campaign/cat-bottoms.jpg"
                   alt="Bottoms"
                   aspectRatio="square"
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  style={{ objectPosition: 'center 25%' }}
                   loading="lazy"
                 />
               </div>
@@ -148,7 +166,7 @@ const Index = () => {
             <Link to="/shop-all?category=sets" className="group text-center">
               <div className="relative aspect-square mb-3 overflow-hidden">
                 <OptimizedImage
-                  src="/category-sets.png"
+                  src="/campaign/cat-sets.jpg"
                   alt="Sets"
                   aspectRatio="square"
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -161,10 +179,11 @@ const Index = () => {
             <Link to="/shop-all?category=accessories" className="group text-center">
               <div className="relative aspect-square mb-3 overflow-hidden">
                 <OptimizedImage
-                  src="/category-accessories.png"
+                  src="/campaign/cat-accessories.jpg"
                   alt="Accessories"
                   aspectRatio="square"
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  style={{ objectPosition: 'center 12%' }}
                   loading="lazy"
                 />
               </div>
@@ -174,132 +193,96 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Three Service Cards */}
+      {/* Service Banners */}
       <section className="py-6 bg-white">
         <div className="container mx-auto px-4">
-          <div className="grid md:grid-cols-3 gap-6">
-            <Link to="/bespoke" className="group relative h-64 overflow-hidden">
+          <div className="grid md:grid-cols-2 gap-6">
+            <Link to="/bespoke" className="group relative h-72 overflow-hidden">
               <OptimizedImage
-                src="/homepage-custom.png"
-                alt="Bespoke"
+                src="/campaign/banner-custom.jpg"
+                alt="Custom, Rework & Repair"
                 aspectRatio="landscape"
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                className="absolute inset-0 w-full h-full object-cover object-[center_62%] transition-transform duration-500 group-hover:scale-105"
                 loading="lazy"
               />
               <div className="absolute inset-0 bg-black/60 group-hover:bg-black/70 transition-colors" />
-              <div className="absolute inset-0 flex flex-col justify-center p-8 text-white">
-                <h3 className="text-2xl font-semibold mb-3 uppercase">Bespoke</h3>
-                <p className="text-sm mb-6 max-w-xs">Made for you. Work with our studio to create something personal.</p>
-                <button className="border-2 border-white px-6 py-2 text-sm uppercase tracking-wide hover:bg-white hover:text-black transition-colors self-start flex items-center gap-2">
-                  Learn More
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
-                </button>
+              <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-white text-center">
+                <h3 className="font-display text-3xl font-bold mb-2">MAKE IT YOURS</h3>
+                <p className="text-xs uppercase tracking-[0.2em] mb-4">Custom + Rework & Repair</p>
+                <p className="text-sm max-w-md">
+                  Have an idea? Have something in your wardrobe that could become something more? Work with
+                  AZACH to create, reconstruct, repair or reshape a piece.
+                </p>
               </div>
             </Link>
 
-            <Link to="/rework" className="group relative h-64 overflow-hidden">
+            <Link to="/donate-garments" className="group relative h-72 overflow-hidden">
               <OptimizedImage
-                src="/homepage-rrs.png"
-                alt="Rework & Repair"
+                src="/campaign/banner-donate.jpg"
+                alt="Garment Donation"
                 aspectRatio="landscape"
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                 loading="lazy"
               />
               <div className="absolute inset-0 bg-black/60 group-hover:bg-black/70 transition-colors" />
-              <div className="absolute inset-0 flex flex-col justify-center p-8 text-white">
-                <h3 className="text-2xl font-semibold mb-3 uppercase">Rework & Repair</h3>
-                <p className="text-sm mb-6 max-w-xs">Give your pieces a second life.</p>
-                <button className="border-2 border-white px-6 py-2 text-sm uppercase tracking-wide hover:bg-white hover:text-black transition-colors self-start flex items-center gap-2">
-                  Learn More
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
-                </button>
-              </div>
-            </Link>
-
-            <Link to="/donate-garments" className="group relative h-64 overflow-hidden">
-              <OptimizedImage
-                src="/homepage-donate.png"
-                alt="Donate Garments"
-                aspectRatio="landscape"
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-black/60 group-hover:bg-black/70 transition-colors" />
-              <div className="absolute inset-0 flex flex-col justify-center p-8 text-white">
-                <h3 className="text-2xl font-semibold mb-3 uppercase">Donate Garments</h3>
-                <p className="text-sm mb-6 max-w-xs">Your old clothes can help someone else and the planet.</p>
-                <button className="border-2 border-white px-6 py-2 text-sm uppercase tracking-wide hover:bg-white hover:text-black transition-colors self-start flex items-center gap-2">
-                  Learn More
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
-                </button>
+              <div className="absolute inset-0 flex flex-col items-center justify-center p-8 text-white text-center">
+                <h3 className="font-display text-3xl font-bold mb-2">GIVE IT ANOTHER LIFE</h3>
+                <p className="text-xs uppercase tracking-[0.2em] mb-4">Garment Donation</p>
+                <p className="text-sm max-w-md">
+                  Done with something you own? Give it to AZACH and help keep it in motion through reuse,
+                  reconstruction or responsible next steps.
+                </p>
               </div>
             </Link>
           </div>
         </div>
       </section>
 
-      {/* HOW IT WORKS */}
-      <section className="py-8 bg-white">
+      {/* THE AZACH LIFECYCLE */}
+      <section className="py-10 bg-white">
         <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl md:text-3xl font-semibold uppercase tracking-wide">How It Works</h2>
+          <div className="flex justify-between items-center mb-8">
+            <h2 className="text-2xl md:text-3xl font-semibold uppercase tracking-wide">How AZACH Keeps Things Moving</h2>
             <Link to="/our-story" className="text-sm uppercase tracking-wider hover:text-secondary transition-colors hidden md:block">
-              View Process →
+              Explore the Lifecycle →
             </Link>
           </div>
-          <div className="grid lg:grid-cols-[1fr,auto] gap-6 items-center">
-            {/* Steps - Horizontal */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <div className="text-center">
-                <div className="w-16 h-16 rounded-full bg-foreground text-background flex items-center justify-center text-2xl font-semibold mx-auto mb-4">
-                  1
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-x-6 gap-y-10">
+            {[
+              {
+                step: 1,
+                title: "Create",
+                copy: "Existing materials are transformed into pieces designed to be wanted, worn and lived in.",
+              },
+              {
+                step: 2,
+                title: "Wear",
+                copy: "The piece becomes yours. You wear it, live in it, style it and give it a story of its own.",
+              },
+              {
+                step: 3,
+                title: "Return",
+                copy: "When you're done, bring it back. Instead of letting it disappear, you can return your AZACH piece to give it another possibility.",
+              },
+              {
+                step: 4,
+                title: "Rework",
+                copy: "We repair, alter, reconstruct or transform the piece based on what it needs and what it can become.",
+              },
+              {
+                step: 5,
+                title: "Reintroduce",
+                copy: "The garment or its materials return to circulation as something ready to be worn, used or experienced again.",
+              },
+            ].map(({ step, title, copy }) => (
+              <div key={step} className="text-center">
+                <div className="w-14 h-14 rounded-full bg-foreground text-background flex items-center justify-center text-xl font-semibold mx-auto mb-4">
+                  {step}
                 </div>
-                <h3 className="text-lg font-semibold mb-2 uppercase">Choose Your Path</h3>
-                <p className="text-sm text-muted-foreground">
-                  Browse our collection, request a bespoke item, or bring in something to rework.
-                </p>
+                <h3 className="text-lg font-semibold mb-2 uppercase">{title}</h3>
+                <p className="text-sm text-muted-foreground">{copy}</p>
               </div>
-
-              <div className="text-center">
-                <div className="w-16 h-16 rounded-full bg-foreground text-background flex items-center justify-center text-2xl font-semibold mx-auto mb-4">
-                  2
-                </div>
-                <h3 className="text-lg font-semibold mb-2 uppercase">We Create</h3>
-                <p className="text-sm text-muted-foreground">
-                  Our skilled team reconstructs, repairs, or crafts your piece using upcycled materials.
-                </p>
-              </div>
-
-              <div className="text-center">
-                <div className="w-16 h-16 rounded-full bg-foreground text-background flex items-center justify-center text-2xl font-semibold mx-auto mb-4">
-                  3
-                </div>
-                <h3 className="text-lg font-semibold mb-2 uppercase">You Receive</h3>
-                <p className="text-sm text-muted-foreground">
-                  Get your unique piece delivered, ready to wear and make a statement.
-                </p>
-              </div>
-            </div>
-
-            {/* Image - Wide Rectangle */}
-            <div className="hidden lg:block w-72">
-              <div className="aspect-[4/3] overflow-hidden">
-                <OptimizedImage
-                  src="/how-it-works.png"
-                  alt="How AZACH Works"
-                  aspectRatio="landscape"
-                  className="w-full h-full object-cover"
-                  style={{ objectPosition: 'center 10%' }}
-                  loading="lazy"
-                />
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>

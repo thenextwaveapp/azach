@@ -5,7 +5,6 @@ import { useEffect } from "react";
 const PrivacyPolicy = () => {
   useEffect(() => {
     document.title = "Privacy Policy - AZACH";
-    window.scrollTo(0, 0);
   }, []);
 
   return (

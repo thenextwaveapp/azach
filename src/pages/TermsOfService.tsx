@@ -6,7 +6,6 @@ import { useEffect } from "react";
 const TermsOfService = () => {
   useEffect(() => {
     document.title = "Terms of Service - AZACH";
-    window.scrollTo(0, 0);
   }, []);
 
   return (

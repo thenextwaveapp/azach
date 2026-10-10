@@ -26,7 +26,6 @@ const Bespoke = () => {
 
   useEffect(() => {
     document.title = "Custom (Bespoke) - AZACH";
-    window.scrollTo(0, 0);
   }, []);
 
   const [formData, setFormData] = useState({
@@ -126,20 +125,20 @@ const Bespoke = () => {
         {/* Background Image */}
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: 'url(/header-custom.png)' }}
+          style={{ backgroundImage: 'url(/campaign/hero-custom.jpg)' }}
         />
         {/* Overlay */}
         <div className="absolute inset-0 bg-slate-900/35" />
 
         <div className="container mx-auto px-4 relative z-10 py-20">
           <div className="max-w-4xl mx-auto text-center">
-            <h1 className="text-5xl md:text-6xl font-semibold uppercase tracking-tight text-white"
+            <h1 className="font-display text-5xl md:text-6xl font-bold uppercase text-white"
               style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}
             >
-              Custom (Bespoke)
+              Make It Yours
             </h1>
-            <h2 className="text-2xl md:text-3xl font-light mt-4 text-white">
-              Create Something New
+            <h2 className="text-xl md:text-2xl font-light uppercase tracking-wide mt-4 text-white">
+              Have an idea? Have a piece that needs a new direction? Let's make something from it
             </h2>
           </div>
         </div>

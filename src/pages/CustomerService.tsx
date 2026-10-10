@@ -86,22 +86,22 @@ const CustomerService = () => {
         <div
           className="absolute inset-0 bg-cover bg-no-repeat"
           style={{
-            backgroundImage: 'url(/header-customer-service.png)',
-            backgroundPosition: 'center 20%'
+            backgroundImage: 'url(/campaign/hero-service.jpg)',
+            backgroundPosition: 'center 35%'
           }}
         />
         {/* Overlay */}
         <div className="absolute inset-0 bg-slate-900/35" />
 
         <div className="container mx-auto px-4 relative z-10 py-20">
-          <div className="text-center max-w-3xl mx-auto">
-            <h1 className="text-5xl md:text-6xl font-semibold text-white"
+          <div className="text-center max-w-4xl mx-auto">
+            <h1 className="font-display text-5xl md:text-6xl font-bold uppercase text-white"
               style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}
             >
-              Customer Service
+              Need a Hand?
             </h1>
-            <h2 className="text-2xl md:text-3xl font-light mt-4 text-white">
-              We're Here To Help
+            <h2 className="text-xl md:text-2xl font-light uppercase tracking-wide mt-4 text-white">
+              Questions, orders, returns, rework or anything else — we're here to help
             </h2>
           </div>
         </div>

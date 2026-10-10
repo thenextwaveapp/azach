@@ -20,7 +20,6 @@ const DonateGarments = () => {
 
   useEffect(() => {
     document.title = "Donate Garments - AZACH";
-    window.scrollTo(0, 0);
   }, []);
 
   const [formData, setFormData] = useState({

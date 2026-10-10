@@ -76,8 +76,8 @@ const ShopAll = () => {
         <div
           className="absolute inset-0 bg-cover bg-no-repeat"
           style={{
-            backgroundImage: 'url(/header-shop.png)',
-            backgroundPosition: 'center 15%'
+            backgroundImage: 'url(/campaign/hero-store.jpg)',
+            backgroundPosition: 'center 55%'
           }}
         />
         {/* Overlay */}
@@ -85,13 +85,13 @@ const ShopAll = () => {
 
         <div className="container mx-auto px-4 relative z-10 py-20">
           <div className="text-center">
-            <h1 className="text-5xl md:text-6xl font-semibold text-white"
+            <h1 className="font-display text-5xl md:text-6xl font-bold uppercase text-white"
               style={{ textShadow: '2px 2px 4px rgba(0,0,0,0.5)' }}
             >
-              The Collection
+              Find Your Piece
             </h1>
-            <h2 className="text-2xl md:text-3xl font-light mt-4 text-white">
-              Discover Our Complete Range
+            <h2 className="text-xl md:text-2xl font-light uppercase tracking-wide mt-4 text-white">
+              Contemporary pieces made from what already exists
             </h2>
           </div>
         </div>
@@ -111,7 +111,7 @@ const ShopAll = () => {
               <p className="text-muted-foreground">Loading products...</p>
             </div>
           ) : products.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
               {products.map((product) => (
                 <ProductCard key={product.id} {...productToDisplay(product)} product={product} listName="Shop All" />
               ))}
