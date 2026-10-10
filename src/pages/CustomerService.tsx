@@ -86,7 +86,7 @@ const CustomerService = () => {
         <div
           className="absolute inset-0 bg-cover bg-no-repeat"
           style={{
-            backgroundImage: 'url(/campaign/hero-service.jpg)',
+            backgroundImage: 'url(/campaign/hero-service.webp)',
             backgroundPosition: 'center 35%'
           }}
         />

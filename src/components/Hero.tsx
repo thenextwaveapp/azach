@@ -48,7 +48,7 @@ export const Hero = () => {
     <section className="relative h-[calc(100dvh-64px)] lg:h-[calc(100vh-64px)] overflow-hidden bg-[#f5f0e8]">
       {/* Campaign image */}
       <img
-        src="/campaign/hero-home.jpg"
+        src="/campaign/hero-home.webp"
         alt="AZACH — Reconstruction Into Refinement campaign"
         className="absolute inset-0 h-full w-full object-cover object-[center_22%]"
         loading="eager"

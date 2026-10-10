@@ -128,7 +128,7 @@ export const Header = () => {
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
               className="hover:opacity-80 transition-opacity"
             >
-              <img src="/Azach-Logo.png" alt="AZACH" className="h-8 w-auto" />
+              <img src="/Azach-Logo.webp" alt="AZACH" className="h-8 w-auto" />
             </Link>
           </div>
           <div className="flex lg:hidden absolute left-1/2 -translate-x-1/2">
@@ -137,7 +137,7 @@ export const Header = () => {
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
               className="hover:opacity-80 transition-opacity"
             >
-              <img src="/Azach-Logo.png" alt="AZACH" className="h-4 w-auto" />
+              <img src="/Azach-Logo.webp" alt="AZACH" className="h-4 w-auto" />
             </Link>
           </div>
 

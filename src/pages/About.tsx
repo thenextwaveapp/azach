@@ -19,7 +19,7 @@ const About = () => {
         <div
           className="absolute inset-0 bg-cover bg-no-repeat"
           style={{
-            backgroundImage: 'url(/campaign/hero-about.jpg)',
+            backgroundImage: 'url(/campaign/hero-about.webp)',
             backgroundPosition: 'center 25%'
           }}
         />

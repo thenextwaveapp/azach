@@ -108,7 +108,7 @@ const Index = () => {
           {[1, 2, 3, 4, 5, 6].map((n) => (
             <img
               key={n}
-              src={`/campaign/strip-${n}.jpg`}
+              src={`/campaign/strip-${n}.webp`}
               alt=""
               className={`h-full w-full object-cover object-top ${n > 3 ? "hidden md:block" : ""}`}
               loading="lazy"
@@ -139,7 +139,7 @@ const Index = () => {
             <Link to="/shop-all?category=tops" className="group text-center">
               <div className="relative aspect-square mb-3 overflow-hidden">
                 <OptimizedImage
-                  src="/campaign/cat-tops.jpg"
+                  src="/campaign/cat-tops.webp"
                   alt="Tops"
                   aspectRatio="square"
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -152,7 +152,7 @@ const Index = () => {
             <Link to="/shop-all?category=bottoms" className="group text-center">
               <div className="relative aspect-square mb-3 overflow-hidden">
                 <OptimizedImage
-                  src="/campaign/cat-bottoms.jpg"
+                  src="/campaign/cat-bottoms.webp"
                   alt="Bottoms"
                   aspectRatio="square"
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -166,7 +166,7 @@ const Index = () => {
             <Link to="/shop-all?category=sets" className="group text-center">
               <div className="relative aspect-square mb-3 overflow-hidden">
                 <OptimizedImage
-                  src="/campaign/cat-sets.jpg"
+                  src="/campaign/cat-sets.webp"
                   alt="Sets"
                   aspectRatio="square"
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -179,7 +179,7 @@ const Index = () => {
             <Link to="/shop-all?category=accessories" className="group text-center">
               <div className="relative aspect-square mb-3 overflow-hidden">
                 <OptimizedImage
-                  src="/campaign/cat-accessories.jpg"
+                  src="/campaign/cat-accessories.webp"
                   alt="Accessories"
                   aspectRatio="square"
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -199,7 +199,7 @@ const Index = () => {
           <div className="grid md:grid-cols-2 gap-6">
             <Link to="/bespoke" className="group relative h-72 overflow-hidden">
               <OptimizedImage
-                src="/campaign/banner-custom.jpg"
+                src="/campaign/banner-custom.webp"
                 alt="Custom, Rework & Repair"
                 aspectRatio="landscape"
                 className="absolute inset-0 w-full h-full object-cover object-[center_62%] transition-transform duration-500 group-hover:scale-105"
@@ -218,7 +218,7 @@ const Index = () => {
 
             <Link to="/donate-garments" className="group relative h-72 overflow-hidden">
               <OptimizedImage
-                src="/campaign/banner-donate.jpg"
+                src="/campaign/banner-donate.webp"
                 alt="Garment Donation"
                 aspectRatio="landscape"
                 className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"

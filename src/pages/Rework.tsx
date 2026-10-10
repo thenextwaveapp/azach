@@ -120,7 +120,7 @@ const Rework = () => {
         {/* Background Image */}
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: 'url(/campaign/banner-custom.jpg)', backgroundPosition: 'center 25%' }}
+          style={{ backgroundImage: 'url(/campaign/banner-custom.webp)', backgroundPosition: 'center 25%' }}
         />
         {/* Overlay */}
         <div className="absolute inset-0 bg-slate-900/35" />

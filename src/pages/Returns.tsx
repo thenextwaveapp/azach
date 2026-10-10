@@ -18,7 +18,7 @@ const Returns = () => {
         {/* Background Image */}
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: 'url(/header-returns.png)' }}
+          style={{ backgroundImage: 'url(/header-returns.webp)' }}
         />
         {/* Overlay */}
         <div className="absolute inset-0 bg-slate-900/35" />

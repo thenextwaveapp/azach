@@ -125,7 +125,7 @@ const Bespoke = () => {
         {/* Background Image */}
         <div
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-          style={{ backgroundImage: 'url(/campaign/hero-custom.jpg)' }}
+          style={{ backgroundImage: 'url(/campaign/hero-custom.webp)' }}
         />
         {/* Overlay */}
         <div className="absolute inset-0 bg-slate-900/35" />

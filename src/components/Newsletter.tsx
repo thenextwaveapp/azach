@@ -57,19 +57,19 @@ export const Newsletter = () => {
             {/* Right: Social Media Icons */}
             <div className="flex gap-6 items-center">
               <a href="https://www.instagram.com/azachng" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
-                <img src="/instagram.png" alt="Instagram" className="h-6 w-6" />
+                <img src="/instagram.webp" alt="Instagram" className="h-6 w-6" />
                 <span className="sr-only">Instagram</span>
               </a>
               <a href="https://www.tiktok.com/@azachng" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
-                <img src="/tiktok.png" alt="TikTok" className="h-6 w-6" />
+                <img src="/tiktok.webp" alt="TikTok" className="h-6 w-6" />
                 <span className="sr-only">TikTok</span>
               </a>
               <a href="https://x.com/azachng?s=11" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
-                <img src="/x.png" alt="X" className="h-6 w-6" />
+                <img src="/x.webp" alt="X" className="h-6 w-6" />
                 <span className="sr-only">X</span>
               </a>
               <a href="https://www.facebook.com/share/18yazwSQ52/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" className="opacity-70 hover:opacity-100 transition-opacity">
-                <img src="/facebook.png" alt="Facebook" className="h-6 w-6" />
+                <img src="/facebook.webp" alt="Facebook" className="h-6 w-6" />
                 <span className="sr-only">Facebook</span>
               </a>
           </div>

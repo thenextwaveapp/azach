@@ -20,7 +20,7 @@ export const Footer = ({ dark = false }: FooterProps) => {
                 to="/"
                 onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
               >
-                <img src="/Azach-Logo.png" alt="AZACH" className="h-4 md:h-8 w-auto brightness-0 invert" />
+                <img src="/Azach-Logo.webp" alt="AZACH" className="h-4 md:h-8 w-auto brightness-0 invert" />
               </Link>
             </div>
           </div>

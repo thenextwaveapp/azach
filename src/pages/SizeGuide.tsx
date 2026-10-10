@@ -57,7 +57,7 @@ const SizeGuide = () => {
         <div
           className="absolute inset-0 bg-cover bg-no-repeat"
           style={{
-            backgroundImage: 'url(/header-size-guide.png)',
+            backgroundImage: 'url(/header-size-guide.webp)',
             backgroundPosition: 'center 5%'
           }}
         />
@@ -149,7 +149,7 @@ const SizeGuide = () => {
                 <h3 className="text-2xl font-semibold mb-6">How to Measure</h3>
                 <div className="grid md:grid-cols-2 gap-8 items-center">
                   <img
-                    src="/male-measurement-guide.png"
+                    src="/male-measurement-guide.webp"
                     alt="How to measure: chest, waist, and trouser length guide"
                     className="w-full max-w-sm mx-auto rounded-lg"
                   />
@@ -221,7 +221,7 @@ const SizeGuide = () => {
                 <h3 className="text-2xl font-semibold mb-6">How to Measure</h3>
                 <div className="grid md:grid-cols-2 gap-8 items-center">
                   <img
-                    src="/female-measurement-guide.png"
+                    src="/female-measurement-guide.webp"
                     alt="How to measure: chest, waist, hips, and length guide"
                     className="w-full max-w-sm mx-auto rounded-lg"
                   />

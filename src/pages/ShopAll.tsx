@@ -76,7 +76,7 @@ const ShopAll = () => {
         <div
           className="absolute inset-0 bg-cover bg-no-repeat"
           style={{
-            backgroundImage: 'url(/campaign/hero-store.jpg)',
+            backgroundImage: 'url(/campaign/hero-store.webp)',
             backgroundPosition: 'center 55%'
           }}
         />
