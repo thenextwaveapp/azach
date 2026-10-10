@@ -15,6 +15,7 @@ export const Hero = () => {
       video.pause();
       video.muted = true;
       video.controls = false;
+      video.style.opacity = "";
     };
 
     const handleFullscreenChange = () => {
@@ -35,6 +36,7 @@ export const Hero = () => {
     if (!video) return;
     video.muted = false;
     video.controls = true;
+    video.style.opacity = "1";
     if (video.requestFullscreen) {
       video.requestFullscreen();
     } else if ((video as any).webkitEnterFullscreen) {
