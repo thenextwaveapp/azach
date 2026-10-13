@@ -12,7 +12,7 @@ import { QuickViewModal } from "./QuickViewModal";
 import { OptimizedImage } from "./OptimizedImage";
 import { Product } from "@/types/product";
 import { trackAddToCart, trackAddToWishlist, trackSelectItem } from "@/lib/analytics";
-import { getAvailableSizes } from "@/lib/sizes";
+import { getAvailableSizes, isSizeAvailable } from "@/lib/sizes";
 
 interface ProductCardProps {
   id: number | string;
@@ -48,10 +48,13 @@ export const ProductCard = ({ id, name, price, image, category, product, listNam
     e.preventDefault();
     e.stopPropagation();
 
-    // The quick-add button can't pick a size; when there's a real choice to make,
-    // open the quick view so the customer chooses there.
+    // The quick-add button can't pick a size; when there's a real choice to make
+    // (or the only size is sold out), open the quick view so the customer sees it there.
     const availableSizes = product ? getAvailableSizes(product) : [];
-    if (availableSizes.length > 1) {
+    if (
+      availableSizes.length > 1 ||
+      (product && availableSizes.length === 1 && !isSizeAvailable(product, availableSizes[0]))
+    ) {
       setQuickViewOpen(true);
       return;
     }

@@ -43,8 +43,10 @@ export interface Product extends ProductCurrencyPrices {
   sku?: string;
   /** Legacy single-size field; superseded by `sizes` but kept for old products */
   size?: string;
-  /** Sizes the customer can order this product in */
+  /** Sizes the customer can order this product in (derived from size_stock when set) */
   sizes?: string[];
+  /** Stock count per size, e.g. { M: 2, XL: 1 }. Total stock/in_stock derive from it. */
+  size_stock?: Record<string, number> | null;
   material?: string;
   care_instructions?: string;
   style_code?: string;
@@ -83,6 +85,7 @@ export interface ProductInsert extends ProductCurrencyPrices {
   sku?: string;
   size?: string;
   sizes?: string[];
+  size_stock?: Record<string, number> | null;
   material?: string;
   care_instructions?: string;
   style_code?: string;

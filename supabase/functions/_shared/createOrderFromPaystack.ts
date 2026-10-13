@@ -263,6 +263,7 @@ export async function createOrderFromPaystackTransaction(
     const { error: stockError } = await supabaseAdmin.rpc('decrement_stock_for_purchase', {
       p_product_id: item.id,
       p_quantity: item.quantity,
+      p_size: item.size || null,
     });
 
     if (stockError) {

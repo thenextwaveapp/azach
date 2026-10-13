@@ -34,7 +34,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import type { ProductInsert, ProductUpdate, ForeignCurrency } from '@/types/product';
 import { uploadImageToStorage, uploadMultipleImages } from '@/utils/imageUpload';
-import { ALL_SIZES } from '@/lib/sizes';
+import { ALL_SIZES, sortSizes } from '@/lib/sizes';
 
 // Paystack only charges NGN + USD on this account, so USD is the only foreign
 // currency we take a manually-set display/charge price for.
@@ -76,6 +76,7 @@ const Admin = () => {
     image_urls: [],
     sku: '',
     sizes: [...ALL_SIZES],
+    size_stock: Object.fromEntries(ALL_SIZES.map((s) => [s, 0])),
     material: '',
     care_instructions: '',
     style_code: '',
@@ -153,6 +154,19 @@ const Admin = () => {
     try {
       let updatedFormData = { ...formData };
 
+      // Per-size stock only applies to sized, non-bundle products; the DB trigger
+      // derives total stock from it, but keep the payload consistent anyway.
+      if (updatedFormData.is_bundle || !(updatedFormData.sizes?.length)) {
+        updatedFormData.size_stock = null;
+        if (!updatedFormData.is_bundle) updatedFormData.sizes = [];
+      } else {
+        const sizeStock = Object.fromEntries(
+          sortSizes(updatedFormData.sizes).map((s) => [s, updatedFormData.size_stock?.[s] ?? 0])
+        );
+        updatedFormData.size_stock = sizeStock;
+        updatedFormData.stock = Object.values(sizeStock).reduce((a, b) => a + b, 0);
+      }
+
       // Upload cover image if a file was selected
       if (coverImageFile) {
         const coverImageUrl = await uploadImageToStorage(coverImageFile);
@@ -208,8 +222,14 @@ const Admin = () => {
       image_url: product.image_url,
       image_urls: product.image_urls || [],
       sku: product.sku || '',
-      // Legacy single-size products fall back to that size as the only offered one
+      // Legacy single-size products fall back to that size as the only offered one,
+      // carrying their whole stock on it
       sizes: product.sizes ?? (product.size ? [product.size] : []),
+      size_stock:
+        product.size_stock ??
+        (product.sizes?.length === 1 || (!product.sizes?.length && product.size)
+          ? { [product.sizes?.[0] ?? product.size]: product.stock }
+          : Object.fromEntries((product.sizes ?? []).map((s: string) => [s, 0]))),
       material: product.material || '',
       care_instructions: product.care_instructions || '',
       style_code: product.style_code || '',
@@ -291,6 +311,7 @@ const Admin = () => {
       image_urls: [],
       sku: '',
       sizes: [...ALL_SIZES],
+      size_stock: Object.fromEntries(ALL_SIZES.map((s) => [s, 0])),
       material: '',
       care_instructions: '',
       style_code: '',
@@ -493,16 +514,26 @@ const Admin = () => {
                     <Input
                       id="stock"
                       type="number"
-                      value={formData.is_bundle ? (editingProduct?.stock ?? 0) : formData.stock}
+                      value={
+                        formData.is_bundle
+                          ? (editingProduct?.stock ?? 0)
+                          : formData.sizes?.length
+                            ? Object.values(formData.size_stock || {}).reduce((a, b) => a + b, 0)
+                            : formData.stock
+                      }
                       onChange={(e) => setFormData({ ...formData, stock: parseInt(e.target.value) || 0, in_stock: parseInt(e.target.value) > 0 })}
-                      disabled={formData.is_bundle}
+                      disabled={formData.is_bundle || !!formData.sizes?.length}
                       required
                     />
-                    {formData.is_bundle && (
+                    {formData.is_bundle ? (
                       <p className="text-xs text-muted-foreground mt-1">
                         Computed automatically from component stock — save this set, then link components to it.
                       </p>
-                    )}
+                    ) : formData.sizes?.length ? (
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Sum of the per-size stock above.
+                      </p>
+                    ) : null}
                   </div>
                 </div>
                 <div className="grid grid-cols-2 gap-4">
@@ -711,30 +742,57 @@ const Admin = () => {
                   </div>
                 </div>
                 <div>
-                  <Label>Available Sizes</Label>
+                  <Label>Sizes &amp; Stock per Size</Label>
                   <p className="text-xs text-muted-foreground mb-2">
-                    Sizes the customer can order this piece in. Untick all for size-less items (e.g. accessories).
+                    Tick the sizes this piece is offered in and how many you have of each.
+                    Untick all for size-less items (e.g. accessories). Total stock is the sum.
                   </p>
                   <div className="flex flex-wrap gap-4">
-                    {ALL_SIZES.map((size) => (
-                      <label key={size} className="flex items-center gap-1.5 text-sm cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={formData.sizes?.includes(size) || false}
-                          onChange={(e) =>
-                            setFormData({
-                              ...formData,
-                              sizes: e.target.checked
-                                ? [...(formData.sizes || []), size].sort(
-                                    (a, b) => ALL_SIZES.indexOf(a) - ALL_SIZES.indexOf(b)
-                                  )
-                                : (formData.sizes || []).filter((s) => s !== size),
-                            })
-                          }
-                        />
-                        {size}
-                      </label>
-                    ))}
+                    {ALL_SIZES.map((size) => {
+                      const offered = formData.sizes?.includes(size) || false;
+                      return (
+                        <div key={size} className="flex items-center gap-1.5">
+                          <label className="flex items-center gap-1.5 text-sm cursor-pointer">
+                            <input
+                              type="checkbox"
+                              checked={offered}
+                              onChange={(e) =>
+                                setFormData({
+                                  ...formData,
+                                  sizes: e.target.checked
+                                    ? sortSizes([...(formData.sizes || []), size])
+                                    : (formData.sizes || []).filter((s) => s !== size),
+                                  size_stock: e.target.checked
+                                    ? { ...formData.size_stock, [size]: formData.size_stock?.[size] ?? 0 }
+                                    : Object.fromEntries(
+                                        Object.entries(formData.size_stock || {}).filter(([k]) => k !== size)
+                                      ),
+                                })
+                              }
+                            />
+                            {size}
+                          </label>
+                          {offered && !formData.is_bundle && (
+                            <Input
+                              type="number"
+                              min={0}
+                              aria-label={`Stock for size ${size}`}
+                              className="h-8 w-16"
+                              value={formData.size_stock?.[size] ?? 0}
+                              onChange={(e) =>
+                                setFormData({
+                                  ...formData,
+                                  size_stock: {
+                                    ...formData.size_stock,
+                                    [size]: Math.max(0, parseInt(e.target.value) || 0),
+                                  },
+                                })
+                              }
+                            />
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
                 <div>
@@ -1208,8 +1266,14 @@ const Admin = () => {
                       )}
                     </TableCell>
                     <TableCell className="text-muted-foreground">{product.sku || '—'}</TableCell>
-                    <TableCell className="text-muted-foreground">
-                      {product.sizes?.length ? product.sizes.join(', ') : product.size || '—'}
+                    <TableCell className="text-muted-foreground whitespace-nowrap">
+                      {product.size_stock && Object.keys(product.size_stock).length > 0
+                        ? sortSizes(Object.keys(product.size_stock))
+                            .map((s: string) => `${s} (${product.size_stock[s]})`)
+                            .join(', ')
+                        : product.sizes?.length
+                          ? product.sizes.join(', ')
+                          : product.size || '—'}
                     </TableCell>
                     <TableCell>{product.category}</TableCell>
                     <TableCell>${product.price}</TableCell>

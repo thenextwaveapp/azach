@@ -69,18 +69,33 @@ serve(async (req) => {
     // Point-in-time stock check — no hold/reservation, just confirms enough stock exists
     // right now. A concurrent checkout could still race this between check and payment;
     // that's accepted (see decrement_stock_for_purchase, which floors at 0 either way).
+    // Checked per size when the product tracks size_stock, else against the total.
     for (const item of items) {
       if (item.id === 'shipping') continue; // Skip shipping line item
 
       const { data: product, error } = await supabase
         .from('products')
-        .select('stock')
+        .select('stock, size_stock')
         .eq('id', item.id)
         .maybeSingle();
 
-      if (error || !product || product.stock < item.quantity) {
+      if (error || !product) {
         return new Response(
           JSON.stringify({ error: `${item.name} is out of stock.` }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
+        );
+      }
+
+      const sizeStock = product.size_stock as Record<string, number> | null;
+      const available =
+        item.size && sizeStock && item.size in sizeStock
+          ? sizeStock[item.size] ?? 0
+          : product.stock;
+
+      if (available < item.quantity) {
+        const label = item.size ? `${item.name} (Size ${item.size})` : item.name;
+        return new Response(
+          JSON.stringify({ error: `${label} is out of stock.` }),
           { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 400 }
         );
       }

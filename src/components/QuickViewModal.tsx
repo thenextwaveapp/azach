@@ -12,7 +12,7 @@ import { Product } from "@/types/product";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { trackAddToCart, trackAddToWishlist } from "@/lib/analytics";
-import { getAvailableSizes } from "@/lib/sizes";
+import { getAvailableSizes, isSizeAvailable } from "@/lib/sizes";
 
 interface QuickViewModalProps {
   product: Product | null;
@@ -35,9 +35,13 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
 
   const availableSizes = product ? getAvailableSizes(product) : [];
 
-  // A single available size needs no decision — preselect it.
+  // A single available size needs no decision — preselect it (if it's actually in stock).
   useEffect(() => {
-    setSelectedSize(availableSizes.length === 1 ? availableSizes[0] : '');
+    setSelectedSize(
+      product && availableSizes.length === 1 && isSizeAvailable(product, availableSizes[0])
+        ? availableSizes[0]
+        : ''
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [product?.id]);
 
@@ -222,8 +226,9 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
                   </SelectTrigger>
                   <SelectContent>
                     {availableSizes.map((size) => (
-                      <SelectItem key={size} value={size}>
+                      <SelectItem key={size} value={size} disabled={!isSizeAvailable(product, size)}>
                         {size}
+                        {!isSizeAvailable(product, size) && ' — Sold out'}
                       </SelectItem>
                     ))}
                   </SelectContent>
