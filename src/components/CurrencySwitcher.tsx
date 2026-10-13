@@ -6,7 +6,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { DollarSign } from 'lucide-react';
 
 const OPTIONS: { code: CurrencyCode; label: string; country: string }[] = [
   { code: 'USD', label: 'USD - US Dollar', country: 'United States' },
@@ -15,6 +14,15 @@ const OPTIONS: { code: CurrencyCode; label: string; country: string }[] = [
   { code: 'EUR', label: 'EUR - Euro', country: 'Europe' },
   { code: 'AUD', label: 'AUD - Australian Dollar', country: 'Australia' },
 ];
+
+const CURRENCY_SYMBOLS: Record<string, string> = {
+  USD: '$',
+  CAD: '$',
+  GBP: '£',
+  EUR: '€',
+  AUD: '$',
+  NGN: '₦',
+};
 
 export const CurrencySwitcher = () => {
   const { currency, setCurrency } = useCurrency();
@@ -26,7 +34,7 @@ export const CurrencySwitcher = () => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" size="sm" className="gap-1 hover:bg-muted hover:text-foreground">
-          <DollarSign className="h-4 w-4" />
+          <span className="text-sm font-medium">{CURRENCY_SYMBOLS[currency] ?? ''}</span>
           <span className="text-sm font-medium">{currency}</span>
         </Button>
       </DropdownMenuTrigger>
