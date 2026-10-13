@@ -100,6 +100,7 @@ const Admin = () => {
     currency_prices: {},
   });
   const [additionalImageInput, setAdditionalImageInput] = useState('');
+  const [customSizeInput, setCustomSizeInput] = useState('');
   const [coverImageFile, setCoverImageFile] = useState<File | null>(null);
   const [additionalImageFiles, setAdditionalImageFiles] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
@@ -282,6 +283,22 @@ const Admin = () => {
     });
   };
 
+  // Per-product custom sizes (e.g. inch waists) live in sizes/size_stock exactly like
+  // the standard run — they're just not in the fixed checkbox list.
+  const addCustomSize = () => {
+    const size = customSizeInput.trim();
+    if (!size || formData.sizes?.includes(size)) {
+      setCustomSizeInput('');
+      return;
+    }
+    setFormData({
+      ...formData,
+      sizes: sortSizes([...(formData.sizes || []), size]),
+      size_stock: { ...formData.size_stock, [size]: 0 },
+    });
+    setCustomSizeInput('');
+  };
+
   const handleDelete = async (id: string) => {
     if (confirm('Are you sure you want to delete this product?')) {
       try {
@@ -334,6 +351,7 @@ const Admin = () => {
       currency_prices: {},
     });
     setAdditionalImageInput('');
+    setCustomSizeInput('');
     setCoverImageFile(null);
     setAdditionalImageFiles([]);
     setEditingProduct(null);
@@ -793,6 +811,69 @@ const Admin = () => {
                         </div>
                       );
                     })}
+                  </div>
+                  {(formData.sizes || []).some((s) => !ALL_SIZES.includes(s)) && (
+                    <div className="flex flex-wrap gap-4 mt-3">
+                      {(formData.sizes || [])
+                        .filter((s) => !ALL_SIZES.includes(s))
+                        .map((size) => (
+                          <div key={size} className="flex items-center gap-1.5">
+                            <span className="text-sm">{size}</span>
+                            {!formData.is_bundle && (
+                              <Input
+                                type="number"
+                                min={0}
+                                aria-label={`Stock for size ${size}`}
+                                className="h-8 w-16"
+                                value={formData.size_stock?.[size] ?? 0}
+                                onChange={(e) =>
+                                  setFormData({
+                                    ...formData,
+                                    size_stock: {
+                                      ...formData.size_stock,
+                                      [size]: Math.max(0, parseInt(e.target.value) || 0),
+                                    },
+                                  })
+                                }
+                              />
+                            )}
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6"
+                              aria-label={`Remove size ${size}`}
+                              onClick={() =>
+                                setFormData({
+                                  ...formData,
+                                  sizes: (formData.sizes || []).filter((s) => s !== size),
+                                  size_stock: Object.fromEntries(
+                                    Object.entries(formData.size_stock || {}).filter(([k]) => k !== size)
+                                  ),
+                                })
+                              }
+                            >
+                              <Trash2 className="h-3 w-3 text-destructive" />
+                            </Button>
+                          </div>
+                        ))}
+                    </div>
+                  )}
+                  <div className="flex gap-2 mt-3 max-w-xs">
+                    <Input
+                      placeholder={'Custom size, e.g. 32" or 44 Long'}
+                      value={customSizeInput}
+                      onChange={(e) => setCustomSizeInput(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === 'Enter') {
+                          e.preventDefault();
+                          addCustomSize();
+                        }
+                      }}
+                    />
+                    <Button type="button" variant="outline" onClick={addCustomSize}>
+                      Add
+                    </Button>
                   </div>
                 </div>
                 <div>

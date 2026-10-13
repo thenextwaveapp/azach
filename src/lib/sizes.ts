@@ -11,8 +11,12 @@ const sizeOrder = (size: string) => {
   return idx === -1 ? ALL_SIZES.length : idx;
 };
 
+// Standard sizes in run order first, then per-product custom sizes (numeric-aware,
+// so inch labels sort 30 < 32 < 34 rather than alphabetically).
 export const sortSizes = (sizes: string[]): string[] =>
-  [...sizes].sort((a, b) => sizeOrder(a) - sizeOrder(b) || a.localeCompare(b));
+  [...sizes].sort(
+    (a, b) => sizeOrder(a) - sizeOrder(b) || a.localeCompare(b, undefined, { numeric: true })
+  );
 
 interface SizedProduct {
   size_stock?: Record<string, number> | null;
