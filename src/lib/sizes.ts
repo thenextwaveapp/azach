@@ -1,6 +1,6 @@
 // The standard AZACH size run. Admin picks which of these a product is offered in
 // (with a stock count per size); the customer picks one of those on the product page.
-export const ALL_SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
+export const ALL_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL'];
 
 const sizeOrder = (size: string) => {
   const idx = ALL_SIZES.indexOf(size);
