@@ -11,7 +11,6 @@ const SizeGuide = () => {
   const [activeTab, setActiveTab] = useState<"men" | "women">("men");
 
   const mensSizes = [
-    { size: "XXXS", chest: { inches: "28-30", cm: "71-76" }, waist: { inches: "20-22", cm: "51-56" } },
     { size: "XS", chest: { inches: "32-34", cm: "81-86" }, waist: { inches: "24-26", cm: "61-66" } },
     { size: "S", chest: { inches: "36-38", cm: "91-97" }, waist: { inches: "28-30", cm: "71-76" } },
     { size: "M", chest: { inches: "38-40", cm: "97-102" }, waist: { inches: "28-30", cm: "71-76" } },
@@ -20,12 +19,9 @@ const SizeGuide = () => {
     { size: "XXL", chest: { inches: "50-52", cm: "127-132" }, waist: { inches: "44-46", cm: "112-117" } },
     { size: "3XL", chest: { inches: "54-56", cm: "137-142" }, waist: { inches: "48-50", cm: "122-127" } },
     { size: "4XL", chest: { inches: "58-60", cm: "147-152" }, waist: { inches: "52-54", cm: "132-137" } },
-    { size: "5XL", chest: { inches: "62-64", cm: "157-162" }, waist: { inches: "54-60", cm: "137-152" } },
   ];
 
   const womensSizes = [
-    { ukSize: "2", usSize: "0", bust: { inches: "28", cm: "71" }, waist: { inches: "20", cm: "51" }, hips: { inches: "32", cm: "81" }, label: "3XS" },
-    { ukSize: "4", usSize: "0", bust: { inches: "30", cm: "76" }, waist: { inches: "22", cm: "56" }, hips: { inches: "34", cm: "86" }, label: "XXS" },
     { ukSize: "6", usSize: "2", bust: { inches: "32", cm: "81" }, waist: { inches: "24", cm: "61" }, hips: { inches: "36", cm: "91" }, label: "XS" },
     { ukSize: "8", usSize: "4", bust: { inches: "34", cm: "86" }, waist: { inches: "26", cm: "66" }, hips: { inches: "38", cm: "97" }, label: "S" },
     { ukSize: "10", usSize: "6", bust: { inches: "36", cm: "91" }, waist: { inches: "28", cm: "71" }, hips: { inches: "40", cm: "102" }, label: "S" },
@@ -38,7 +34,6 @@ const SizeGuide = () => {
     { ukSize: "24", usSize: "20", bust: { inches: "50", cm: "127" }, waist: { inches: "42", cm: "107" }, hips: { inches: "54", cm: "137" }, label: "3XL" },
     { ukSize: "26", usSize: "22", bust: { inches: "52", cm: "132" }, waist: { inches: "44", cm: "112" }, hips: { inches: "56", cm: "142" }, label: "4XL" },
     { ukSize: "28", usSize: "24", bust: { inches: "54", cm: "137" }, waist: { inches: "46", cm: "117" }, hips: { inches: "58", cm: "147" }, label: "4XL" },
-    { ukSize: "30", usSize: "26", bust: { inches: "56", cm: "142" }, waist: { inches: "48", cm: "123" }, hips: { inches: "60", cm: "152" }, label: "5XL" },
   ];
 
   const trouserLengths = [
