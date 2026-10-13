@@ -41,7 +41,10 @@ export interface Product extends ProductCurrencyPrices {
   image_url: string;
   image_urls?: string[];
   sku?: string;
+  /** Legacy single-size field; superseded by `sizes` but kept for old products */
   size?: string;
+  /** Sizes the customer can order this product in */
+  sizes?: string[];
   material?: string;
   care_instructions?: string;
   style_code?: string;
@@ -79,6 +82,7 @@ export interface ProductInsert extends ProductCurrencyPrices {
   image_urls?: string[];
   sku?: string;
   size?: string;
+  sizes?: string[];
   material?: string;
   care_instructions?: string;
   style_code?: string;

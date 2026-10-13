@@ -21,7 +21,12 @@ async function sendOrderEmails(order: any, orderItems: any[], shippingAddress: a
     total: order.total,
     currency,
   };
-  const emailItems = orderItems.map((i) => ({ name: i.product_name, qty: i.quantity, price: i.price, image: i.product_image }));
+  const emailItems = orderItems.map((i) => ({
+    name: i.selected_size ? `${i.product_name} — Size ${i.selected_size}` : i.product_name,
+    qty: i.quantity,
+    price: i.price,
+    image: i.product_image,
+  }));
   const orderNumber = `#AZ-${order.id.slice(0, 8).toUpperCase()}`;
   const orderDate = new Date(order.created_at || Date.now()).toLocaleDateString('en-US', {
     year: 'numeric', month: 'long', day: 'numeric',
@@ -241,6 +246,7 @@ export async function createOrderFromPaystackTransaction(
       product_image: item.image,
       price: item.price,
       quantity: item.quantity,
+      selected_size: item.size || null,
     }));
 
   const { error: itemsError } = await supabaseAdmin.from('order_items').insert(orderItems);

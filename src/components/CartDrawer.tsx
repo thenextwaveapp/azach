@@ -81,7 +81,7 @@ export const CartDrawer = ({ open, onOpenChange }: CartDrawerProps) => {
             <div className="flex-1 overflow-y-auto py-4 space-y-4">
               {items.map((item) => (
                 <div
-                  key={item.id}
+                  key={`${item.id}-${item.size || ''}`}
                   className="flex gap-4 p-3 border rounded-lg hover:shadow-sm transition-shadow"
                 >
                   <img
@@ -94,13 +94,16 @@ export const CartDrawer = ({ open, onOpenChange }: CartDrawerProps) => {
                       <div>
                         <h4 className="font-semibold text-sm">{item.name}</h4>
                         <p className="text-xs text-muted-foreground">{item.category}</p>
+                        {item.size && (
+                          <p className="text-xs text-muted-foreground">Size: {item.size}</p>
+                        )}
                       </div>
                       <Button
                         variant="ghost"
                         size="icon"
                         aria-label={`Remove ${item.name} from cart`}
                         className="h-8 w-8"
-                        onClick={() => removeFromCart(item.id)}
+                        onClick={() => removeFromCart(item.id, item.size)}
                       >
                         <Trash2 className="h-4 w-4 text-destructive" />
                       </Button>
@@ -113,7 +116,7 @@ export const CartDrawer = ({ open, onOpenChange }: CartDrawerProps) => {
                           size="icon"
                           aria-label={`Decrease quantity of ${item.name}`}
                           className="h-7 w-7"
-                          onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                          onClick={() => updateQuantity(item.id, item.quantity - 1, item.size)}
                         >
                           <Minus className="h-3 w-3" />
                         </Button>
@@ -123,7 +126,7 @@ export const CartDrawer = ({ open, onOpenChange }: CartDrawerProps) => {
                           size="icon"
                           aria-label={`Increase quantity of ${item.name}`}
                           className="h-7 w-7"
-                          onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                          onClick={() => updateQuantity(item.id, item.quantity + 1, item.size)}
                         >
                           <Plus className="h-3 w-3" />
                         </Button>

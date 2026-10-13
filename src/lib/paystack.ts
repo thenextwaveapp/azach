@@ -12,6 +12,7 @@ export interface PaystackCheckoutRequest {
     price: number;
     quantity: number;
     image: string;
+    size?: string;
   }>;
   userId: string;
   userEmail: string;

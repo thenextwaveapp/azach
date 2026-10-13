@@ -12,14 +12,20 @@ export interface CartItem {
   image: string;
   category: string;
   quantity: number;
+  size?: string;
   currency_prices?: CurrencyPrices;
 }
+
+// A cart line is identified by product + chosen size, so the same product in two
+// sizes shows as two lines.
+const isSameLine = (item: CartItem, id: number | string, size?: string) =>
+  item.id === id && (item.size || '') === (size || '');
 
 interface CartContextType {
   items: CartItem[];
   addToCart: (item: Omit<CartItem, "quantity">) => void;
-  removeFromCart: (id: number | string) => void;
-  updateQuantity: (id: number | string, quantity: number) => void;
+  removeFromCart: (id: number | string, size?: string) => void;
+  updateQuantity: (id: number | string, quantity: number, size?: string) => void;
   clearCart: () => void;
   getTotalPrice: () => number;
   getTotalItems: () => number;
@@ -67,7 +73,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
           if (localCart.length > 0) {
             const localCartForSync = localCart.map(item => ({
               id: String(item.id),
-              quantity: item.quantity
+              quantity: item.quantity,
+              size: item.size,
             }));
             await cartService.syncLocalCart(user.id, localCartForSync);
 
@@ -84,6 +91,7 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
             image: item.product.image_url,
             category: item.product.category,
             quantity: item.quantity,
+            size: item.selected_size || undefined,
             currency_prices: item.product.currency_prices,
           }));
 
@@ -110,10 +118,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const addToCart = async (item: Omit<CartItem, "quantity">) => {
     setItems((prevItems) => {
-      const existingItem = prevItems.find((i) => i.id === item.id);
+      const existingItem = prevItems.find((i) => isSameLine(i, item.id, item.size));
       if (existingItem) {
         return prevItems.map((i) =>
-          i.id === item.id ? { ...i, quantity: i.quantity + 1 } : i
+          isSameLine(i, item.id, item.size) ? { ...i, quantity: i.quantity + 1 } : i
         );
       }
       return [...prevItems, { ...item, quantity: 1 }];
@@ -122,15 +130,15 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     // Sync to database if user is logged in
     if (user) {
       try {
-        await cartService.addToCart(user.id, String(item.id), 1);
+        await cartService.addToCart(user.id, String(item.id), 1, item.size);
       } catch (error) {
         console.error('Error adding to cart:', error);
       }
     }
   };
 
-  const removeFromCart = async (id: number | string) => {
-    const removed = items.find((item) => item.id === id);
+  const removeFromCart = async (id: number | string, size?: string) => {
+    const removed = items.find((item) => isSameLine(item, id, size));
     if (removed) {
       const display = getPrice(removed);
       trackRemoveFromCart(
@@ -145,34 +153,34 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       );
     }
 
-    setItems((prevItems) => prevItems.filter((item) => item.id !== id));
+    setItems((prevItems) => prevItems.filter((item) => !isSameLine(item, id, size)));
 
     // Sync to database if user is logged in
     if (user) {
       try {
-        await cartService.removeFromCart(user.id, String(id));
+        await cartService.removeFromCart(user.id, String(id), size);
       } catch (error) {
         console.error('Error removing from cart:', error);
       }
     }
   };
 
-  const updateQuantity = async (id: number | string, quantity: number) => {
+  const updateQuantity = async (id: number | string, quantity: number, size?: string) => {
     if (quantity <= 0) {
-      removeFromCart(id);
+      removeFromCart(id, size);
       return;
     }
 
     setItems((prevItems) =>
       prevItems.map((item) =>
-        item.id === id ? { ...item, quantity } : item
+        isSameLine(item, id, size) ? { ...item, quantity } : item
       )
     );
 
     // Sync to database if user is logged in
     if (user) {
       try {
-        await cartService.updateQuantity(user.id, String(id), quantity);
+        await cartService.updateQuantity(user.id, String(id), quantity, size);
       } catch (error) {
         console.error('Error updating quantity:', error);
       }

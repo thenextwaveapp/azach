@@ -79,7 +79,7 @@ const Cart = () => {
           <div className="lg:col-span-2 space-y-4">
             {items.map((item) => (
               <div
-                key={item.id}
+                key={`${item.id}-${item.size || ''}`}
                 className="flex gap-4 p-4 border rounded-lg hover:shadow-md transition-shadow"
               >
                 <img
@@ -92,12 +92,15 @@ const Cart = () => {
                     <div>
                       <h3 className="font-semibold">{item.name}</h3>
                       <p className="text-sm text-muted-foreground">{item.category}</p>
+                      {item.size && (
+                        <p className="text-sm text-muted-foreground">Size: {item.size}</p>
+                      )}
                     </div>
                     <Button
                       variant="ghost"
                       size="icon"
                       aria-label={`Remove ${item.name} from cart`}
-                      onClick={() => removeFromCart(item.id)}
+                      onClick={() => removeFromCart(item.id, item.size)}
                       className="text-destructive hover:text-destructive"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -111,7 +114,7 @@ const Cart = () => {
                         size="icon"
                         aria-label={`Decrease quantity of ${item.name}`}
                         className="h-8 w-8"
-                        onClick={() => updateQuantity(item.id, item.quantity - 1)}
+                        onClick={() => updateQuantity(item.id, item.quantity - 1, item.size)}
                       >
                         <Minus className="h-3 w-3" />
                       </Button>
@@ -121,7 +124,7 @@ const Cart = () => {
                         size="icon"
                         aria-label={`Increase quantity of ${item.name}`}
                         className="h-8 w-8"
-                        onClick={() => updateQuantity(item.id, item.quantity + 1)}
+                        onClick={() => updateQuantity(item.id, item.quantity + 1, item.size)}
                       >
                         <Plus className="h-3 w-3" />
                       </Button>

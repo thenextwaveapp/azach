@@ -480,6 +480,7 @@ const OrdersAdmin = () => {
                           {order.order_items.slice(0, 2).map((item, idx) => (
                             <p key={idx} className="truncate">
                               {item.quantity}× {item.product_name}
+                              {item.selected_size ? ` (${item.selected_size})` : ''}
                             </p>
                           ))}
                           {order.order_items.length > 2 && (
@@ -597,7 +598,7 @@ const OrdersAdmin = () => {
                         <div className="flex-1">
                           <p className="font-medium text-sm">{item.product_name}</p>
                           <p className="text-xs text-muted-foreground">
-                            Qty: {item.quantity} × {formatAsCurrency(item.price, selectedOrder.currency)}
+                            {item.selected_size ? `Size: ${item.selected_size} · ` : ''}Qty: {item.quantity} × {formatAsCurrency(item.price, selectedOrder.currency)}
                           </p>
                         </div>
                         <p className="font-semibold">{formatAsCurrency(item.price * item.quantity, selectedOrder.currency)}</p>

@@ -1,5 +1,6 @@
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ShoppingBag, Heart, X } from "lucide-react";
 import { useCart } from "@/contexts/CartContext";
 import { useCurrency } from "@/contexts/CurrencyContext";
@@ -9,8 +10,9 @@ import { useIsInWishlist, useAddToWishlist, useRemoveFromWishlist } from "@/hook
 import { OptimizedImage } from "@/components/OptimizedImage";
 import { Product } from "@/types/product";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { trackAddToCart, trackAddToWishlist } from "@/lib/analytics";
+import { getAvailableSizes } from "@/lib/sizes";
 
 interface QuickViewModalProps {
   product: Product | null;
@@ -29,6 +31,15 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [isHovering, setIsHovering] = useState(false);
+  const [selectedSize, setSelectedSize] = useState('');
+
+  const availableSizes = product ? getAvailableSizes(product) : [];
+
+  // A single available size needs no decision — preselect it.
+  useEffect(() => {
+    setSelectedSize(availableSizes.length === 1 ? availableSizes[0] : '');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product?.id]);
 
   if (!product) return null;
 
@@ -43,18 +54,28 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
   };
 
   const handleAddToCart = () => {
+    if (availableSizes.length > 0 && !selectedSize) {
+      toast({
+        title: "Select a size",
+        description: "Please choose your size before adding to cart.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     addToCart({
       id: product.id,
       name: product.name,
       price: product.price,
       image: product.image_url,
       category: product.category,
+      size: selectedSize || undefined,
       currency_prices: product.currency_prices,
     });
     trackAddToCart(analyticsItem(), currency);
     toast({
       title: "Added to cart",
-      description: `${product.name} has been added to your cart.`,
+      description: `${product.name}${selectedSize ? ` (Size ${selectedSize})` : ''} has been added to your cart.`,
     });
   };
 
@@ -190,6 +211,25 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
                 </span>
               </div>
             </div>
+
+            {/* Size Selector */}
+            {availableSizes.length > 0 && (
+              <div className="mb-4">
+                <p className="font-semibold mb-2 text-sm">Size</p>
+                <Select value={selectedSize} onValueChange={setSelectedSize}>
+                  <SelectTrigger className="w-full" aria-label="Select size">
+                    <SelectValue placeholder="Select your size" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableSizes.map((size) => (
+                      <SelectItem key={size} value={size}>
+                        {size}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             {/* Actions */}
             <div className="mt-auto space-y-3">

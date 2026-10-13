@@ -41,6 +41,7 @@ export interface OrderItem {
   product_image: string | null;
   price: number;
   quantity: number;
+  selected_size: string | null;
   created_at: string;
 }
 

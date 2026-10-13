@@ -19,6 +19,7 @@ interface InitializeRequest {
     price: number;
     quantity: number;
     image: string;
+    size?: string; // customer-selected size, carried through metadata into the order
   }>;
   userId: string;
   userEmail: string;

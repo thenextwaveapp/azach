@@ -34,6 +34,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import type { ProductInsert, ProductUpdate, ForeignCurrency } from '@/types/product';
 import { uploadImageToStorage, uploadMultipleImages } from '@/utils/imageUpload';
+import { ALL_SIZES } from '@/lib/sizes';
 
 // Paystack only charges NGN + USD on this account, so USD is the only foreign
 // currency we take a manually-set display/charge price for.
@@ -74,7 +75,7 @@ const Admin = () => {
     image_url: '',
     image_urls: [],
     sku: '',
-    size: '',
+    sizes: [...ALL_SIZES],
     material: '',
     care_instructions: '',
     style_code: '',
@@ -207,7 +208,8 @@ const Admin = () => {
       image_url: product.image_url,
       image_urls: product.image_urls || [],
       sku: product.sku || '',
-      size: product.size || '',
+      // Legacy single-size products fall back to that size as the only offered one
+      sizes: product.sizes ?? (product.size ? [product.size] : []),
       material: product.material || '',
       care_instructions: product.care_instructions || '',
       style_code: product.style_code || '',
@@ -288,7 +290,7 @@ const Admin = () => {
       image_url: '',
       image_urls: [],
       sku: '',
-      size: '',
+      sizes: [...ALL_SIZES],
       material: '',
       care_instructions: '',
       style_code: '',
@@ -689,7 +691,7 @@ const Admin = () => {
                     </div>
                   )}
                 </div>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="sku">Garment ID (SKU) *</Label>
                     <Input
@@ -700,20 +702,39 @@ const Admin = () => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="size">Size</Label>
-                    <Input
-                      id="size"
-                      value={formData.size || ''}
-                      onChange={(e) => setFormData({ ...formData, size: e.target.value })}
-                    />
-                  </div>
-                  <div>
                     <Label htmlFor="style_code">Style Code</Label>
                     <Input
                       id="style_code"
                       value={formData.style_code || ''}
                       onChange={(e) => setFormData({ ...formData, style_code: e.target.value })}
                     />
+                  </div>
+                </div>
+                <div>
+                  <Label>Available Sizes</Label>
+                  <p className="text-xs text-muted-foreground mb-2">
+                    Sizes the customer can order this piece in. Untick all for size-less items (e.g. accessories).
+                  </p>
+                  <div className="flex flex-wrap gap-4">
+                    {ALL_SIZES.map((size) => (
+                      <label key={size} className="flex items-center gap-1.5 text-sm cursor-pointer">
+                        <input
+                          type="checkbox"
+                          checked={formData.sizes?.includes(size) || false}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              sizes: e.target.checked
+                                ? [...(formData.sizes || []), size].sort(
+                                    (a, b) => ALL_SIZES.indexOf(a) - ALL_SIZES.indexOf(b)
+                                  )
+                                : (formData.sizes || []).filter((s) => s !== size),
+                            })
+                          }
+                        />
+                        {size}
+                      </label>
+                    ))}
                   </div>
                 </div>
                 <div>
@@ -1132,7 +1153,7 @@ const Admin = () => {
                   </div>
                 </TableHead>
                 <TableHead>SKU</TableHead>
-                <TableHead>Size</TableHead>
+                <TableHead>Sizes</TableHead>
                 <TableHead
                   className="cursor-pointer hover:bg-muted/50 select-none"
                   onClick={() => handleSort('category')}
@@ -1187,7 +1208,9 @@ const Admin = () => {
                       )}
                     </TableCell>
                     <TableCell className="text-muted-foreground">{product.sku || '—'}</TableCell>
-                    <TableCell className="text-muted-foreground">{product.size || '—'}</TableCell>
+                    <TableCell className="text-muted-foreground">
+                      {product.sizes?.length ? product.sizes.join(', ') : product.size || '—'}
+                    </TableCell>
                     <TableCell>{product.category}</TableCell>
                     <TableCell>${product.price}</TableCell>
                     <TableCell>{product.stock}</TableCell>

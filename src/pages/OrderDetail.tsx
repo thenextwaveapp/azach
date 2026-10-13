@@ -226,6 +226,11 @@ const OrderDetail = () => {
                     )}
                     <div className="flex-1">
                       <p className="font-medium">{item.product_name}</p>
+                      {item.selected_size && (
+                        <p className="text-sm text-muted-foreground">
+                          Size: {item.selected_size}
+                        </p>
+                      )}
                       <p className="text-sm text-muted-foreground">
                         Quantity: {item.quantity}
                       </p>

@@ -356,6 +356,7 @@ const Checkout = () => {
         price: getItemChargeAmountNGN(item),
         quantity: item.quantity,
         image: item.image,
+        size: item.size,
       }));
 
       // Use shipping address as billing address (can be enhanced later for separate billing)
@@ -581,7 +582,7 @@ const Checkout = () => {
                 <h2 className="text-xl font-semibold mb-4">Order Summary</h2>
                 <div className="space-y-4 mb-4 max-h-64 overflow-y-auto">
                   {items.map((item) => (
-                    <div key={item.id} className="flex justify-between items-center">
+                    <div key={`${item.id}-${item.size || ''}`} className="flex justify-between items-center">
                       <div className="flex items-center gap-4">
                         <img
                           src={item.image}
@@ -591,7 +592,7 @@ const Checkout = () => {
                         <div>
                           <p className="font-medium">{item.name}</p>
                           <p className="text-sm text-muted-foreground">
-                            Qty: {item.quantity}
+                            {item.size ? `Size: ${item.size} · ` : ''}Qty: {item.quantity}
                           </p>
                         </div>
                       </div>

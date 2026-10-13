@@ -12,6 +12,7 @@ import { QuickViewModal } from "./QuickViewModal";
 import { OptimizedImage } from "./OptimizedImage";
 import { Product } from "@/types/product";
 import { trackAddToCart, trackAddToWishlist, trackSelectItem } from "@/lib/analytics";
+import { getAvailableSizes } from "@/lib/sizes";
 
 interface ProductCardProps {
   id: number | string;
@@ -46,18 +47,28 @@ export const ProductCard = ({ id, name, price, image, category, product, listNam
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
+
+    // The quick-add button can't pick a size; when there's a real choice to make,
+    // open the quick view so the customer chooses there.
+    const availableSizes = product ? getAvailableSizes(product) : [];
+    if (availableSizes.length > 1) {
+      setQuickViewOpen(true);
+      return;
+    }
+
     addToCart({
       id,
       name,
       price,
       image,
       category,
+      size: availableSizes[0],
       currency_prices: product?.currency_prices,
     });
     trackAddToCart(analyticsItem(), currency);
     toast({
       title: "Added to cart",
-      description: `${name} has been added to your cart.`,
+      description: `${name}${availableSizes[0] ? ` (Size ${availableSizes[0]})` : ''} has been added to your cart.`,
     });
   };
 

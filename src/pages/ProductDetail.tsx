@@ -13,8 +13,10 @@ import { ProductReviews } from '@/components/ProductReviews';
 import { RelatedProducts } from '@/components/RelatedProducts';
 import { OptimizedImage } from '@/components/OptimizedImage';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ShoppingBag, ArrowLeft, Heart, ZoomIn, ZoomOut, Ruler, ChevronDown } from 'lucide-react';
 import { trackAddToCart, trackAddToWishlist, trackViewItem } from '@/lib/analytics';
+import { getAvailableSizes } from '@/lib/sizes';
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
@@ -36,7 +38,16 @@ const ProductDetail = () => {
   const [selectedImageIndex, setSelectedImageIndex] = useState(0);
   const [isZoomEnabled, setIsZoomEnabled] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(true);
+  const [selectedSize, setSelectedSize] = useState('');
   const touchStartX = useRef<number | null>(null);
+
+  const availableSizes = product ? getAvailableSizes(product) : [];
+
+  // A single available size needs no decision — preselect it.
+  useEffect(() => {
+    setSelectedSize(availableSizes.length === 1 ? availableSizes[0] : '');
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [product?.id]);
 
   useEffect(() => {
     if (product) {
@@ -98,12 +109,22 @@ const ProductDetail = () => {
   const handleAddToCart = () => {
     if (!product) return;
 
+    if (availableSizes.length > 0 && !selectedSize) {
+      toast({
+        title: 'Select a size',
+        description: 'Please choose your size before adding to cart.',
+        variant: 'destructive',
+      });
+      return;
+    }
+
     addToCart({
       id: product.id,
       name: product.name,
       price: product.price,
       image: product.image_url,
       category: product.category,
+      size: selectedSize || undefined,
       currency_prices: product.currency_prices,
     });
 
@@ -120,7 +141,7 @@ const ProductDetail = () => {
 
     toast({
       title: 'Added to cart',
-      description: `${product.name} has been added to your cart.`,
+      description: `${product.name}${selectedSize ? ` (Size ${selectedSize})` : ''} has been added to your cart.`,
     });
   };
 
@@ -374,10 +395,10 @@ const ProductDetail = () => {
                 <span className="text-muted-foreground">Category</span>
                 <span className="font-medium capitalize">{product.category}</span>
               </div>
-              {product.size && (
+              {availableSizes.length > 0 && (
                 <div className="flex justify-between py-2 border-b">
-                  <span className="text-muted-foreground">Size</span>
-                  <span className="font-medium">{product.size}</span>
+                  <span className="text-muted-foreground">Available Sizes</span>
+                  <span className="font-medium">{availableSizes.join(' / ')}</span>
                 </div>
               )}
               {product.gender && product.gender.length > 0 && (
@@ -420,6 +441,25 @@ const ProductDetail = () => {
                 Size Guide
               </Link>
             </div>
+
+            {/* Size Selector */}
+            {availableSizes.length > 0 && (
+              <div className="mb-6">
+                <p className="font-semibold mb-2">Size</p>
+                <Select value={selectedSize} onValueChange={setSelectedSize}>
+                  <SelectTrigger className="w-full" aria-label="Select size">
+                    <SelectValue placeholder="Select your size" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableSizes.map((size) => (
+                      <SelectItem key={size} value={size}>
+                        {size}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
 
             {/* Add to Cart Button */}
             <div className="mt-auto space-y-2">
