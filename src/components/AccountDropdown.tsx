@@ -1,4 +1,4 @@
-import { User, LogIn, Heart, Package, Settings, LogOut } from "lucide-react";
+import { User, LogIn, Heart, Package, Settings, LogOut, ShieldCheck } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -13,7 +13,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
 
 export const AccountDropdown = () => {
-  const { user, isAnonymous, signOut } = useAuth();
+  const { user, isAnonymous, isAdmin, signOut } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
   const isAuthenticated = !!user && !isAnonymous;
@@ -64,14 +64,14 @@ export const AccountDropdown = () => {
               </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            {user?.email === "admin@azach.com" || user?.email?.includes("admin") ? (
+            {isAdmin && (
               <DropdownMenuItem asChild className="px-3">
                 <Link to="/admin" className="flex items-center cursor-pointer w-full">
-                  <Settings className="mr-2 h-4 w-4 flex-shrink-0" />
-                  <span>Admin Panel</span>
+                  <ShieldCheck className="mr-2 h-4 w-4 flex-shrink-0" />
+                  <span>Admin</span>
                 </Link>
               </DropdownMenuItem>
-            ) : null}
+            )}
             <DropdownMenuItem className="text-destructive px-3" onClick={handleLogout}>
               <LogOut className="mr-2 h-4 w-4 flex-shrink-0" />
               <span>Logout</span>
