@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { ZoomIn, ZoomOut } from 'lucide-react';
 
-// Hover-follow magnifier with two selectable zoom levels (2x / 4x) — tap the active
-// level again to turn zoom off. Mirrors the product-page zoom UX.
-const ZOOM_LEVELS = [2, 4];
-
+// Hover-follow 2x magnifier behind a single zoom-lens toggle — same UX as the
+// product page's image zoom.
 interface ZoomableImageProps {
   src: string;
   alt: string;
@@ -16,17 +15,17 @@ interface ZoomableImageProps {
 }
 
 export const ZoomableImage = ({ src, alt, className, wrapperClassName, loading }: ZoomableImageProps) => {
-  const [zoom, setZoom] = useState(0); // 0 = zoom off
+  const [isZoomEnabled, setIsZoomEnabled] = useState(false);
   const [position, setPosition] = useState({ x: 50, y: 50 });
   const [isHovering, setIsHovering] = useState(false);
 
-  const active = zoom > 0 && isHovering;
+  const active = isZoomEnabled && isHovering;
 
   return (
     <div
-      className={`relative overflow-hidden ${wrapperClassName || ''} ${zoom ? 'cursor-crosshair' : ''}`}
+      className={`relative overflow-hidden ${wrapperClassName || ''} ${isZoomEnabled ? 'cursor-crosshair' : ''}`}
       onMouseMove={(e) => {
-        if (!zoom) return;
+        if (!isZoomEnabled) return;
         const rect = e.currentTarget.getBoundingClientRect();
         setPosition({
           x: ((e.clientX - rect.left) / rect.width) * 100,
@@ -42,34 +41,25 @@ export const ZoomableImage = ({ src, alt, className, wrapperClassName, loading }
         loading={loading}
         className={className}
         style={{
-          transform: active ? `scale(${zoom})` : 'scale(1)',
+          transform: active ? 'scale(2)' : 'scale(1)',
           transformOrigin: `${position.x}% ${position.y}%`,
           transition: active ? 'none' : 'transform 0.3s ease-out',
         }}
       />
-      <div className="absolute top-3 right-3 z-20 flex gap-1.5">
-        {ZOOM_LEVELS.map((level) => (
-          <Button
-            key={level}
-            type="button"
-            size="sm"
-            variant="secondary"
-            className={`h-8 px-2.5 shadow-lg border-0 ${
-              zoom === level
-                ? 'bg-black text-white hover:bg-black'
-                : 'bg-white/90 text-black hover:bg-white'
-            }`}
-            onClick={(e) => {
-              e.stopPropagation();
-              setZoom(zoom === level ? 0 : level);
-            }}
-            aria-label={zoom === level ? `Disable ${level}x zoom` : `Enable ${level}x zoom`}
-            title={zoom === level ? 'Turn zoom off' : `Zoom ${level}x`}
-          >
-            {level}×
-          </Button>
-        ))}
-      </div>
+      <Button
+        type="button"
+        variant="secondary"
+        size="icon"
+        className="absolute top-3 right-3 z-20 bg-black hover:bg-gray-900 shadow-lg border-0"
+        onClick={(e) => {
+          e.stopPropagation();
+          setIsZoomEnabled(!isZoomEnabled);
+        }}
+        aria-label={isZoomEnabled ? 'Disable zoom' : 'Enable zoom'}
+        title={isZoomEnabled ? 'Disable zoom' : 'Enable zoom'}
+      >
+        {isZoomEnabled ? <ZoomOut className="h-5 w-5 text-white" /> : <ZoomIn className="h-5 w-5 text-white" />}
+      </Button>
     </div>
   );
 };
