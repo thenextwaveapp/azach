@@ -34,7 +34,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import type { ProductInsert, ProductUpdate, ForeignCurrency } from '@/types/product';
 import { uploadImageToStorage, uploadMultipleImages } from '@/utils/imageUpload';
-import { ALL_SIZES, sortSizes } from '@/lib/sizes';
+import { ALL_SIZES, UK_SIZE_LABELS, sortSizes } from '@/lib/sizes';
 
 // Paystack only charges NGN + USD on this account, so USD is the only foreign
 // currency we take a manually-set display/charge price for.
@@ -746,6 +746,7 @@ const Admin = () => {
                   <p className="text-xs text-muted-foreground mb-2">
                     Tick the sizes this piece is offered in and how many you have of each.
                     Untick all for size-less items (e.g. accessories). Total stock is the sum.
+                    UK numbers are female sizes only.
                   </p>
                   <div className="flex flex-wrap gap-4">
                     {ALL_SIZES.map((size) => {
@@ -771,6 +772,9 @@ const Admin = () => {
                               }
                             />
                             {size}
+                            {UK_SIZE_LABELS[size] && (
+                              <span className="text-xs text-muted-foreground">({UK_SIZE_LABELS[size]})</span>
+                            )}
                           </label>
                           {offered && !formData.is_bundle && (
                             <Input
