@@ -1,19 +1,10 @@
 // The standard AZACH size run. Admin picks which of these a product is offered in
 // (with a stock count per size); the customer picks one of those on the product page.
-export const ALL_SIZES = ['XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL'];
-
-// UK dress-size equivalents (women's sizing only) — shown as a hint in the admin
-// form, taken from the size guide chart.
-export const UK_SIZE_LABELS: Record<string, string> = {
-  XS: 'UK 6',
-  S: 'UK 8–10',
-  M: 'UK 12',
-  L: 'UK 14',
-  XL: 'UK 16–18',
-  XXL: 'UK 20–22',
-  '3XL': 'UK 24',
-  '4XL': 'UK 26–28',
-};
+// Letter sizes (XS–4XL) plus UK dress sizes 6–28 (female garments only).
+export const ALL_SIZES = [
+  'XS', 'S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL',
+  'UK 6', 'UK 8', 'UK 10', 'UK 12', 'UK 14', 'UK 16', 'UK 18', 'UK 20', 'UK 22', 'UK 24', 'UK 26', 'UK 28',
+];
 
 const sizeOrder = (size: string) => {
   const idx = ALL_SIZES.indexOf(size);
