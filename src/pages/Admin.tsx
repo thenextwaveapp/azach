@@ -1,5 +1,5 @@
 import { useState, useEffect, Fragment } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import {
@@ -29,7 +29,7 @@ import {
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct, useBundles } from '@/hooks/useProducts';
-import { Trash2, Edit, Plus, LogOut, ChevronUp, ChevronDown, Upload, Search, ArrowUpDown, ArrowUp, ArrowDown, ShoppingCart, Star } from 'lucide-react';
+import { Trash2, Edit, Plus, LogOut, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Upload, Search, ArrowUpDown, ArrowUp, ArrowDown, ShoppingCart, Star } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import type { ProductInsert, ProductUpdate, ForeignCurrency } from '@/types/product';
@@ -105,6 +105,9 @@ const Admin = () => {
   const [additionalImageFiles, setAdditionalImageFiles] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  // Product whose images are open in the gallery modal, and which image is shown
+  const [galleryProduct, setGalleryProduct] = useState<any | null>(null);
+  const [galleryIndex, setGalleryIndex] = useState(0);
   const [sortColumn, setSortColumn] = useState<'name' | 'category' | 'price' | 'stock' | 'created_at' | null>(null);
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
@@ -1329,14 +1332,26 @@ const Admin = () => {
                 filteredProducts.map((product) => (
                   <TableRow key={product.id}>
                     <TableCell>
-                      <img
-                        src={product.image_url}
-                        alt={product.name}
-                        className="w-16 h-20 object-cover rounded-md"
-                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setGalleryProduct(product);
+                          setGalleryIndex(0);
+                        }}
+                        aria-label={`View images of ${product.name}`}
+                        title="View images"
+                      >
+                        <img
+                          src={product.image_url}
+                          alt={product.name}
+                          className="w-16 h-20 object-cover rounded-md hover:opacity-80 transition-opacity"
+                        />
+                      </button>
                     </TableCell>
                     <TableCell className="font-medium">
-                      {product.name}
+                      <Link to={`/product/${product.id}`} className="hover:underline">
+                        {product.name}
+                      </Link>
                       {product.is_bundle && (
                         <span className="ml-2 px-1.5 py-0.5 rounded text-[10px] bg-primary/10 text-primary align-middle">SET</span>
                       )}
@@ -1406,6 +1421,71 @@ const Admin = () => {
             </TableBody>
           </Table>
         </div>
+
+        {/* Image gallery modal (click a product image in the table) */}
+        <Dialog open={!!galleryProduct} onOpenChange={(open) => !open && setGalleryProduct(null)}>
+          <DialogContent className="max-w-2xl">
+            {galleryProduct && (() => {
+              const images = [galleryProduct.image_url, ...(galleryProduct.image_urls || [])];
+              return (
+                <>
+                  <DialogHeader>
+                    <DialogTitle>
+                      {galleryProduct.name}
+                      <span className="ml-2 text-sm font-normal text-muted-foreground">
+                        {galleryIndex + 1} / {images.length}
+                      </span>
+                    </DialogTitle>
+                  </DialogHeader>
+                  <div className="relative">
+                    <img
+                      src={images[galleryIndex]}
+                      alt={`${galleryProduct.name} ${galleryIndex + 1}`}
+                      className="w-full max-h-[65vh] object-contain rounded-md bg-muted"
+                    />
+                    {images.length > 1 && (
+                      <>
+                        <Button
+                          variant="secondary"
+                          size="icon"
+                          className="absolute left-2 top-1/2 -translate-y-1/2"
+                          aria-label="Previous image"
+                          onClick={() => setGalleryIndex((galleryIndex - 1 + images.length) % images.length)}
+                        >
+                          <ChevronLeft className="h-5 w-5" />
+                        </Button>
+                        <Button
+                          variant="secondary"
+                          size="icon"
+                          className="absolute right-2 top-1/2 -translate-y-1/2"
+                          aria-label="Next image"
+                          onClick={() => setGalleryIndex((galleryIndex + 1) % images.length)}
+                        >
+                          <ChevronRight className="h-5 w-5" />
+                        </Button>
+                      </>
+                    )}
+                  </div>
+                  {images.length > 1 && (
+                    <div className="flex gap-2 overflow-x-auto pb-1">
+                      {images.map((url, index) => (
+                        <button
+                          key={index}
+                          onClick={() => setGalleryIndex(index)}
+                          className={`w-14 h-16 shrink-0 overflow-hidden rounded-md border-2 transition-all ${
+                            galleryIndex === index ? 'border-primary' : 'border-transparent hover:border-muted-foreground'
+                          }`}
+                        >
+                          <img src={url} alt={`Thumbnail ${index + 1}`} className="w-full h-full object-cover" />
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </>
+              );
+            })()}
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
