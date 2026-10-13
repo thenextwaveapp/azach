@@ -1284,7 +1284,7 @@ const Admin = () => {
           </div>
         </div>
 
-        <div className="border rounded-lg">
+        <div className="border rounded-lg overflow-x-auto">
           <Table>
             <TableHeader>
               <TableRow>
@@ -1366,7 +1366,7 @@ const Admin = () => {
                       )}
                     </TableCell>
                     <TableCell className="text-muted-foreground">{product.sku || '—'}</TableCell>
-                    <TableCell className="text-muted-foreground whitespace-nowrap">
+                    <TableCell className="text-muted-foreground max-w-[200px] text-xs">
                       {product.size_stock && Object.keys(product.size_stock).length > 0
                         ? sortSizes(Object.keys(product.size_stock))
                             .map((s: string) => `${s} (${product.size_stock[s]})`)
