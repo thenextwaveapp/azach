@@ -32,6 +32,7 @@ import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct, useB
 import { Trash2, Edit, Plus, LogOut, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Upload, Search, ArrowUpDown, ArrowUp, ArrowDown, ShoppingCart, Star } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
+import { useCurrency } from '@/contexts/CurrencyContext';
 import type { ProductInsert, ProductUpdate, ForeignCurrency } from '@/types/product';
 import { uploadImageToStorage, uploadMultipleImages } from '@/utils/imageUpload';
 import { ALL_SIZES, sortSizes } from '@/lib/sizes';
@@ -54,6 +55,8 @@ const Admin = () => {
   const deleteProduct = useDeleteProduct();
   const { toast } = useToast();
   const { user, signOut } = useAuth();
+  // Base prices are always NGN regardless of the admin's own browsing currency
+  const { formatNGN } = useCurrency();
   const navigate = useNavigate();
 
   const handleLogout = async () => {
@@ -509,7 +512,7 @@ const Admin = () => {
                 </div>
                 <div className="grid grid-cols-3 gap-4">
                   <div>
-                    <Label htmlFor="price">Price *</Label>
+                    <Label htmlFor="price">Price (₦) *</Label>
                     <Input
                       id="price"
                       type="number"
@@ -520,7 +523,7 @@ const Admin = () => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="originalPrice">Original Price (for sale items)</Label>
+                    <Label htmlFor="originalPrice">Original Price (₦, for sale items)</Label>
                     <Input
                       id="originalPrice"
                       type="number"
@@ -1372,7 +1375,7 @@ const Admin = () => {
                           : '—'}
                     </TableCell>
                     <TableCell>{product.category}</TableCell>
-                    <TableCell>${product.price}</TableCell>
+                    <TableCell className="whitespace-nowrap">{formatNGN(product.price)}</TableCell>
                     <TableCell>{product.stock}</TableCell>
                     <TableCell>
                       <span className={`px-2 py-1 rounded text-xs ${
