@@ -383,7 +383,7 @@ const ProductDetail = () => {
             {product.description && (
               <div className="mb-6">
                 <h3 className="font-semibold mb-2">Description</h3>
-                <p className="text-muted-foreground leading-relaxed">
+                <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
                   {product.description}
                 </p>
               </div>
@@ -679,7 +679,7 @@ const ProductDetail = () => {
                     {product.care_instructions && (
                       <div>
                         <h3 className="font-semibold mb-1">Care Instructions</h3>
-                        <p className="text-muted-foreground">{product.care_instructions}</p>
+                        <p className="text-muted-foreground whitespace-pre-line">{product.care_instructions}</p>
                       </div>
                     )}
                   </div>

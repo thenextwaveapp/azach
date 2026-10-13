@@ -200,7 +200,7 @@ export const QuickViewModal = ({ product, open, onOpenChange }: QuickViewModalPr
             {/* Description */}
             {product.description && (
               <div className="mb-6">
-                <p className="text-muted-foreground leading-relaxed line-clamp-3">
+                <p className="text-muted-foreground leading-relaxed line-clamp-3 whitespace-pre-line">
                   {product.description}
                 </p>
               </div>
