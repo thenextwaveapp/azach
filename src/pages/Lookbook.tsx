@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { ShoppingBag, MessageSquarePlus } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useLookbookImages } from '@/hooks/useLookbook';
+import { ZoomableImage } from '@/components/ZoomableImage';
 
 const Lookbook = () => {
   const navigate = useNavigate();
@@ -125,10 +126,11 @@ const Lookbook = () => {
                 className="group relative w-full max-w-7xl overflow-hidden rounded-3xl bg-gradient-to-br from-zinc-800 to-zinc-950"
                 style={{ height: 'calc(100vh - 20px)' }}
               >
-                <img
+                <ZoomableImage
                   src={image.image_url}
                   alt={image.headline || 'AZACH Lookbook'}
                   className="w-full h-full object-contain"
+                  wrapperClassName="w-full h-full"
                   loading="lazy"
                 />
 

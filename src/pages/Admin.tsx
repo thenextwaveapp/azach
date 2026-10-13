@@ -35,6 +35,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useCurrency } from '@/contexts/CurrencyContext';
 import type { ProductInsert, ProductUpdate, ForeignCurrency } from '@/types/product';
 import { uploadImageToStorage, uploadMultipleImages } from '@/utils/imageUpload';
+import { ZoomableImage } from '@/components/ZoomableImage';
 import { ALL_SIZES, sortSizes } from '@/lib/sizes';
 
 // Paystack only charges NGN + USD on this account, so USD is the only foreign
@@ -1441,10 +1442,11 @@ const Admin = () => {
                     </DialogTitle>
                   </DialogHeader>
                   <div className="relative">
-                    <img
+                    <ZoomableImage
                       src={images[galleryIndex]}
                       alt={`${galleryProduct.name} ${galleryIndex + 1}`}
-                      className="w-full max-h-[65vh] object-contain rounded-md bg-muted"
+                      className="w-full max-h-[65vh] object-contain"
+                      wrapperClassName="rounded-md bg-muted"
                     />
                     {images.length > 1 && (
                       <>
