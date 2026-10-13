@@ -222,13 +222,12 @@ const Admin = () => {
       image_url: product.image_url,
       image_urls: product.image_urls || [],
       sku: product.sku || '',
-      // Legacy single-size products fall back to that size as the only offered one,
-      // carrying their whole stock on it
-      sizes: product.sizes ?? (product.size ? [product.size] : []),
+      sizes: product.sizes ?? [],
+      // Single-size products without per-size counts yet carry their whole stock on it
       size_stock:
         product.size_stock ??
-        (product.sizes?.length === 1 || (!product.sizes?.length && product.size)
-          ? { [product.sizes?.[0] ?? product.size]: product.stock }
+        (product.sizes?.length === 1
+          ? { [product.sizes[0]]: product.stock }
           : Object.fromEntries((product.sizes ?? []).map((s: string) => [s, 0]))),
       material: product.material || '',
       care_instructions: product.care_instructions || '',
@@ -1274,7 +1273,7 @@ const Admin = () => {
                             .join(', ')
                         : product.sizes?.length
                           ? product.sizes.join(', ')
-                          : product.size || '—'}
+                          : '—'}
                     </TableCell>
                     <TableCell>{product.category}</TableCell>
                     <TableCell>${product.price}</TableCell>

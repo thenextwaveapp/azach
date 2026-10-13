@@ -632,7 +632,11 @@ const ProductDetail = () => {
                     )}
                   </div>
                   <p className="text-sm font-medium mt-2 truncate">{piece.sku || piece.name}</p>
-                  {piece.size && <p className="text-xs text-muted-foreground">Size: {piece.size}</p>}
+                  {getAvailableSizes(piece).length > 0 && (
+                    <p className="text-xs text-muted-foreground">
+                      Size: {getAvailableSizes(piece).join(' / ')}
+                    </p>
+                  )}
                   <p className="text-sm font-semibold">{formatDisplayPrice(piece)}</p>
                 </button>
               ))}

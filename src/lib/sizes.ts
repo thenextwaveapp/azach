@@ -21,15 +21,15 @@ interface SizedProduct {
 }
 
 // Sizes a product can be ordered in (including currently sold-out ones, so they can
-// be shown as unavailable). Falls back to the legacy fields for products from before
-// sizes became customer-selectable; empty means the product has no size dimension
-// (e.g. accessories) and no selector is shown.
+// be shown as unavailable). Driven purely by what admin ticked (size_stock, with the
+// trigger-maintained sizes array as backup) — the legacy single `size` field is
+// deliberately NOT used, so the customer dropdown always matches the admin picker.
+// Empty means the product has no size dimension (e.g. accessories): no selector shown.
 export const getAvailableSizes = (product: SizedProduct): string[] => {
   if (product.size_stock && Object.keys(product.size_stock).length > 0) {
     return sortSizes(Object.keys(product.size_stock));
   }
   if (product.sizes && product.sizes.length > 0) return product.sizes;
-  if (product.size) return [product.size];
   return [];
 };
 
