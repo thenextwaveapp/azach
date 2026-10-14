@@ -8,8 +8,14 @@ import { productToDisplay, getDisplayPriceAmount } from "@/utils/productHelpers"
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useTrackItemList } from "@/hooks/useTrackItemList";
 import { useState, useEffect, useMemo } from "react";
+import { useSearchParams } from "react-router-dom";
+import { categoryBySlug } from "@/config/categories";
 
 const ShopAll = () => {
+  const [searchParams] = useSearchParams();
+  const categoryFromUrl = categoryBySlug(searchParams.get("category"));
+  const initialCategories = categoryFromUrl ? [categoryFromUrl.dbValue] : [];
+
   const [filters, setFilters] = useState<{
     categories: string[];
     minPrice: number;
@@ -19,7 +25,7 @@ const ShopAll = () => {
     gender: 'men' | 'women' | 'unisex' | null;
     sortBy: SortOption;
   }>({
-    categories: [],
+    categories: initialCategories,
     minPrice: 0,
     maxPrice: 10000,
     inStock: null,
@@ -100,7 +106,10 @@ const ShopAll = () => {
       {/* Products Grid */}
       <section className="py-24">
         <div className="container mx-auto px-4">
+          {/* Keyed on the URL category so navigating between category links resets the filter UI */}
           <ProductFilters
+            key={categoryFromUrl?.slug ?? "all"}
+            initialCategories={initialCategories}
             onFiltersChange={setFilters}
             availableCategories={Array.from(new Set(allProducts.map(p => p.category)))}
             maxPrice={allProducts.length > 0 ? Math.max(...allProducts.map(p => getDisplayPriceAmount(p, getPrice))) : 1000}

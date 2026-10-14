@@ -13,6 +13,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { X, Filter, SortAsc, SortDesc } from "lucide-react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { useCurrency } from "@/contexts/CurrencyContext";
+import { categoryLabel } from "@/config/categories";
 
 export type SortOption = "newest" | "price-low" | "price-high" | "name-asc" | "name-desc";
 
@@ -29,6 +30,7 @@ interface ProductFiltersProps {
   availableCategories: string[];
   maxPrice: number;
   hideGenderFilter?: boolean;
+  initialCategories?: string[];
 }
 
 export const ProductFilters = ({
@@ -36,10 +38,11 @@ export const ProductFilters = ({
   availableCategories,
   maxPrice,
   hideGenderFilter = false,
+  initialCategories = [],
 }: ProductFiltersProps) => {
   const { currency, formatAsCurrency } = useCurrency();
   const [sortBy, setSortBy] = useState<SortOption>("newest");
-  const [categories, setCategories] = useState<string[]>([]);
+  const [categories, setCategories] = useState<string[]>(initialCategories);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, maxPrice]);
   // NGN-scale prices need a coarser step than dollar-scale ones to keep ~50+ slider positions.
   const priceStep = maxPrice > 1000 ? 10 : 1;
@@ -127,7 +130,7 @@ export const ProductFilters = ({
                 htmlFor={`category-${category}`}
                 className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 capitalize cursor-pointer"
               >
-                {category}
+                {categoryLabel(category)}
               </label>
             </div>
           ))}
@@ -298,7 +301,7 @@ export const ProductFilters = ({
                     onClick={() => handleCategoryToggle(category)}
                     className="h-8 text-xs font-normal border border-transparent"
                   >
-                    {category}
+                    {categoryLabel(category)}
                   </Button>
                 ))}
               </div>

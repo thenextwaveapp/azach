@@ -37,6 +37,7 @@ import type { ProductInsert, ProductUpdate, ForeignCurrency } from '@/types/prod
 import { uploadImageToStorage, uploadMultipleImages } from '@/utils/imageUpload';
 import { ZoomableImage } from '@/components/ZoomableImage';
 import { ALL_SIZES, sortSizes } from '@/lib/sizes';
+import { CATEGORIES } from '@/config/categories';
 
 // Paystack only charges NGN + USD on this account, so USD is the only foreign
 // currency we take a manually-set display/charge price for.
@@ -494,11 +495,9 @@ const Admin = () => {
                         <SelectValue placeholder="Select category" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="TOPS">Tops</SelectItem>
-                        <SelectItem value="BOTTOM">Bottoms</SelectItem>
-                        <SelectItem value="SET">Sets</SelectItem>
-                        <SelectItem value="ACCESSORIES">Accessories</SelectItem>
-                        <SelectItem value="DRESS">Dress</SelectItem>
+                        {CATEGORIES.map((c) => (
+                          <SelectItem key={c.dbValue} value={c.dbValue}>{c.label}</SelectItem>
+                        ))}
                       </SelectContent>
                     </Select>
                   </div>
