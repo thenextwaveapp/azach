@@ -9,16 +9,7 @@ import { productToDisplay } from "@/utils/productHelpers";
 import { OptimizedImage } from "@/components/OptimizedImage";
 import { Link } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
-import { Play } from "lucide-react";
-import { supabase } from "@/lib/supabase";
-
-const campaignUrl = (path: string) =>
-  supabase.storage.from("campaign-media").getPublicUrl(path).data.publicUrl;
-
-const FILM_URL = campaignUrl("r2r/reconstruction-into-refinement.mp4");
-const FILM_POSTER_URL = campaignUrl("r2r/film-poster.jpg");
-const CATALOG_URL = campaignUrl("r2r/AZACH-R2R-Catalog.pdf");
+import { CATALOG_URL } from "@/lib/campaignMedia";
 
 // Matches the grid's lg:grid-cols-5 breakpoint — below it (2-3 cols) a full page
 // of 6 fills whole rows; at lg+ (5 cols) a page of 5 fills exactly one row.
@@ -29,7 +20,6 @@ const Index = () => {
   const { data: featuredProducts = [], isLoading } = useFeaturedProducts();
   const [featuredPage, setFeaturedPage] = useState(0);
   const [isDesktop, setIsDesktop] = useState(false);
-  const [filmOpen, setFilmOpen] = useState(false);
 
   useEffect(() => {
     const mql = window.matchMedia("(min-width: 1024px)");
@@ -134,41 +124,12 @@ const Index = () => {
           <p className="mt-4 text-sm md:text-base text-white/90">
             Different Pasts, A More Considered Future
           </p>
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-4">
-            <a href={CATALOG_URL} target="_blank" rel="noopener noreferrer" className="inline-block">
-              <button className="bg-[#a97c50] hover:bg-[#8b6440] text-white px-8 py-3 text-sm uppercase tracking-wide font-semibold transition-colors">
-                View the Collection
-              </button>
-            </a>
-            <button
-              onClick={() => setFilmOpen(true)}
-              className="flex items-center gap-2 border-2 border-white text-white hover:bg-white hover:text-black px-8 py-3 text-sm uppercase tracking-wide font-semibold transition-colors"
-            >
-              <Play className="h-4 w-4" />
-              Watch the Film
+          <a href={CATALOG_URL} target="_blank" rel="noopener noreferrer" className="inline-block mt-8">
+            <button className="bg-[#a97c50] hover:bg-[#8b6440] text-white px-8 py-3 text-sm uppercase tracking-wide font-semibold transition-colors">
+              View the Collection
             </button>
-          </div>
+          </a>
         </div>
-
-        <Dialog open={filmOpen} onOpenChange={setFilmOpen}>
-          <DialogContent
-            aria-describedby={undefined}
-            className="max-w-5xl p-0 bg-black border-zinc-800 overflow-hidden"
-          >
-            <DialogTitle className="sr-only">Reconstruction Into Refinement — The Film</DialogTitle>
-            {/* Mount the video only while open so closing the dialog stops playback */}
-            {filmOpen && (
-              <video
-                src={FILM_URL}
-                poster={FILM_POSTER_URL}
-                controls
-                autoPlay
-                playsInline
-                className="w-full aspect-video"
-              />
-            )}
-          </DialogContent>
-        </Dialog>
       </section>
 
       {/* SHOP BY TYPE */}

@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
+import { FILM_URL } from "@/lib/campaignMedia";
 
 export const Hero = () => {
   const videoRef = useRef<HTMLVideoElement>(null);
@@ -62,7 +63,7 @@ export const Hero = () => {
       <video
         ref={videoRef}
         className="absolute h-px w-px opacity-0 pointer-events-none"
-        src="/hero-video.mp4"
+        src={FILM_URL}
         preload="metadata"
         playsInline
       />
