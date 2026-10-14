@@ -2,10 +2,18 @@ import { useEffect, useRef, useState } from 'react';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { Button } from '@/components/ui/button';
-import { ShoppingBag, MessageSquarePlus } from 'lucide-react';
+import { ShoppingBag, MessageSquarePlus, BookOpen } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useLookbookImages } from '@/hooks/useLookbook';
 import { ZoomableImage } from '@/components/ZoomableImage';
+import { supabase } from '@/lib/supabase';
+
+const campaignUrl = (path: string) =>
+  supabase.storage.from('campaign-media').getPublicUrl(path).data.publicUrl;
+
+const FILM_URL = campaignUrl('r2r/reconstruction-into-refinement.mp4');
+const FILM_POSTER_URL = campaignUrl('r2r/film-poster.jpg');
+const CATALOG_URL = campaignUrl('r2r/AZACH-R2R-Catalog.pdf');
 
 const Lookbook = () => {
   const navigate = useNavigate();
@@ -105,6 +113,38 @@ const Lookbook = () => {
                 <path d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
               </svg>
             </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Campaign Film + Catalog */}
+      <div className="relative bg-black px-2 md:px-6 py-20 md:py-28">
+        <div className="mx-auto w-full max-w-7xl space-y-10">
+          <div className="text-center space-y-4">
+            <p className="text-xs md:text-sm uppercase tracking-[0.3em] text-zinc-500">The Film</p>
+            <h2 className="text-4xl md:text-6xl font-semibold tracking-tighter font-display text-white">
+              RECONSTRUCTION INTO REFINEMENT
+            </h2>
+          </div>
+          <video
+            src={FILM_URL}
+            poster={FILM_POSTER_URL}
+            controls
+            playsInline
+            preload="metadata"
+            className="w-full rounded-3xl bg-zinc-950 shadow-2xl"
+          />
+          <div className="flex justify-center">
+            <Button
+              asChild
+              size="lg"
+              className="gap-2 text-lg px-8 py-6 bg-gradient-to-r from-[#a97c50] via-[#c4976d] to-[#a97c50] bg-[length:200%_100%] border-0 text-white hover:bg-[position:100%_0] transition-all duration-700 ease-out hover:scale-110 hover:-translate-y-1 shadow-lg hover:shadow-[0_20px_50px_rgba(169,124,80,0.4)]"
+            >
+              <a href={CATALOG_URL} target="_blank" rel="noopener noreferrer">
+                <BookOpen className="h-5 w-5" />
+                View the Catalog
+              </a>
+            </Button>
           </div>
         </div>
       </div>
