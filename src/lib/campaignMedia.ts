@@ -6,4 +6,7 @@ const campaignUrl = (path: string) =>
   supabase.storage.from('campaign-media').getPublicUrl(path).data.publicUrl;
 
 export const FILM_URL = campaignUrl('r2r/reconstruction-into-refinement.mp4');
-export const CATALOG_URL = campaignUrl('r2r/AZACH-R2R-Catalog.pdf');
+
+// Served from our own domain via a vercel.json rewrite (and a vite dev proxy)
+// so visitors never see the raw storage URL in their address bar.
+export const CATALOG_URL = '/catalog';

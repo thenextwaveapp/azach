@@ -9,6 +9,10 @@
   ],
   "rewrites": [
     {
+      "source": "/catalog",
+      "destination": "https://oomypczpxxpechltrqmq.supabase.co/storage/v1/object/public/campaign-media/r2r/AZACH-R2R-Catalog.pdf"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }
