@@ -1,50 +1,10 @@
-import { useEffect, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { FILM_URL } from "@/lib/campaignMedia";
 
 export const Hero = () => {
-  const videoRef = useRef<HTMLVideoElement>(null);
-
-  // The campaign film only plays fullscreen on demand — once the viewer exits
-  // fullscreen (standard API or iOS's video-only fullscreen), stop playback.
-  useEffect(() => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    const stopPlayback = () => {
-      video.pause();
-      video.muted = true;
-      video.controls = false;
-      video.style.opacity = "";
-    };
-
-    const handleFullscreenChange = () => {
-      if (!document.fullscreenElement) stopPlayback();
-    };
-
-    document.addEventListener("fullscreenchange", handleFullscreenChange);
-    video.addEventListener("webkitendfullscreen", stopPlayback);
-
-    return () => {
-      document.removeEventListener("fullscreenchange", handleFullscreenChange);
-      video.removeEventListener("webkitendfullscreen", stopPlayback);
-    };
-  }, []);
-
   const handleWatchFilm = () => {
-    const video = videoRef.current;
-    if (!video) return;
-    video.muted = false;
-    video.controls = true;
-    video.style.opacity = "1";
-    if (video.requestFullscreen) {
-      video.requestFullscreen();
-    } else if ((video as any).webkitEnterFullscreen) {
-      // iOS Safari
-      (video as any).webkitEnterFullscreen();
-    }
-    video.play().catch(() => {});
+    window.open(FILM_URL, "_blank", "noopener,noreferrer");
   };
 
   return (
@@ -58,15 +18,6 @@ export const Hero = () => {
       />
       {/* Legibility overlay */}
       <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/20 to-black/10" />
-
-      {/* Hidden campaign film — opened fullscreen via "Watch the Film" */}
-      <video
-        ref={videoRef}
-        className="absolute h-px w-px opacity-0 pointer-events-none"
-        src={FILM_URL}
-        preload="metadata"
-        playsInline
-      />
 
       <div className="relative z-10 container mx-auto px-4 h-full flex items-end lg:items-center">
         <div className="max-w-2xl pb-16 lg:pb-0 text-white">
