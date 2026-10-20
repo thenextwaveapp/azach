@@ -140,7 +140,7 @@ export const WelcomeModal = () => {
     </Dialog>
 
     {/* Confirmation Modal */}
-    <Dialog open={showConfirmClose} onOpenChange={setShowConfirmClose}>
+    <Dialog open={showConfirmClose} onOpenChange={(open) => !open && handleClose()}>
       <DialogContent className="sm:max-w-md p-0 gap-0 overflow-hidden">
         <div className="relative bg-secondary text-secondary-foreground p-8 pb-10">
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-secondary to-secondary/80" />
@@ -158,7 +158,7 @@ export const WelcomeModal = () => {
               </p>
             </div>
 
-            <div className="space-y-3 pt-1">
+            <div className="pt-1">
               <Button
                 size="lg"
                 className="w-full text-base"
@@ -166,12 +166,6 @@ export const WelcomeModal = () => {
               >
                 Yes! I Want My 15% Off
               </Button>
-              <button
-                onClick={handleClose}
-                className="w-full text-sm text-muted-foreground hover:text-foreground transition-colors underline py-2"
-              >
-                No thanks, I don't want to save 15%
-              </button>
             </div>
 
             <div className="flex items-center justify-center gap-4 text-xs text-muted-foreground pt-1 border-t pt-4">
