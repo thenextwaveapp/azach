@@ -38,16 +38,22 @@ const DiscountsAdmin = () => {
   const navigate = useNavigate();
   const [codes, setCodes] = useState<DiscountCode[]>([]);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
   const [form, setForm] = useState({ code: '', percent_off: 10, applies_to: 'order', active: true });
 
   const fetchCodes = async () => {
     setLoading(true);
+    setError('');
     const { data, error } = await supabase
       .from('discount_codes')
       .select('*')
       .order('created_at', { ascending: false });
-    if (error) toast({ title: 'Error', description: error.message, variant: 'destructive' });
-    else setCodes((data as DiscountCode[]) || []);
+    if (error) {
+      setError(error.message);
+      toast({ title: 'Error', description: error.message, variant: 'destructive' });
+    } else {
+      setCodes((data as DiscountCode[]) || []);
+    }
     setLoading(false);
   };
 
@@ -174,6 +180,10 @@ const DiscountsAdmin = () => {
               {loading ? (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center py-8 text-muted-foreground">Loading...</TableCell>
+                </TableRow>
+              ) : error ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-8 text-destructive">{error}</TableCell>
                 </TableRow>
               ) : codes.length > 0 ? (
                 codes.map((c) => (
