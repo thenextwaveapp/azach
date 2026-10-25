@@ -140,6 +140,7 @@ const App = () => (
                   </AdminRoute>
                 }
               />
+              <Route path="/our-story" element={<OurStory />} />
               <Route path="/lookbook" element={<Lookbook />} />
               <Route path="/customer-service" element={<CustomerService />} />
               <Route path="/returns" element={<Returns />} />
