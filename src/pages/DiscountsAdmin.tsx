@@ -35,6 +35,7 @@ interface DiscountCode {
   usage_type: string;
   max_uses: number | null;
   min_spend: number;
+  used_count: number;
   issued_to_email: string | null;
   created_at: string;
 }
@@ -186,6 +187,7 @@ const DiscountsAdmin = () => {
                 <TableHead>Percent Off</TableHead>
                 <TableHead>Applies To</TableHead>
                 <TableHead>Usage</TableHead>
+                <TableHead>Used</TableHead>
                 <TableHead>Min Spend</TableHead>
                 <TableHead>Status</TableHead>
                 <TableHead>Issued To</TableHead>
@@ -196,11 +198,11 @@ const DiscountsAdmin = () => {
             <TableBody>
               {loading ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">Loading...</TableCell>
+                  <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">Loading...</TableCell>
                 </TableRow>
               ) : error ? (
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center py-8 text-destructive">{error}</TableCell>
+                  <TableCell colSpan={10} className="text-center py-8 text-destructive">{error}</TableCell>
                 </TableRow>
               ) : codes.length > 0 ? (
                 codes.map((c) => (
@@ -209,6 +211,7 @@ const DiscountsAdmin = () => {
                     <TableCell>{c.percent_off}%</TableCell>
                     <TableCell>{c.applies_to}</TableCell>
                     <TableCell>{usageLabel(c)}</TableCell>
+                    <TableCell>{c.used_count ?? 0}{c.max_uses ? ` / ${c.max_uses}` : ''}</TableCell>
                     <TableCell>{c.min_spend ? c.min_spend : '—'}</TableCell>
                     <TableCell>
                       <Badge variant={c.active ? 'default' : 'secondary'}>{c.active ? 'Active' : 'Inactive'}</Badge>
@@ -232,7 +235,7 @@ const DiscountsAdmin = () => {
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={9} className="text-center py-8 text-muted-foreground">No discount codes found.</TableCell>
+                  <TableCell colSpan={10} className="text-center py-8 text-muted-foreground">No discount codes found.</TableCell>
                 </TableRow>
               )}
             </TableBody>
@@ -248,7 +251,7 @@ const DiscountsAdmin = () => {
           <form onSubmit={handleSave} className="space-y-4">
             <div>
               <Label>Code</Label>
-              <Input value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value })} required />
+              <Input value={form.code} onChange={(e) => setForm({ ...form, code: e.target.value })} required disabled={!!editingId} readOnly={!!editingId} />
             </div>
             <div>
               <Label>Percent Off</Label>

@@ -13,12 +13,27 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
-    const { data, error } = await supabase
+    const { data: codes, error } = await supabase
       .from('discount_codes')
       .select('*')
       .order('created_at', { ascending: false });
     if (error) throw error;
-    return new Response(JSON.stringify({ codes: data || [] }), {
+
+    const ids = (codes || []).map((c: any) => c.id);
+    let counts: Record<string, number> = {};
+    if (ids.length) {
+      const { data: redemptions } = await supabase
+        .from('discount_redemptions')
+        .select('discount_code_id')
+        .in('discount_code_id', ids);
+      (redemptions || []).forEach((r: any) => {
+        counts[r.discount_code_id] = (counts[r.discount_code_id] || 0) + 1;
+      });
+    }
+
+    const enriched = (codes || []).map((c: any) => ({ ...c, used_count: counts[c.id] || 0 }));
+
+    return new Response(JSON.stringify({ codes: enriched }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
