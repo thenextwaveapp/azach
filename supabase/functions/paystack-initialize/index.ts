@@ -112,13 +112,14 @@ serve(async (req) => {
     let discountPercent = 0;
     let discountAmount = 0;
     let appliedDiscountCode: string | null = null;
+    let discountAppliesTo: string = 'order';
 
     if (discountCode && discountCode.trim() !== '') {
       const normalizedCode = discountCode.trim().toUpperCase();
 
       const { data: discount, error: discountError } = await supabase
         .from('discount_codes')
-        .select('id, code, percent_off')
+        .select('id, code, percent_off, applies_to')
         .eq('code', normalizedCode)
         .eq('active', true)
         .maybeSingle();
@@ -151,10 +152,15 @@ serve(async (req) => {
       discountCodeId = discount.id;
       appliedDiscountCode = discount.code;
       discountPercent = discount.percent_off;
-      discountAmount = subtotal * (discountPercent / 100);
+      discountAppliesTo = discount.applies_to || 'order';
+      if (discountAppliesTo === 'shipping') {
+        discountAmount = shippingCost * (discountPercent / 100);
+      } else {
+        discountAmount = subtotal * (discountPercent / 100);
+      }
     }
 
-    const total = subtotal - discountAmount + shippingCost;
+    const total = subtotal + shippingCost - discountAmount;
 
     console.log('Payment calculation:', {
       subtotal,
@@ -192,6 +198,7 @@ serve(async (req) => {
         discountCodeId,
         discountCode: appliedDiscountCode,
         discountAmount,
+        discountAppliesTo,
         custom_fields: [
           {
             display_name: 'Customer Name',

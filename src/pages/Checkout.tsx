@@ -73,7 +73,7 @@ const Checkout = () => {
   const [selectedShippingRate, setSelectedShippingRate] = useState<CheckoutShippingRate | null>(null);
   const [billingSameAsShipping, setBillingSameAsShipping] = useState(true);
   const [discountCodeInput, setDiscountCodeInput] = useState('');
-  const [appliedDiscount, setAppliedDiscount] = useState<{ code: string; percentOff: number } | null>(null);
+  const [appliedDiscount, setAppliedDiscount] = useState<{ code: string; percentOff: number; appliesTo: string } | null>(null);
   const [discountError, setDiscountError] = useState('');
   const [applyingDiscount, setApplyingDiscount] = useState(false);
   const [shippingAddress, setShippingAddress] = useState<ShippingAddress>({
@@ -233,12 +233,17 @@ const Checkout = () => {
   const shippingCostDisplay = convertFromNGN(shippingCostNGN);
 
   const discountPercent = appliedDiscount?.percentOff ?? 0;
-  const discountAmountDisplay = subtotalDisplay * (discountPercent / 100);
-  const totalDisplay = subtotalDisplay - discountAmountDisplay + shippingCostDisplay;
+  const appliesTo = appliedDiscount?.appliesTo ?? 'order';
+  const discountAmountDisplay = appliesTo === 'shipping'
+    ? shippingCostDisplay * (discountPercent / 100)
+    : subtotalDisplay * (discountPercent / 100);
+  const totalDisplay = subtotalDisplay - (appliesTo === 'order' ? discountAmountDisplay : 0) + shippingCostDisplay - (appliesTo === 'shipping' ? discountAmountDisplay : 0);
 
   const subtotalChargeNGN = items.reduce((sum, item) => sum + getItemChargeAmountNGN(item) * item.quantity, 0);
-  const discountAmountChargeNGN = subtotalChargeNGN * (discountPercent / 100);
-  const totalChargeNGN = subtotalChargeNGN - discountAmountChargeNGN + shippingCostNGN;
+  const discountAmountChargeNGN = appliesTo === 'shipping'
+    ? shippingCostNGN * (discountPercent / 100)
+    : subtotalChargeNGN * (discountPercent / 100);
+  const totalChargeNGN = subtotalChargeNGN - (appliesTo === 'order' ? discountAmountChargeNGN : 0) + shippingCostNGN - (appliesTo === 'shipping' ? discountAmountChargeNGN : 0);
 
   const handleApplyDiscount = async () => {
     const code = discountCodeInput.trim();
@@ -267,8 +272,8 @@ const Checkout = () => {
         return;
       }
 
-      setAppliedDiscount({ code: data.code, percentOff: data.percentOff });
-      toast({ title: 'Discount applied', description: `${data.percentOff}% off your order.` });
+      setAppliedDiscount({ code: data.code, percentOff: data.percentOff, appliesTo: data.appliesTo || 'order' });
+      toast({ title: 'Discount applied', description: `${data.percentOff}% off ${data.appliesTo === 'shipping' ? 'shipping' : 'your order'}.` });
     } catch (error) {
       console.error('Discount validation error:', error);
       setDiscountError('Could not validate that code. Please try again.');
@@ -609,7 +614,8 @@ const Checkout = () => {
                       <div className="flex items-center gap-2">
                         <Tag className="w-4 h-4 text-primary" />
                         <span>
-                          Code <span className="font-semibold">{appliedDiscount.code}</span> applied — {appliedDiscount.percentOff}% off
+                          Code <span className="font-semibold">{appliedDiscount.code}</span> applied — {appliedDiscount.percentOff}% off {appliedDiscount.appliesTo === 'shipping' ? 'shipping' : 'order'}
+
                         </span>
                       </div>
                       <button
@@ -650,7 +656,7 @@ const Checkout = () => {
                   </div>
                   {appliedDiscount && (
                     <div className="flex justify-between text-sm text-primary">
-                      <span>Discount ({appliedDiscount.percentOff}%)</span>
+                      <span>Discount ({appliedDiscount.percentOff}% {appliedDiscount.appliesTo === 'shipping' ? 'shipping' : ''})</span>
                       <span>-{formatAsCurrency(discountAmountDisplay, currency)}</span>
                     </div>
                   )}

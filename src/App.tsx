@@ -29,6 +29,7 @@ import Settings from "./pages/Settings";
 import Admin from "./pages/Admin";
 import OrdersAdmin from "./pages/OrdersAdmin";
 import ReviewsAdmin from "./pages/ReviewsAdmin";
+import DiscountsAdmin from "./pages/DiscountsAdmin";
 import OurStory from "./pages/About";
 import Lookbook from "./pages/Lookbook";
 import CustomerService from "./pages/CustomerService";
@@ -131,7 +132,14 @@ const App = () => (
                   </AdminRoute>
                 }
               />
-              <Route path="/our-story" element={<OurStory />} />
+               <Route
+                path="/admin/discounts"
+                element={
+                  <AdminRoute>
+                    <DiscountsAdmin />
+                  </AdminRoute>
+                }
+              />
               <Route path="/lookbook" element={<Lookbook />} />
               <Route path="/customer-service" element={<CustomerService />} />
               <Route path="/returns" element={<Returns />} />

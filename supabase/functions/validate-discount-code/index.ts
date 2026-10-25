@@ -36,7 +36,7 @@ serve(async (req) => {
 
     const { data: discount, error: lookupError } = await supabase
       .from('discount_codes')
-      .select('id, code, percent_off')
+      .select('id, code, percent_off, applies_to')
       .eq('code', normalizedCode)
       .eq('active', true)
       .maybeSingle();
@@ -65,7 +65,7 @@ serve(async (req) => {
     }
 
     return new Response(
-      JSON.stringify({ valid: true, code: discount.code, percentOff: discount.percent_off }),
+      JSON.stringify({ valid: true, code: discount.code, percentOff: discount.percent_off, appliesTo: discount.applies_to || 'order' }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   } catch (error) {
