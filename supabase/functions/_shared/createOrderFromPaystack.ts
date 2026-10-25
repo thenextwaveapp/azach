@@ -227,14 +227,34 @@ export async function createOrderFromPaystackTransaction(
       console.error('Error recording discount redemption:', redemptionError);
     }
 
-    // Deactivate so it can't be redeemed again and won't be handed out as a "reuse" on a
-    // future welcome-popup signup for the same email.
-    const { error: deactivateError } = await supabaseAdmin
+    const { data: discountRow } = await supabaseAdmin
       .from('discount_codes')
-      .update({ active: false })
-      .eq('id', discountCodeId);
-    if (deactivateError) {
-      console.error('Error deactivating redeemed discount code:', deactivateError);
+      .select('usage_type, max_uses')
+      .eq('id', discountCodeId)
+      .maybeSingle();
+
+    const usageType = discountRow?.usage_type || 'single';
+    let shouldDeactivate = usageType === 'single';
+
+    if (usageType === 'multiple') {
+      const { count } = await supabaseAdmin
+        .from('discount_redemptions')
+        .select('id', { count: 'exact', head: true })
+        .eq('discount_code_id', discountCodeId);
+      const maxUses = Number(discountRow?.max_uses) || 0;
+      if (maxUses > 0 && (count || 0) >= maxUses) {
+        shouldDeactivate = true;
+      }
+    }
+
+    if (shouldDeactivate) {
+      const { error: deactivateError } = await supabaseAdmin
+        .from('discount_codes')
+        .update({ active: false })
+        .eq('id', discountCodeId);
+      if (deactivateError) {
+        console.error('Error deactivating redeemed discount code:', deactivateError);
+      }
     }
   }
 

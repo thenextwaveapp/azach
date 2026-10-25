@@ -258,7 +258,7 @@ const Checkout = () => {
     setDiscountError('');
     try {
       const { data, error } = await supabase.functions.invoke('validate-discount-code', {
-        body: { code, email: shippingAddress.email },
+        body: { code, email: shippingAddress.email, subtotal: subtotalDisplay },
       });
       if (error) {
         setDiscountError(await getFunctionErrorMessage(error, 'Could not validate that code. Please try again.'));

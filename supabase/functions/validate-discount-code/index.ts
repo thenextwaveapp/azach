@@ -18,7 +18,7 @@ serve(async (req) => {
   }
 
   try {
-    const { code, email } = await req.json();
+    const { code, email, subtotal } = await req.json();
 
     if (!code || typeof code !== 'string' || !email || typeof email !== 'string') {
       return new Response(JSON.stringify({ valid: false, error: 'Code and email are required' }), {
@@ -36,7 +36,7 @@ serve(async (req) => {
 
     const { data: discount, error: lookupError } = await supabase
       .from('discount_codes')
-      .select('id, code, percent_off, applies_to')
+      .select('id, code, percent_off, applies_to, usage_type, max_uses, min_spend')
       .eq('code', normalizedCode)
       .eq('active', true)
       .maybeSingle();
@@ -49,19 +49,35 @@ serve(async (req) => {
       });
     }
 
-    // Redeemable only once, period — not once per email. Codes are single-use.
-    const { data: redemption, error: redemptionError } = await supabase
+    const minSpend = Number(discount.min_spend) || 0;
+    if (subtotal !== undefined && subtotal !== null && Number(subtotal) < minSpend) {
+      return new Response(JSON.stringify({ valid: false, error: `Minimum spend of ${minSpend} required` }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+
+    const { data: redemptions, error: redemptionError } = await supabase
       .from('discount_redemptions')
       .select('id')
-      .eq('discount_code_id', discount.id)
-      .maybeSingle();
+      .eq('discount_code_id', discount.id);
 
     if (redemptionError) throw redemptionError;
 
-    if (redemption) {
+    const usedCount = (redemptions || []).length;
+    const usageType = discount.usage_type || 'single';
+
+    if (usageType === 'single' && usedCount > 0) {
       return new Response(JSON.stringify({ valid: false, error: 'This code has already been used' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       });
+    }
+    if (usageType === 'multiple') {
+      const maxUses = Number(discount.max_uses) || 0;
+      if (maxUses > 0 && usedCount >= maxUses) {
+        return new Response(JSON.stringify({ valid: false, error: 'This code has reached its usage limit' }), {
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
     }
 
     return new Response(

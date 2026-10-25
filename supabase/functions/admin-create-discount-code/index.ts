@@ -14,10 +14,18 @@ serve(async (req) => {
       Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
     );
 
-    const { code: rawCode, percent_off, applies_to, active } = await req.json();
+    const { code: rawCode, percent_off, applies_to, active, usage_type, max_uses, min_spend } = await req.json();
 
     if (!rawCode || typeof rawCode !== 'string') {
       return new Response(JSON.stringify({ error: 'Code is required' }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 400,
+      });
+    }
+
+    const resolvedUsageType = usage_type || 'single';
+    if (!['single', 'multiple', 'unlimited'].includes(resolvedUsageType)) {
+      return new Response(JSON.stringify({ error: 'Invalid usage type' }), {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400,
       });
@@ -30,8 +38,11 @@ serve(async (req) => {
         percent_off: Number(percent_off),
         applies_to: applies_to || 'order',
         active: active === undefined ? true : Boolean(active),
+        usage_type: resolvedUsageType,
+        max_uses: resolvedUsageType === 'multiple' ? Number(max_uses) || null : null,
+        min_spend: Number(min_spend) || 0,
       })
-      .select('id, code, percent_off, applies_to, active, issued_to_email, created_at')
+      .select('id, code, percent_off, applies_to, active, usage_type, max_uses, min_spend, issued_to_email, created_at')
       .single();
 
     if (error) throw error;
