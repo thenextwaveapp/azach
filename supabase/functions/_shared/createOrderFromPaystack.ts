@@ -166,10 +166,10 @@ export async function createOrderFromPaystackTransaction(
 
   const total = data.amount / 100;
   const shippingCost = metadata.shippingCost || 0;
+  const discountAmount = Number(metadata.discountAmount) || 0;
   const subtotal = total - shippingCost + discountAmount;
   const discountCodeId = metadata.discountCodeId || null;
   const discountCode = metadata.discountCode || null;
-  const discountAmount = metadata.discountAmount || 0;
   const discountAppliesTo = metadata.discountAppliesTo || 'order';
 
   const userId = metadata.userId;
