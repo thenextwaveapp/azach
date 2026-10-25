@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
+import { AdminNav } from '@/components/AdminNav';
 import { Button } from '@/components/ui/button';
 import {
   Table,
@@ -75,28 +76,7 @@ const ReviewsAdmin = () => {
             <h1 className="text-4xl font-semibold">Reviews Management</h1>
             {user && <p className="text-sm text-muted-foreground mt-1">Logged in as: {user.email}</p>}
           </div>
-          <div className="flex gap-2">
-            <Button variant="outline" onClick={() => navigate('/admin')}>
-              <Package className="mr-2 h-4 w-4" />
-              Products
-            </Button>
-            <Button variant="outline" onClick={() => navigate('/admin/orders')}>
-              <ShoppingCart className="mr-2 h-4 w-4" />
-              Orders
-            </Button>
-            <Button variant="outline" onClick={() => navigate('/admin/discounts')}>
-              <Tag className="mr-2 h-4 w-4" />
-              Discounts
-            </Button>
-            <Button variant="outline" onClick={() => navigate('/admin/reviews')}>
-              <Star className="mr-2 h-4 w-4" />
-              Reviews
-            </Button>
-            <Button variant="outline" onClick={handleLogout}>
-              <LogOut className="mr-2 h-4 w-4" />
-              Logout
-            </Button>
-          </div>
+          <AdminNav />
         </div>
 
         <Tabs value={tab} onValueChange={(v) => setTab(v as typeof tab)}>
