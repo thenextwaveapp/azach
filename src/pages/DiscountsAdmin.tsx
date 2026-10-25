@@ -44,15 +44,12 @@ const DiscountsAdmin = () => {
   const fetchCodes = async () => {
     setLoading(true);
     setError('');
-    const { data, error } = await supabase
-      .from('discount_codes')
-      .select('*')
-      .order('created_at', { ascending: false });
+    const { data, error } = await supabase.functions.invoke('admin-list-discount-codes');
     if (error) {
-      setError(error.message);
+      setError(error.message || 'Failed to load');
       toast({ title: 'Error', description: error.message, variant: 'destructive' });
     } else {
-      setCodes((data as DiscountCode[]) || []);
+      setCodes((data?.codes as DiscountCode[]) || []);
     }
     setLoading(false);
   };
