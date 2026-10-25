@@ -16,7 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { Trash2, Plus, LogOut, ShoppingCart, Package, Star, Tag } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/lib/supabase';
+import { invokeFunction } from '@/lib/functionError';
 
 interface DiscountCode {
   id: string;
@@ -44,12 +44,13 @@ const DiscountsAdmin = () => {
   const fetchCodes = async () => {
     setLoading(true);
     setError('');
-    const { data, error } = await supabase.functions.invoke('admin-list-discount-codes');
-    if (error) {
-      setError(error.message || 'Failed to load');
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
-    } else {
-      setCodes((data?.codes as DiscountCode[]) || []);
+    try {
+      const data = await invokeFunction<{ codes: DiscountCode[] }>('admin-list-discount-codes');
+      setCodes(data.codes || []);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Failed to load';
+      setError(message);
+      toast({ title: 'Error', description: message, variant: 'destructive' });
     }
     setLoading(false);
   };
@@ -66,29 +67,45 @@ const DiscountsAdmin = () => {
       applies_to: form.applies_to,
       active: form.active,
     };
-    const { error } = await supabase.from('discount_codes').insert(payload);
-    if (error) {
-      toast({ title: 'Error', description: error.message, variant: 'destructive' });
-    } else {
+    try {
+      await invokeFunction('admin-create-discount-code', payload);
       toast({ title: 'Created', description: 'Discount code added.' });
       setForm({ code: '', percent_off: 10, applies_to: 'order', active: true });
       fetchCodes();
+    } catch (err) {
+      toast({
+        title: 'Error',
+        description: err instanceof Error ? err.message : 'Failed to add discount code',
+        variant: 'destructive',
+      });
     }
   };
 
   const handleToggle = async (id: string, active: boolean) => {
-    const { error } = await supabase.from('discount_codes').update({ active: !active }).eq('id', id);
-    if (error) toast({ title: 'Error', description: error.message, variant: 'destructive' });
-    else fetchCodes();
+    try {
+      await invokeFunction('admin-update-discount-code', { id, active: !active });
+      fetchCodes();
+    } catch (err) {
+      toast({
+        title: 'Error',
+        description: err instanceof Error ? err.message : 'Failed to update discount code',
+        variant: 'destructive',
+      });
+    }
   };
 
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this discount code?')) return;
-    const { error } = await supabase.from('discount_codes').delete().eq('id', id);
-    if (error) toast({ title: 'Error', description: error.message, variant: 'destructive' });
-    else {
+    try {
+      await invokeFunction('admin-delete-discount-code', { id });
       toast({ title: 'Deleted', description: 'Discount code removed.' });
       fetchCodes();
+    } catch (err) {
+      toast({
+        title: 'Error',
+        description: err instanceof Error ? err.message : 'Failed to delete discount code',
+        variant: 'destructive',
+      });
     }
   };
 
