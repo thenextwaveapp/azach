@@ -29,7 +29,7 @@ import {
 } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useProducts, useCreateProduct, useUpdateProduct, useDeleteProduct, useBundles } from '@/hooks/useProducts';
-import { Trash2, Edit, Plus, LogOut, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Upload, Search, ArrowUpDown, ArrowUp, ArrowDown, ShoppingCart, Star } from 'lucide-react';
+import { Trash2, Edit, Plus, LogOut, ChevronUp, ChevronDown, ChevronLeft, ChevronRight, Upload, Search, ArrowUpDown, ArrowUp, ArrowDown, ShoppingCart, Star, Tag } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCurrency } from '@/contexts/CurrencyContext';
@@ -450,6 +450,10 @@ const Admin = () => {
             <Button variant="outline" onClick={() => navigate('/admin/orders')}>
               <ShoppingCart className="mr-2 h-4 w-4" />
               Orders
+            </Button>
+            <Button variant="outline" onClick={() => navigate('/admin/discounts')}>
+              <Tag className="mr-2 h-4 w-4" />
+              Discounts
             </Button>
             <Button variant="outline" onClick={() => navigate('/admin/reviews')}>
               <Star className="mr-2 h-4 w-4" />

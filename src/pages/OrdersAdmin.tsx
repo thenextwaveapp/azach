@@ -367,7 +367,10 @@ const OrdersAdmin = () => {
                 <Package className="mr-2 h-4 w-4" />
                 Products
               </Button>
-              <Button variant="outline" onClick={() => navigate('/admin/reviews')}>
+              <Button variant="outline" onClick={() => navigate('/admin/discounts')}>
+              Discounts
+            </Button>
+            <Button variant="outline" onClick={() => navigate('/admin/reviews')}>
                 <Star className="mr-2 h-4 w-4" />
                 Reviews
               </Button>
