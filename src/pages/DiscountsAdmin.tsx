@@ -13,7 +13,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Trash2, Plus, LogOut, ShoppingCart, Package, Star } from 'lucide-react';
+import { Trash2, Plus, LogOut, ShoppingCart, Package, Star, Tag } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
 import { supabase } from '@/lib/supabase';
@@ -114,6 +114,10 @@ const DiscountsAdmin = () => {
             <Button variant="outline" onClick={() => navigate('/admin/orders')}>
               <ShoppingCart className="mr-2 h-4 w-4" />
               Orders
+            </Button>
+            <Button variant="outline" onClick={() => navigate('/admin/discounts')}>
+              <Tag className="mr-2 h-4 w-4" />
+              Discounts
             </Button>
             <Button variant="outline" onClick={() => navigate('/admin/reviews')}>
               <Star className="mr-2 h-4 w-4" />

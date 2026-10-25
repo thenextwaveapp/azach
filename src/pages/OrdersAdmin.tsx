@@ -47,6 +47,8 @@ import {
   Package,
   ExternalLink,
   Star,
+  Tag,
+  ShoppingCart,
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useAuth } from '@/contexts/AuthContext';
@@ -359,20 +361,25 @@ const OrdersAdmin = () => {
               )}
             </div>
             <div className="flex gap-2">
-              <Button variant="outline" onClick={handleLogout}>
-                <LogOut className="mr-2 h-4 w-4" />
-                Logout
-              </Button>
               <Button variant="outline" onClick={() => navigate('/admin')}>
                 <Package className="mr-2 h-4 w-4" />
                 Products
               </Button>
+              <Button variant="outline" onClick={() => navigate('/admin/orders')}>
+                <ShoppingCart className="mr-2 h-4 w-4" />
+                Orders
+              </Button>
               <Button variant="outline" onClick={() => navigate('/admin/discounts')}>
-              Discounts
-            </Button>
-            <Button variant="outline" onClick={() => navigate('/admin/reviews')}>
+                <Tag className="mr-2 h-4 w-4" />
+                Discounts
+              </Button>
+              <Button variant="outline" onClick={() => navigate('/admin/reviews')}>
                 <Star className="mr-2 h-4 w-4" />
                 Reviews
+              </Button>
+              <Button variant="outline" onClick={handleLogout}>
+                <LogOut className="mr-2 h-4 w-4" />
+                Logout
               </Button>
             </div>
           </div>
