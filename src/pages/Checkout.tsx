@@ -9,7 +9,7 @@ import { useCart } from '@/contexts/CartContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useCurrency } from '@/contexts/CurrencyContext';
 import { useLiveExchangeRates } from '@/hooks/useLiveExchangeRate';
-import { initializePaystackTransaction, loadPaystackScript, openPaystackPopup } from '@/lib/paystack';
+import { createStripeCheckout, redirectToStripeCheckout } from '@/lib/stripe';
 import { getDHLRates, formatDeliveryEstimate } from '@/lib/dhl';
 import { getTopshipRates } from '@/lib/topship';
 import { Loader2, Package, Truck, Tag } from 'lucide-react';
@@ -98,11 +98,6 @@ const Checkout = () => {
       setShippingAddress(prev => ({ ...prev, email: user.email || '' }));
     }
   }, [user, isAnonymous]);
-
-  // Load Paystack script on mount
-  useEffect(() => {
-    loadPaystackScript().catch(console.error);
-  }, []);
 
   // Clear location fields when country changes to prevent autofill conflicts
   const [previousCountry, setPreviousCountry] = useState<string>('');
@@ -205,17 +200,17 @@ const Checkout = () => {
 
   const totalItems = getTotalItems();
 
-  // Paystack only settles NGN on this account, so the actual charge is always NGN. We
-  // still display — and base that NGN charge on — whatever currency the visitor is
-  // browsing in, converting through the live rate rather than falling back to the
-  // separately-stored NGN price.
+  // The visitor browses in their local currency (NGN on azach.ng, USD/CAD/… on azach.ca),
+  // but the Stripe account can only charge USD — so whatever is on screen is converted to
+  // USD at the live rate and that is what we charge.
   const getItemDisplayAmount = (item: (typeof items)[number]): number =>
     currency === 'NGN' ? item.price : (getPrice(item)?.amount ?? item.price);
 
-  // Converts an amount already shown in the current display currency into NGN.
-  const convertToNGN = (displayAmount: number): number => {
-    if (currency === 'NGN' || !rates?.[currency]) return displayAmount;
-    return (displayAmount / rates[currency]) * rates.NGN;
+  // Converts an amount shown in the current display currency into USD. Live rates are
+  // quoted as units-per-USD, so every non-USD currency (NGN included) just divides out.
+  const convertToUSD = (displayAmount: number): number => {
+    if (currency === 'USD' || !rates?.[currency]) return displayAmount;
+    return displayAmount / rates[currency];
   };
 
   // Converts a raw NGN amount (e.g. the DHL shipping quote) into the current display currency.
@@ -224,9 +219,9 @@ const Checkout = () => {
     return (ngnAmount / rates.NGN) * rates[currency];
   };
 
-  // The NGN amount actually charged for this item.
-  const getItemChargeAmountNGN = (item: (typeof items)[number]): number =>
-    currency === 'NGN' ? item.price : convertToNGN(getItemDisplayAmount(item));
+  // The USD amount actually charged for this item.
+  const getItemChargeAmountUSD = (item: (typeof items)[number]): number =>
+    convertToUSD(getItemDisplayAmount(item));
 
   const subtotalDisplay = items.reduce((sum, item) => sum + getItemDisplayAmount(item) * item.quantity, 0);
   const shippingCostNGN = selectedShippingRate?.totalPrice || 0;
@@ -239,11 +234,9 @@ const Checkout = () => {
     : subtotalDisplay * (discountPercent / 100);
   const totalDisplay = subtotalDisplay - (appliesTo === 'order' ? discountAmountDisplay : 0) + shippingCostDisplay - (appliesTo === 'shipping' ? discountAmountDisplay : 0);
 
-  const subtotalChargeNGN = items.reduce((sum, item) => sum + getItemChargeAmountNGN(item) * item.quantity, 0);
-  const discountAmountChargeNGN = appliesTo === 'shipping'
-    ? shippingCostNGN * (discountPercent / 100)
-    : subtotalChargeNGN * (discountPercent / 100);
-  const totalChargeNGN = subtotalChargeNGN - (appliesTo === 'order' ? discountAmountChargeNGN : 0) + shippingCostNGN - (appliesTo === 'shipping' ? discountAmountChargeNGN : 0);
+  // Charged in USD. Each item's USD price rides on its own Stripe line item; shipping is
+  // converted from its NGN quote. The discount is validated and recomputed server-side.
+  const shippingChargeUSD = rates?.NGN ? shippingCostNGN / rates.NGN : shippingCostDisplay;
 
   const handleApplyDiscount = async () => {
     const code = discountCodeInput.trim();
@@ -290,7 +283,8 @@ const Checkout = () => {
   };
 
   // Waiting on the live rate before we can safely show/charge a non-NGN order.
-  const ratePending = currency !== 'NGN' && ratesLoading;
+  // Any non-USD browsing currency needs the live rate to compute the USD charge.
+  const ratePending = currency !== 'USD' && ratesLoading;
 
   useEffect(() => {
     // Redirect to cart if empty
@@ -353,51 +347,30 @@ const Checkout = () => {
 
       setLoading(true);
 
-      // Cart items priced in NGN for the actual Paystack charge — converted from the
-      // real USD price at the live rate when the order was shown/priced in USD.
+      // Cart items priced in USD for the actual Stripe charge — converted from whatever
+      // currency the order was shown in at the live rate.
       const cartItems = items.map(item => ({
         id: item.id,
         name: item.name,
-        price: getItemChargeAmountNGN(item),
+        price: getItemChargeAmountUSD(item),
         quantity: item.quantity,
         image: item.image,
         size: item.size,
       }));
 
-      // Use shipping address as billing address (can be enhanced later for separate billing)
-      const billingAddress = shippingAddress;
-
-      // Initialize Paystack transaction
-      const checkoutData = await initializePaystackTransaction(
+      // Create the Stripe Checkout Session and hand off to its hosted payment page.
+      const checkout = await createStripeCheckout(
         cartItems,
-        user.id, // Pass user_id (anonymous or authenticated)
+        user.id, // anonymous or authenticated
         shippingAddress.email,
-        'NGN', // Always NGN — no USD settlement account set up yet
         shippingAddress,
-        shippingCostNGN,
+        shippingChargeUSD,
         appliedDiscount?.code,
         selectedShippingRate?.provider,
         selectedShippingRate?.code
       );
 
-      // Open Paystack popup
-      openPaystackPopup(
-        checkoutData,
-        shippingAddress.email,
-        totalChargeNGN,
-        (reference: string) => {
-          // Payment successful - redirect to success page
-          navigate(`/checkout/success?reference=${reference}`);
-        },
-        () => {
-          // Payment cancelled
-          setLoading(false);
-          toast({
-            title: 'Payment cancelled',
-            description: 'You cancelled the payment. Your cart is still saved.',
-          });
-        }
-      );
+      redirectToStripeCheckout(checkout);
     } catch (error: any) {
       console.error('Checkout error:', error);
 
@@ -705,12 +678,12 @@ const Checkout = () => {
                       Loading...
                     </>
                   ) : (
-                    'Pay with Paystack'
+                    'Proceed to Payment'
                   )}
                 </Button>
 
                 <p className="text-center text-xs text-muted-foreground mt-4">
-                  Secure payment powered by Paystack. Your payment information is encrypted and secure.
+                  Secure payment powered by Stripe. Your payment information is encrypted and secure.
                 </p>
               </div>
             </div>

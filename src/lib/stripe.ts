@@ -1,43 +1,114 @@
-import { loadStripe } from '@stripe/stripe-js';
+/**
+ * Stripe Payment Gateway Integration
+ * Creates a Stripe Checkout Session via edge function and redirects to Stripe's hosted
+ * page, then verifies the session on the success page. Charges are always in USD — the
+ * Stripe account cannot settle NGN — regardless of the currency the visitor browses in.
+ */
 
-// Load Stripe with publishable key
-export const stripePromise = loadStripe(
-  import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || ''
-);
+import { invokeFunction } from './functionError';
 
-// Create checkout session via Supabase Edge Function
-export const createCheckoutSession = async (
-  items: any[],
-  userEmail?: string,
-  currency: 'USD' | 'CAD' = 'USD',
-  shippingAddress?: any
-) => {
-  const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-  const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+export interface StripeCheckoutRequest {
+  items: Array<{
+    id: string;
+    name: string;
+    price: number; // USD
+    quantity: number;
+    image: string;
+    size?: string;
+  }>;
+  userId: string;
+  userEmail: string;
+  shippingAddress: {
+    fullName: string;
+    email: string;
+    phone: string;
+    address: string;
+    city: string;
+    state: string;
+    postalCode: string;
+    country: string;
+  };
+  shippingCost: number; // USD
+  shippingProvider?: 'dhl' | 'topship';
+  shippingService?: string;
+  discountCode?: string;
+}
 
-  const response = await fetch(
-    `${supabaseUrl}/functions/v1/create-checkout-session`,
-    {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${supabaseAnonKey}`,
-      },
-      body: JSON.stringify({
-        items,
-        userEmail,
-        currency: currency.toLowerCase(),
-        shippingAddress,
-        successUrl: `${window.location.origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
-        cancelUrl: `${window.location.origin}/cart`,
-      }),
+export interface StripeCheckoutResponse {
+  sessionId: string;
+  url: string;
+}
+
+export interface StripeVerificationResponse {
+  status: string;
+  sessionId: string;
+  amount: number; // cents
+  currency: string;
+  order_id?: string;
+}
+
+/**
+ * Create a Stripe Checkout Session and get back its hosted-page URL.
+ */
+export const createStripeCheckout = async (
+  items: StripeCheckoutRequest['items'],
+  userId: string,
+  userEmail: string,
+  shippingAddress: StripeCheckoutRequest['shippingAddress'],
+  shippingCost: number,
+  discountCode?: string,
+  shippingProvider?: 'dhl' | 'topship',
+  shippingService?: string
+): Promise<StripeCheckoutResponse> => {
+  try {
+    const data = await invokeFunction<{ sessionId: string; url: string }>('stripe-create-checkout', {
+      items,
+      userId,
+      userEmail,
+      shippingAddress,
+      shippingCost,
+      shippingProvider,
+      shippingService,
+      discountCode,
+      successUrl: `${window.location.origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancelUrl: `${window.location.origin}/cart`,
+    });
+
+    if (!data?.url) {
+      throw new Error('Invalid response from payment server');
     }
-  );
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(error.error || 'Failed to create checkout session');
+    return { sessionId: data.sessionId, url: data.url };
+  } catch (error) {
+    console.error('Stripe error:', error);
+    throw error;
   }
+};
 
-  return response.json();
+/**
+ * Redirect the browser to the Stripe-hosted checkout page.
+ */
+export const redirectToStripeCheckout = (checkout: StripeCheckoutResponse): void => {
+  window.location.href = checkout.url;
+};
+
+/**
+ * Verify a Stripe Checkout Session.
+ * Called on the success page to confirm payment and ensure the order was recorded.
+ */
+export const verifyStripeCheckout = async (
+  sessionId: string
+): Promise<StripeVerificationResponse> => {
+  try {
+    const data = await invokeFunction<StripeVerificationResponse>('stripe-verify', { sessionId });
+
+    if (!data || data.status !== 'success') {
+      throw new Error('Payment verification failed');
+    }
+
+    return data;
+  } catch (error) {
+    console.error('Error verifying Stripe session:', error);
+    throw error;
+  }
 };

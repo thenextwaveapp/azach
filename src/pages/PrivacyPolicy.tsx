@@ -24,7 +24,7 @@ const PrivacyPolicy = () => {
           <h2 className="text-2xl font-semibold mt-10 mb-3">1. Information We Collect</h2>
           <ul className="space-y-2 text-muted-foreground">
             <li><strong className="text-foreground">Account &amp; order data:</strong> name, email, phone, shipping/billing address, and order history, provided when you create an account, check out, or place a custom (Bespoke) or repair (Rework) request.</li>
-            <li><strong className="text-foreground">Payment data:</strong> we never see or store your card details. Payments are processed directly by Paystack; we retain only the transaction reference and status.</li>
+            <li><strong className="text-foreground">Payment data:</strong> we never see or store your card details. Payments are processed directly by Stripe; we retain only the transaction reference and status.</li>
             <li><strong className="text-foreground">Reference images:</strong> photos you upload for Bespoke, Rework, or garment donation requests, used solely to fulfill that request.</li>
             <li><strong className="text-foreground">Newsletter &amp; marketing:</strong> your email address, if you subscribe or submit the welcome discount pop-up.</li>
             <li><strong className="text-foreground">Usage data:</strong> pages viewed, device/browser type, and approximate location (from IP), used to run the site (e.g. showing NGN vs. other currencies) and, where you've consented, for analytics.</li>
@@ -42,7 +42,7 @@ const PrivacyPolicy = () => {
 
           <h2 className="text-2xl font-semibold mt-10 mb-3">3. Who We Share Data With</h2>
           <p className="text-muted-foreground">
-            We share the minimum data necessary with the vendors who help us operate: <strong className="text-foreground">Paystack</strong> (payment
+            We share the minimum data necessary with the vendors who help us operate: <strong className="text-foreground">Stripe</strong> (payment
             processing), <strong className="text-foreground">DHL Express</strong> (shipping and customs documentation), <strong className="text-foreground">Supabase</strong> (database
             and account infrastructure), and <strong className="text-foreground">Resend</strong> (transactional email delivery). We do not sell your personal
             data to anyone.

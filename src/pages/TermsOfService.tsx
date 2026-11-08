@@ -32,7 +32,7 @@ const TermsOfService = () => {
 
           <h2 className="text-2xl font-semibold mt-10 mb-3">2. Orders &amp; Payment</h2>
           <p className="text-muted-foreground">
-            All payments are processed securely by Paystack. Placing an order is an offer to purchase, which
+            All payments are processed securely by Stripe. Placing an order is an offer to purchase, which
             we accept once payment is confirmed. Stock is reserved for a short window while you complete
             checkout; if payment isn't completed in time, the reservation is released and the item may sell
             out. Fraudulent, duplicate, or abusive use of promotional/discount codes may result in order

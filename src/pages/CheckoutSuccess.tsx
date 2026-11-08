@@ -4,7 +4,7 @@ import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { CheckCircle, Loader2, AlertTriangle } from 'lucide-react';
 import { useCart } from '@/contexts/CartContext';
-import { verifyPaystackTransaction } from '@/lib/paystack';
+import { verifyStripeCheckout } from '@/lib/stripe';
 import { trackPurchase } from '@/lib/analytics';
 
 type VerifyState = 'verifying' | 'success' | 'failed';
@@ -12,8 +12,8 @@ type VerifyState = 'verifying' | 'success' | 'failed';
 const CheckoutSuccess = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  // Paystack uses 'trxref' or 'reference' parameter
-  const reference = searchParams.get('trxref') || searchParams.get('reference') || searchParams.get('session_id');
+  // Stripe redirects back with the Checkout Session id.
+  const reference = searchParams.get('session_id');
   const { items, clearCart } = useCart();
   const [state, setState] = useState<VerifyState>('verifying');
   const [errorMessage, setErrorMessage] = useState('');
@@ -32,11 +32,11 @@ const CheckoutSuccess = () => {
     // Actively confirms the order was recorded, rather than trusting that the webhook
     // fired — closes the gap where a webhook failure would otherwise leave a customer
     // who was actually charged with no order in the system.
-    verifyPaystackTransaction(reference)
+    verifyStripeCheckout(reference)
       .then((verification) => {
-        // Paystack returns amount in kobo.
+        // Stripe returns the charged amount in cents.
         trackPurchase(
-          verification.reference,
+          verification.sessionId,
           items.map((item) => ({
             item_id: String(item.id),
             item_name: item.name,
